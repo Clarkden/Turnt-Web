@@ -1,0 +1,294 @@
+<script lang="ts">
+  import { createEventDispatcher } from "svelte";
+  import { onMount } from "svelte";
+  import { Loader } from "@googlemaps/js-api-loader";
+  import { IconCaretDown, IconQuestionMark } from "@tabler/icons-svelte";
+  import { clickOutside } from "$lib/clickOutSide";
+
+  const dispatch = createEventDispatcher();
+
+  let name: string = "";
+  let autocomplete: google.maps.places.Autocomplete;
+  let address: any;
+  let privateAddress: boolean = false;
+  let description: string = "";
+  let date: string;
+  let hostName: StaticRange;
+
+  let selectedTimeStart: string;
+  let selectedTimeEnd: string;
+  let timeOptions: string[] = [];
+  let showTimeStartDropdown = false;
+  let showTimeEndDropdown = false;
+
+  let error: string = "";
+
+  export let data: any;
+
+  const options = {
+    componentRestrictions: { country: "us" },
+    strictBounds: false,
+  };
+
+  const completion = () => {
+    if (
+      !name ||
+      !address ||
+      !selectedTimeStart ||
+      !selectedTimeEnd ||
+      !date ||
+      !hostName ||
+      !description
+    ) {
+      error = "Please fill out all fields";
+      return;
+    }
+
+    dispatch("completion", {
+      name,
+      date,
+      startTime: selectedTimeStart,
+      endTime: selectedTimeEnd,
+      address,
+      description,
+      hostName,
+      privateAddress,
+    });
+  };
+
+  const selectTime = (dropdown: string, time: string) => {
+    if (dropdown === "start") {
+      selectedTimeStart = time;
+      showTimeStartDropdown = false;
+    } else if (dropdown === "end") {
+      selectedTimeEnd = time;
+      showTimeEndDropdown = false;
+    }
+  };
+
+  onMount(() => {
+    for (let i = 0; i < 24; i++) {
+      for (let j = 0; j < 4; j++) {
+        let hour = i;
+        let period = "AM";
+
+        if (hour >= 12) {
+          period = "PM";
+          if (hour > 12) {
+            hour -= 12;
+          }
+        } else if (hour === 0) {
+          hour = 12;
+        }
+
+        const hourFormatted = hour < 10 ? `0${hour}` : `${hour}`;
+        const minutes = j * 15 === 0 ? "00" : `${j * 15}`;
+        timeOptions.push(`${hourFormatted}:${minutes} ${period}`);
+      }
+    }
+
+    const loader = new Loader({
+      apiKey: "AIzaSyCUQ24URm-IQ3QKw9WtDc5L36irv31FMpg",
+      version: "weekly",
+      libraries: ["places"],
+    });
+
+    loader.loadCallback((e) => {
+      if (e) {
+        console.log(e);
+      } else {
+        autocomplete = new google.maps.places.Autocomplete(
+          document.getElementById("autocomplete") as HTMLInputElement,
+          options
+        );
+
+        autocomplete.addListener("place_changed", onPlaceChanged);
+      }
+    });
+
+    function onPlaceChanged() {
+      address = autocomplete.getPlace();
+      address = address.formatted_address;
+    }
+
+    if (data) {
+      if (data.name) name = data.name;
+      if (data.hostName) hostName = data.hostName;
+      if (data.description) description = data.description;
+      if (data.date) date = data.date;
+      if (data.startTime) selectedTimeStart = data.startTime;
+      if (data.endTime) selectedTimeEnd = data.endTime;
+      if (data.address) {
+        address = data.address;
+        document.getElementById("autocomplete").value = address;
+      }
+      privateAddress = data.privateAddress;
+    }
+  });
+</script>
+
+<h1 class="font-bold text-3xl text-white mb-4">
+  Now let's get some basic details
+</h1>
+{#if error}
+  <p class="text-yellow-300 mb-4">{error}!</p>
+{/if}
+<form
+  on:submit|preventDefault={() => completion()}
+  class="flex flex-col gap-2 pb-20"
+>
+  <div class="w-full flex flex-col sm:flex-row gap-4">
+    <div class="flex flex-col gap-2 w-full">
+      <label for="name" class="text-white">Party Name</label>
+      <input
+        type="text"
+        name="name"
+        id="name"
+        placeholder="Ex. Epic Backyard Rager"
+        class="p-2 rounded-md bg-matteBlack text-white outline-none"
+        bind:value={name}
+      />
+    </div>
+    <div class="flex flex-col gap-2 w-full">
+      <label for="name" class="text-white">Party Host</label>
+      <input
+        type="text"
+        name="host"
+        id="host"
+        placeholder="Host"
+        class="p-2 rounded-md bg-matteBlack text-white outline-none"
+        bind:value={hostName}
+      />
+    </div>
+  </div>
+  <label for="description" class="text-white">Party Description</label>
+  <textarea
+    name="description"
+    id="description"
+    class="rounded-md p-2 bg-matteBlack text-white outline-none resize-none"
+    bind:value={description}
+    placeholder="Party Description"
+  />
+  <div class="w-full flex flex-col sm:flex-row gap-4">
+    <div class="flex flex-col gap-1 w-full">
+      <label for="autocomplete" class="text-white">Party Location</label>
+      <input
+        type="text"
+        name="autocomplete"
+        id="autocomplete"
+        autocomplete="off"
+        class="p-2 rounded-md bg-matteBlack text-white outline-none"
+      />
+    </div>
+    <div class="flex flex-col min-w-fit gap-2">
+      <label for="private" class="text-white">Private Address?</label>
+      <div class="flex flex-row gap-1">
+        <div
+          on:mousedown={() => (privateAddress = !privateAddress)}
+          class={`w-14 h-8 bg-matteBlack rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
+            privateAddress ? "justify-end bg-green-400" : "justify-start"
+          }`}
+        >
+          <div class="w-6 h-6 rounded-full bg-white" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-2 w-full mb-4">
+    <div class="flex flex-col gap-2 w-full">
+      <label for="date" class="text-white">Date</label>
+
+      <input
+        id="date"
+        name="date"
+        type="date"
+        class="p-2 rounded-md bg-matteBlack text-white outline-none"
+        bind:value={date}
+      />
+    </div>
+    <div class="flex flex-col gap-2 w-full">
+      <label for="timeStart" class="text-white">Start Time</label>
+      <div class="relative">
+        <div
+          id="timeStart"
+          class=" p-2 rounded-md w-full cursor-pointer bg-matteBlack text-white flex flex-row items-center justify-between"
+          on:mouseup={() => (showTimeStartDropdown = !showTimeStartDropdown)}
+          use:clickOutside
+          on:click_outside={() => {
+            showTimeStartDropdown = false;
+          }}
+        >
+          {#if !selectedTimeStart}
+            Select a time
+          {:else}
+            {selectedTimeStart}
+          {/if}
+          <IconCaretDown size={20} stroke={1} />
+        </div>
+        {#if showTimeStartDropdown}
+          <div
+            class="absolute w-full bg-matteBlack border rounded-md z-10 max-h-[200px] overflow-scroll"
+          >
+            {#each timeOptions as time (time)}
+              <div
+                class="p-1 text-white hover:bg-gray-600 cursor-pointer"
+                on:mouseup={() => selectTime("start", time)}
+              >
+                {time}
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 w-full">
+      <label for="timeEnd" class="text-white">End Time</label>
+      <div class="relative">
+        <div
+          id="timeEnd"
+          class="p-2 rounded-md w-full cursor-pointer bg-matteBlack text-white flex flex-row items-center justify-between"
+          on:mouseup={() => (showTimeEndDropdown = !showTimeEndDropdown)}
+          use:clickOutside
+          on:click_outside={() => {
+            showTimeEndDropdown = false;
+          }}
+        >
+          {#if !selectedTimeEnd}
+            Select a time
+          {:else}
+            {selectedTimeEnd}
+          {/if}
+          <IconCaretDown size={20} stroke={1} />
+        </div>
+        {#if showTimeEndDropdown}
+          <div
+            class="absolute w-full bg-matteBlack border rounded-md z-10 max-h-[200px] overflow-scroll"
+          >
+            {#each timeOptions as time (time)}
+              <div
+                class="p-1 text-white hover:bg-gray-600 cursor-pointer"
+                on:mouseup={() => selectTime("end", time)}
+              >
+                {time}
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+
+  {#if !name || !date || !selectedTimeStart || !selectedTimeEnd || !address}
+    <button
+      class="bg-black text-white p-2 rounded-md w-full border-[1px] bg-black/25 border-black"
+      disabled
+    >
+      Next
+    </button>
+  {:else}
+    <button type="submit" class="bg-black text-white p-2 rounded-md w-full">
+      Next
+    </button>
+  {/if}
+</form>
