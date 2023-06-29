@@ -175,7 +175,7 @@
               ticketGender = e.target.value;
             }}
           >
-            <option disabled selected={true}>Select Gender (Optional)</option>
+            <option selected={true}>Select Gender (Optional)</option>
             {#each genders as gender}
               <option>{gender}</option>
             {/each}

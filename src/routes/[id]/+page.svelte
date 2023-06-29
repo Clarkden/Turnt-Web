@@ -2,18 +2,37 @@
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { db, auth } from "../../lib/firebase";
-  import { doc, getDoc, onSnapshot } from "firebase/firestore";
+  import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    onSnapshot,
+    query,
+    where,
+  } from "firebase/firestore";
   import { DateTime } from "luxon";
   import {
     IconClock,
     IconCalendar,
     IconFileFilled,
     IconX,
+    IconLocation,
+    IconUser,
   } from "@tabler/icons-svelte";
   import { authStore } from "../../stores/authStore";
   import axios from "axios";
   import { goto } from "$app/navigation";
   import { fly } from "svelte/transition";
+  import { writable, derived } from "svelte/store";
+
+  // The current date/time as a store
+  const now = writable(DateTime.now());
+
+  // Update the current date/time every second
+  setInterval(() => {
+    now.set(DateTime.now());
+  }, 1000);
 
   let party: any = {};
   let stripeAccountId: string = "";
@@ -21,6 +40,7 @@
   let phoneNumber: string = "";
   let selectedTicket: any = null;
   let message: string = "";
+  let validPhoneNumber: boolean = false;
 
   const getHostStripeAccountId = async () => {
     const hostStripe = await getDoc(
@@ -42,6 +62,12 @@
 
   $: if (!$authStore.isLoading) {
     getHostStripeAccountId();
+  }
+
+  $: if (phoneNumber && phoneNumber.match(/\d/g)?.length === 10) {
+    validPhoneNumber = true;
+  } else {
+    validPhoneNumber = false;
   }
 
   $: if (party.description) {
@@ -66,6 +92,48 @@
     }
   };
 
+  const isTicketSaleWindowOpen = (ticket: any) => {
+    if (ticket.saleStartDate && ticket.saleEndDate) {
+      const saleStartDate = DateTime.fromISO(ticket.saleStartDate).set({
+        hour: DateTime.fromFormat(ticket.saleStartTime, "h:mm a").hour,
+        minute: DateTime.fromFormat(ticket.saleStartTime, "h:mm a").minute,
+      });
+      const saleEndDate = DateTime.fromISO(ticket.saleEndDate).set({
+        hour: DateTime.fromFormat(ticket.saleEndTime, "h:mm a").hour,
+        minute: DateTime.fromFormat(ticket.saleEndTime, "h:mm a").minute,
+      });
+
+      const now = DateTime.now();
+
+      if (now > saleStartDate && now < saleEndDate) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  };
+
+  const isTicketSaleWindowOver = (ticket: any) => {
+    if (ticket.saleEndDate) {
+      const saleEndDate = DateTime.fromISO(ticket.saleEndDate);
+      const now = DateTime.now();
+
+      if (now > saleEndDate) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
+
+  function formatPrice(price: any) {
+    return parseFloat(price).toFixed(2);
+  }
+
   $: if ($page.url.searchParams.get("status")) {
     if ($page.url.searchParams.get("status") === "success") {
       message = "Your ticket has been purchased successfully!";
@@ -76,67 +144,79 @@
 </script>
 
 {#if message}
-  <div class="absolute top-16 left-2 right-2">
-    {#if message === "Your ticket has been purchased successfully!"}
-      <div
-        class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
-        role="alert"
-      >
-        <!-- <strong class="font-bold">Holy smokes!</strong> -->
-        <span class="block sm:inline">{message}</span>
-        <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-          <button
-            class="w-fit h-fit"
-            on:click={() => {
-              message = "";
-            }}
+  <div
+    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
+  >
+    <div class="flex items-center space-x-3">
+      {#if message === "Your ticket has been purchased successfully!"}
+        <div class="text-green-600">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="w-6 h-6"
           >
-            <svg
-              class="fill-current h-6 w-6 text-green-500"
-              role="button"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              ><title>Close</title><path
-                d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"
-              /></svg
-            >
-          </button>
-        </span>
-      </div>
-    {:else if message === "Your ticket purchase has been canceled."}
-      <div
-        class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-        role="alert"
-      >
-        <!-- <strong class="font-bold">Holy smokes!</strong> -->
-        <span class="block sm:inline">{message}</span>
-
-        <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-          <button
-            class="w-fit h-fit"
-            on:click={() => {
-              message = "";
-            }}
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <div class="flex-1 text-green-600">
+          <p class="font-semibold">{message}</p>
+        </div>
+      {:else if message === "Your ticket purchase has been canceled."}
+        <div class="text-mainRed">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="w-6 h-6"
           >
-            <svg
-              class="fill-current h-6 w-6 text-red-500"
-              role="button"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              ><title>Close</title><path
-                d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"
-              /></svg
-            >
-          </button>
-        </span>
-      </div>
-    {/if}
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </div>
+        <div class="flex-1 text-mainRed">
+          <p class="font-semibold">{message}</p>
+        </div>
+      {/if}
+      <button
+        class="text-gray-400 hover:text-gray-600 transition"
+        on:click={() => {
+          message = "";
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
   </div>
 {/if}
 
 {#if phonenumberModal}
   <div
-    class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center p-2"
+    class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center p-2 z-10"
   >
     <div class="w-full md:w-[500px] bg-white rounded-md p-5">
       <IconX
@@ -154,7 +234,7 @@
           placeholder="Phone Number"
           bind:value={phoneNumber}
         />
-        {#if !phoneNumber}
+        {#if !validPhoneNumber}
           <button
             class="w-full bg-primary-600 rounded-md p-2 bg-mainRed/25 border border-mainRed text-black"
             disabled
@@ -181,76 +261,163 @@
 
 {#if party}
   <div
-    class="w-full h-full flex flex-col md:flex-row md:p-10 overflow-scroll pb-20"
+    class="w-full h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
   >
-    <div class="w-full md:min-w-[50%] max-h-[400px] p-5">
-      <div class="w-full h-full border-[1px] bg-white p-1 rounded-md">
+    <div class="w-full h-fit md:min-w-[50%] md:h-[80vh] p-5 md:sticky md:top-0 ">
+      <div class="w-full h-full bg-white rounded-md drop-shadow-md">
         <img
           src={party.flyerPath}
           alt=""
-          class="w-full h-full object-contain rounded-md"
+          class="w-full h-full object-cover rounded-md"
         />
       </div>
     </div>
-    <div class="w-full md:min-w-[50%] p-5 flex flex-col gap-2">
-      <div class="flex flex-col gap-1 border-[1px] rounded">
-        <h1 class="w-full px-2 bg-neutral-600 text-white rounded-t">
+    <div
+      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit"
+    >
+      <div class="flex flex-col gap-2">
+        <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
           Party Info
         </h1>
 
-        <div class="flex flex-col gap-1 rounded p-2">
-          <h1 class="text-white font-bold text-2xl mb-2">{party.name}</h1>
-          <h3 class="text-white flex flex-row gap-1 text-lg items-center">
-            <IconCalendar />
-            {DateTime.fromISO(party.date).toLocaleString()}
+        <h2 class="text-2xl font-bold mb-1">{party.name}</h2>
+        {#if party?.ageLimit > 1}
+          <h3 class="text-lg items-center mb-2">
+            Age : {party.ageLimit}+
           </h3>
-          <h3 class="text-white flex flex-row gap-1 text-lg items-center">
-            <IconClock />
-            {party.startTime} - {party.endTime}
+        {/if}
+        <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+          <IconCalendar />
+          {DateTime.fromISO(party.date).toLocaleString()}
+        </h3>
+        <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+          <IconClock />
+          {party.startTime} - {party.endTime}
+        </h3>
+        <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+          <IconLocation />
+          {party.privateAddress ? "Private Address" : party.address}
+        </h3>
+        {#if party.attendies > 20}
+          <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+            <IconUser />
+            {party.attendies} Attendees
           </h3>
-        </div>
+        {/if}
       </div>
-      <div class="flex flex-col gap-1 border-[1px] rounded">
-        <h1 class="w-full px-2 bg-neutral-600 text-white rounded-t">
-          Description
+
+      <div class="flex flex-col gap-2">
+        <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
+          Overview
         </h1>
-        <div class="p-2">
-          <p class="text-white">{@html party.description}</p>
-        </div>
+        <p class="text-lg">{@html party.description}</p>
       </div>
+
       {#if party.tickets}
-        <div class="flex flex-col gap-1 border-[1px] rounded">
-          <h1 class="w-full px-2 bg-neutral-600 text-white rounded-t">
+        <div class="flex flex-col gap-2">
+          <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
             Tickets
           </h1>
-          <div class="flex flex-col gap-1 rounded p-2">
-            {#each JSON.parse(party.tickets) as ticket}
-              <div
-                class="w-full h-fit border border-mainRed p-3 rounded-md text-white flex flex-row"
-              >
-                <div class="flex flex-col gap-2 w-full">
-                  <h1 class="font-semibold text-xl">{ticket.name}</h1>
+
+          {#each JSON.parse(party.tickets) as ticket}
+            <div
+              class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg"
+            >
+              <div class="flex flex-col flex-grow pr-4">
+                <div class="flex flex-row gap-2 mb-2 items-baseline">
+                  <h1 class="font-semibold text-2xl">{ticket.name}</h1>
                   {#if ticket.gender}
-                    <h1>{ticket.gender}</h1>
+                    <h2 class="font-medium text-red-500 mt-1">
+                      {ticket.gender} Only
+                    </h2>
                   {/if}
-                  <h1>Price: ${ticket.price}</h1>
                 </div>
-                <div
-                  class="flex flex-col items-end justify-center w-full h-full"
-                >
+                <div class="mt-2">
+                  <p class="font-bold text-lg">Price: ${formatPrice(ticket.price)}</p>
+                  {#if ticket.quantity}
+                    <p class="mt-2">{ticket.quantity} Left!</p>
+                  {/if}
+                </div>
+              </div>
+              {#if ticket.saleStartDate}
+                {#if isTicketSaleWindowOpen(ticket)}
+                  <div class="flex items-center">
+                    <button
+                      on:click={() => {
+                        selectedTicket = ticket;
+                        phonenumberModal = true;
+                      }}
+                      class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
+                    >
+                      Buy
+                    </button>
+                  </div>
+                {:else}
+                  <div class="flex items-center">
+                    <button
+                      class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
+                      disabled
+                    >
+                      {#if isTicketSaleWindowOver(ticket)}
+                        Sale Over
+                      {:else}
+                        Sale Starts in {DateTime.fromISO(ticket.saleStartDate)
+                          .set({
+                            hour: DateTime.fromFormat(
+                              ticket.saleStartTime,
+                              "h:mm a"
+                            ).hour,
+                            minute: DateTime.fromFormat(
+                              ticket.saleStartTime,
+                              "h:mm a"
+                            ).minute,
+                          })
+                          .diff($now)
+                          .as("hours") >= 24
+                          ? DateTime.fromISO(ticket.saleStartDate)
+                              .set({
+                                hour: DateTime.fromFormat(
+                                  ticket.saleStartTime,
+                                  "h:mm a"
+                                ).hour,
+                                minute: DateTime.fromFormat(
+                                  ticket.saleStartTime,
+                                  "h:mm a"
+                                ).minute,
+                              })
+                              .toFormat("yyyy-MM-dd")
+                          : DateTime.fromISO(ticket.saleStartDate)
+                              .set({
+                                hour: DateTime.fromFormat(
+                                  ticket.saleStartTime,
+                                  "h:mm a"
+                                ).hour,
+                                minute: DateTime.fromFormat(
+                                  ticket.saleStartTime,
+                                  "h:mm a"
+                                ).minute,
+                              })
+                              .diffNow()
+                              .toFormat("hh:mm:ss")}
+                      {/if}
+                    </button>
+                  </div>
+                {/if}
+              {:else}
+                <div class="flex items-center">
                   <button
                     on:click={() => {
                       selectedTicket = ticket;
                       phonenumberModal = true;
                     }}
-                    class="bg-mainRed hover:bg-mainRed/50 rounded-md text-white px-4 p-2"
-                    >Buy</button
+                    class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
                   >
+                    Buy
+                  </button>
                 </div>
-              </div>
-              <!-- {JSON.stringify(ticket)} -->
-            {/each}
-          </div>
+              {/if}
+            </div>
+          {/each}
         </div>
       {/if}
     </div>

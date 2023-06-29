@@ -15,6 +15,10 @@
         console.log(error);
       });
   };
+
+$: if(!$authStore.isLoading && $authStore.currentUser) {
+    window.location.href = "/hub";
+  }
 </script>
 
 <svelte:head>
@@ -23,7 +27,7 @@
 
 <main class="h-screen flex flex-row items-center justify-center">
   <form
-    class="flex flex-col gap-3 w-[40vw] p-4 bg-white rounded-md"
+    class="flex flex-col gap-3 w-[90vw] md:w-[40vw] p-4 bg-white rounded-md"
     on:submit|preventDefault={() => handleSubmit()}
   >
     <div class="flex flex-col gap-1">

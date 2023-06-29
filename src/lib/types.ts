@@ -8,6 +8,7 @@ export class Ticket {
   saleStartTime: string;
   saleEndTime: string;
   price: number;
+  ageLimit: number;
 
   constructor(
     id: number,
@@ -18,7 +19,8 @@ export class Ticket {
     saleEndDate: string = "",
     saleStartTime: string = "",
     saleEndTime: string = "",
-    price: number = 0
+    price: number = 0,
+    ageLimit: number = 0
   ) {
     this.id = id;
     this.name = name;
@@ -29,6 +31,7 @@ export class Ticket {
     this.saleStartTime = saleStartTime;
     this.saleEndTime = saleEndTime;
     this.price = price;
+    this.ageLimit = ageLimit;
   }
 
   getInformation(): object {
@@ -60,6 +63,7 @@ export class Party {
   createdAt: string;
   flyerPath: string;
   privateAddress: boolean;
+  ageLimit: number;
 
   constructor(
     name: string = "",
@@ -74,7 +78,8 @@ export class Party {
     hostAccountID: string = "",
     createdAt: string = "",
     flyerPath: string = "",
-    privateAddress: boolean = false
+    privateAddress: boolean = false,
+    ageLimit: number = 0
   ) {
     this.name = name;
     this.description = description;
@@ -89,6 +94,7 @@ export class Party {
     this.createdAt = createdAt;
     this.flyerPath = flyerPath;
     this.privateAddress = privateAddress;
+    this.ageLimit = ageLimit;
   }
 
   getInformation(): object {

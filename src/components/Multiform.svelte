@@ -9,6 +9,8 @@
   import { authStore } from "../stores/authStore";
   import type { Party } from "$lib/types";
   import { getDownloadURL, uploadBytes } from "firebase/storage";
+  import axios from "axios";
+  import { fly } from "svelte/transition";
 
   const dispatch = createEventDispatcher();
 
@@ -20,6 +22,7 @@
   let fileInput: HTMLInputElement;
   let file: File | null = null;
   let fileName: string = "";
+  let error: string = "";
 
   const handleFileChange = (e: any) => {
     file = e.target.files[0];
@@ -42,26 +45,112 @@
       hostAccountId: $authStore.currentUser?.["uid"],
       createdAt: new Date(),
       flyerPath: path,
+      attendies: 0,
     };
 
     let party: Party = response;
-    console.log(party);
 
     if (party) {
       const docRef = await addDoc(collection(db, "parties"), party);
-      console.log("Document written with ID: ", docRef.id);
     } else {
       console.log("no party");
     }
   };
 
-  $: if (response.paidParty) {
-    totalSteps = 4;
-  } else {
-    totalSteps = 3;
+  const checkStripeAccount = async () => {
+    if (!$authStore.currentUser) return;
+
+    let stripeAccountId = await getDoc(
+      doc(db, "stripe-accounts", $authStore.currentUser["uid"])
+    );
+
+    if (!stripeAccountId.exists().stripeAccountId) return false;
+
+    try {
+      let returnedStripeAccount: any = await axios.get(
+        `/api/checkStripeAccount?id=${stripeAccountId.data().stripeAccountId}`
+      );
+      console.log(returnedStripeAccount);
+      if (returnedStripeAccount && returnedStripeAccount.data.details_submitted)
+        return true;
+      else return false;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  let previousPaidPartyStatus = response.paidParty;
+
+  $: {
+    if (response.paidParty !== previousPaidPartyStatus) {
+      previousPaidPartyStatus = response.paidParty;
+      if (response.paidParty) {
+        checkStripeAccount().then((result) => {
+          if (result) {
+            totalSteps = 4;
+          } else {
+            currentStepIndex -= 1;
+            error =
+              "You must link your account to create a paid party.<br>Head to the settings tab <a class='text-black underline' href='/hub/dashboard/settings'>Settings</>";
+          }
+        });
+      } else {
+        totalSteps = 3;
+      }
+    }
   }
 </script>
 
+{#if error}
+  <div
+    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
+    in:fly={{ y: 100, duration: 200 }}
+    out:fly={{ y: 100, duration: 200 }}
+  >
+    <div class="flex items-center space-x-3">
+      <div class="text-mainRed">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </div>
+      <div class="flex-1 text-mainRed">
+        <p class="font-semibold">{@html error}</p>
+      </div>
+      <button
+        class="text-gray-400 hover:text-gray-600 transition"
+        on:click={() => {
+          error = "";
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+{/if}
 <button
   on:click={() => {
     if (!response.paidParty && currentStepIndex === 4) {
@@ -89,7 +178,7 @@
         Tickets
       {:else if currentStepIndex === 3}
         Host
-      {:else if currentStepIndex === 4}{/if}
+      {/if}
     </p>
 
     <!-- <div class="mt-4 overflow-hidden rounded-full bg-gray-200">

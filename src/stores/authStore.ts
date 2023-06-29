@@ -14,6 +14,11 @@ export const authStore = writable({
   currentUser: null,
 });
 
+export const stripeStore = writable({
+  stripeAccountId: null,
+  loading: true
+});
+
 export const authHandlers = {
   login: async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);

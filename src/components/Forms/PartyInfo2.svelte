@@ -4,6 +4,8 @@
   import { Loader } from "@googlemaps/js-api-loader";
   import { IconCaretDown, IconQuestionMark } from "@tabler/icons-svelte";
   import { clickOutside } from "$lib/clickOutSide";
+  import { DateTime } from "luxon";
+  import { fly } from "svelte/transition";
 
   const dispatch = createEventDispatcher();
 
@@ -14,16 +16,30 @@
   let description: string = "";
   let date: string;
   let hostName: StaticRange;
-
+  let ageLimit: number = 0;
   let selectedTimeStart: string;
   let selectedTimeEnd: string;
   let timeOptions: string[] = [];
   let showTimeStartDropdown = false;
   let showTimeEndDropdown = false;
+  let validEndTime: boolean = false;
 
   let error: string = "";
 
   export let data: any;
+
+  $: if (selectedTimeStart && selectedTimeEnd) {
+    validEndTime = isEndTimeAfterStartTime(selectedTimeStart, selectedTimeEnd);
+  }
+
+  function isEndTimeAfterStartTime(startTime: any, endTime: any) {
+    // Parse the times using Luxon's DateTime
+    let start = DateTime.fromFormat(startTime, "h:mm a");
+    let end = DateTime.fromFormat(endTime, "h:mm a");
+
+    // Check if the end time is after the start time
+    return end > start;
+  }
 
   const options = {
     componentRestrictions: { country: "us" },
@@ -44,6 +60,11 @@
       return;
     }
 
+    if (!validEndTime) {
+      error = "End time must be after start time";
+      return;
+    }
+
     dispatch("completion", {
       name,
       date,
@@ -53,6 +74,7 @@
       description,
       hostName,
       privateAddress,
+      ageLimit,
     });
   };
 
@@ -131,7 +153,54 @@
   Now let's get some basic details
 </h1>
 {#if error}
-  <p class="text-yellow-300 mb-4">{error}!</p>
+  <div
+    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
+    in:fly={{ y: 100, duration: 200 }}
+    out:fly={{ y: 100, duration: 200 }}
+  >
+    <div class="flex items-center space-x-3">
+      <div class="text-mainRed">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </div>
+      <div class="flex-1 text-mainRed">
+        <p class="font-semibold">{error}</p>
+      </div>
+      <button
+        class="text-gray-400 hover:text-gray-600 transition"
+        on:click={() => {
+          error = "";
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
 {/if}
 <form
   on:submit|preventDefault={() => completion()}
@@ -185,12 +254,29 @@
       <div class="flex flex-row gap-1">
         <div
           on:mousedown={() => (privateAddress = !privateAddress)}
-          class={`w-14 h-8 bg-matteBlack rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
-            privateAddress ? "justify-end bg-green-400" : "justify-start"
+          class={`w-14 h-8  rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
+            privateAddress
+              ? "justify-end bg-green-400"
+              : "justify-start bg-matteBlack"
           }`}
         >
           <div class="w-6 h-6 rounded-full bg-white" />
         </div>
+      </div>
+    </div>
+    <div class="flex flex-col min-w-fit gap-2">
+      <label for="private" class="text-white">Age Limit?</label>
+      <div class="flex flex-row gap-1">
+        <select
+          name="ageLimit"
+          id="ageLimit"
+          class="p-2 rounded-md bg-matteBlack text-white outline-none"
+          bind:value={ageLimit}
+        >
+          <option value="0">No Limit</option>
+          <option value="18">18+</option>
+          <option value="21">21+</option>
+        </select>
       </div>
     </div>
   </div>

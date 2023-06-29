@@ -9,6 +9,7 @@
     IconHelp,
     IconMenu2,
     IconX,
+    IconSearch,
   } from "@tabler/icons-svelte";
   import { authHandlers, memberType } from "../../../stores/authStore";
   import { slide } from "svelte/transition";
@@ -53,17 +54,6 @@
       >
 
       <a
-        href="/hub/dashboard/reviews"
-        class={`flex flex-row items-center gap-2 text-lg hover:text-white ${
-          $page.url.pathname === "/hub/dashboard/reviews"
-            ? ""
-            : "text-neutral-400"
-        }`}
-      >
-        <IconStar size={24} stroke={2} />
-        Reviews</a
-      >
-      <a
         href="/hub/dashboard/settings"
         class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
           $page.url.pathname === "/hub/dashboard/settings"
@@ -74,6 +64,15 @@
         <IconSettings size={24} stroke={2} />
         Settings</a
       >
+      <a
+            href="/find"
+            class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
+              $page.url.pathname === "/find" ? "" : "text-neutral-400"
+            }`}
+          >
+            <IconSearch size={24} stroke={2} />
+            Back To Find</a
+          >
     </ul>
 
     <div class="flex flex-1 flex-col items-center justify-center">
@@ -92,7 +91,9 @@
       {/if}
     </div>
     <div class="flex flex-col items-start gap-4">
-      <a href="/" class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white"
+      <a
+        href="/"
+        class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white"
         ><IconHelp size={24} stroke={2} />Help</a
       >
       <button
@@ -105,10 +106,10 @@
     </div>
   </nav>
   <nav
-    class="md:w-[275px] w-full flex md:hidden flex-col gap-4 text-white h-12 relative"
+    class="md:w-[275px] w-full flex md:hidden flex-col gap-4 text-white h-12 relative z-50 bg-matteBlack"
   >
     <div
-      class="flex flex-row items-center justify-between w-full p-5 border-b-[1px] border-neutral-500"
+      class="flex flex-row items-center justify-between w-full p-5 border-b-[1px] border-neutral-500 bg-matteBlack"
     >
       <h1 class="font-extrabold text-3xl text-[#F94144]">turnt.party</h1>
       {#if !mobileNavOpen}
@@ -121,7 +122,7 @@
     </div>
     {#if mobileNavOpen}
       <div
-        class="absolute z-20 bg-neutral-700 w-full p-5 top-[75px]"
+        class="absolute z-50 bg-neutral-700 w-full p-5 top-[75px]"
         in:slide
         out:slide
         use:clickOutside
@@ -150,17 +151,6 @@
           >
 
           <a
-            href="/hub/dashboard/reviews"
-            class={`flex flex-row items-center gap-2 text-lg hover:text-white ${
-              $page.url.pathname === "/hub/dashboard/reviews"
-                ? ""
-                : "text-neutral-400"
-            }`}
-          >
-            <IconStar size={24} stroke={2} />
-            Reviews</a
-          >
-          <a
             href="/hub/dashboard/settings"
             class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
               $page.url.pathname === "/hub/dashboard/settings"
@@ -170,6 +160,16 @@
           >
             <IconSettings size={24} stroke={2} />
             Settings</a
+          >
+
+          <a
+            href="/find"
+            class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
+              $page.url.pathname === "/find" ? "" : "text-neutral-400"
+            }`}
+          >
+            <IconSearch size={24} stroke={2} />
+            Back To Find</a
           >
 
           <div class="flex flex-row items-center justify-center">
@@ -209,7 +209,7 @@
     {/if}
   </nav>
 
-  <div class="h-full w-full py-10 px-2 md:px-10 relative">
+  <div class="h-full w-full py-10 px-2 md:px-10 relative overflow-scroll z-0">
     <slot />
   </div>
 </div>
