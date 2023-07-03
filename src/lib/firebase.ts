@@ -54,5 +54,5 @@ export const db = initializeFirestore(app, {
   ignoreUndefinedProperties: true,
 });
 export const auth = getAuth(app);
-await setPersistence(auth, browserLocalPersistence);
+// await setPersistence(auth, browserLocalPersistence);
 export const storage = getStorage(app);
