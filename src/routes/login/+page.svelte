@@ -2,7 +2,9 @@
   import { login, loginWithGoogle } from "$lib/stores/auth";
   // import { authHandlers, authStore } from "../../stores/authStore";
   import { IconBrandGoogle } from "@tabler/icons-svelte";
+  import {user} from "$lib/stores/auth";
   import { page } from "$app/stores";
+  import { browser } from "$app/environment";
 
   let email: string;
   let password: string;
@@ -28,9 +30,6 @@
     })
   };
 
-  // $: if ($page.data.uid) {
-  //   window.location.href = "/hub/dashboard";
-  // }
 </script>
 
 <svelte:head>
