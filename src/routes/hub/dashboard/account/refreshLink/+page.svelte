@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import axios from "axios";
-  import { authStore } from "../../../../../stores/authStore";
+  import {page} from "$app/stores";
 
   const refreshLink = async () => {
     try {
@@ -12,7 +12,7 @@
     }
   };
 
-  $: if (!$authStore.isLoading && $authStore.currentUser) {
+  $: if($page.data.uid) {
     refreshLink();
   }
 </script>
