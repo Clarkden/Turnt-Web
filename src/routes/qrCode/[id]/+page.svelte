@@ -2,8 +2,9 @@
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { db } from "../../../lib/firebase";
-  import { getDoc, doc } from "firebase/firestore";
+  import { getDoc, doc, query, where } from "firebase/firestore";
   import { QRCodeImage } from "svelte-qrcode-image";
+  import { goto } from "$app/navigation";
 
   let partyLocation: any;
 
@@ -11,10 +12,14 @@
     const payment = await getDoc(doc(db, "payments", $page.params.id));
 
     if (payment.exists()) {
-      const party = await getDoc(doc(db, "parties", payment.data().metadata.partyId));
+      const party = await getDoc(
+        doc(db, "parties", payment.data().metadata.partyId)
+      );
       if (party.exists()) {
         partyLocation = party.data().address;
       }
+    } else {
+      goto("/find");
     }
   };
 
