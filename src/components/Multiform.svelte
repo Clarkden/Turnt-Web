@@ -4,13 +4,25 @@
   import PartyInfo2 from "./Forms/PartyInfo2.svelte";
   import PartyInfo3 from "./Forms/PartyInfo3.svelte";
   import { createEventDispatcher } from "svelte";
-  import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
-  import { db, storageRef } from "../lib/firebase";
-  import { authStore } from "../stores/authStore";
+  import {
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    addDoc,
+    updateDoc,
+    getDocs,
+    query,
+    where,
+  } from "firebase/firestore";
+  import { db, storage } from "../lib/firebase";
   import type { Party } from "$lib/types";
-  import { getDownloadURL, uploadBytes } from "firebase/storage";
+  import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import axios from "axios";
   import { fly } from "svelte/transition";
+  import { page } from "$app/stores";
+  import { get } from "svelte/store";
+  // import {v4 as uuid} from "uuid";
 
   const dispatch = createEventDispatcher();
 
@@ -23,6 +35,8 @@
   let file: File | null = null;
   let fileName: string = "";
   let error: string = "";
+  let stripeCheck: boolean = false;
+  let stripeCheckValid: boolean = false;
 
   const handleFileChange = (e: any) => {
     file = e.target.files[0];
@@ -36,13 +50,31 @@
   const createParty = async () => {
     if (!file) return;
 
+    const now = new Date();
+
+    const findDuplicateAddressOnDate = await getDocs(
+      query(
+        collection(db, "parties"),
+        where("address", "==", response.address),
+        where("date", "==", response.date)
+      )
+    );
+
+    if (findDuplicateAddressOnDate.docs.length > 0) {
+      error =
+        "You cannot have two parties at the same address on the same day.";
+      return;
+    }
+
+    const storageRef = ref(storage, `images/${now.getTime()}`);
+
     let path = await uploadBytes(storageRef, file).then(async (snapshot) => {
       return await getDownloadURL(snapshot.ref);
     });
 
     response = {
       ...response,
-      hostAccountId: $authStore.currentUser?.["uid"],
+      hostAccountId: $page.data.uid,
       createdAt: new Date(),
       flyerPath: path,
       attendies: 0,
@@ -52,53 +84,52 @@
 
     if (party) {
       const docRef = await addDoc(collection(db, "parties"), party);
+
+      if (!party.paidParty) {
+        const guestList = await addDoc(collection(db, "guest-lists"), {
+          partyId: docRef.id,
+          hostAccountId: $page.data.uid,
+        });
+        const guestsSubCollection = await collection(guestList, "guests");
+      }
+
+      const hostData = await getDoc(doc(db, "hosts", $page.data.uid));
+
+      if (hostData.exists()) {
+        const updatedHostData = {
+          attendies: hostData.data().attendies + 1,
+          parties: [...hostData.data().parties, docRef.id],
+        };
+
+        await updateDoc(doc(db, "hosts", $page.data.uid), updatedHostData);
+      } else {
+        const hostData = {
+          attendies: 0,
+          parties: [docRef.id],
+        };
+
+        await setDoc(doc(db, "hosts", $page.data.uid), hostData);
+      }
     } else {
       console.log("no party");
     }
   };
 
   const checkStripeAccount = async () => {
-    if (!$authStore.currentUser) return;
+    const stripeId = await getDoc(doc(db, "stripe-accounts", $page.data.uid));
 
-    let stripeAccountId = await getDoc(
-      doc(db, "stripe-accounts", $authStore.currentUser["uid"])
-    );
-
-    if (!stripeAccountId.exists().stripeAccountId) return false;
-
-    try {
+    if (stripeId.exists()) {
       let returnedStripeAccount: any = await axios.get(
-        `/api/checkStripeAccount?id=${stripeAccountId.data().stripeAccountId}`
+        `/api/checkStripeAccount?id=${stripeId.data().stripeAccountId}`
       );
-      console.log(returnedStripeAccount);
-      if (returnedStripeAccount && returnedStripeAccount.data.details_submitted)
+
+      if (returnedStripeAccount.data.details_submitted) {
         return true;
-      else return false;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  let previousPaidPartyStatus = response.paidParty;
-
-  $: {
-    if (response.paidParty !== previousPaidPartyStatus) {
-      previousPaidPartyStatus = response.paidParty;
-      if (response.paidParty) {
-        checkStripeAccount().then((result) => {
-          if (result) {
-            totalSteps = 4;
-          } else {
-            currentStepIndex -= 1;
-            error =
-              "You must link your account to create a paid party.<br>Head to the settings tab <a class='text-black underline' href='/hub/dashboard/settings'>Settings</>";
-          }
-        });
       } else {
-        totalSteps = 3;
+        return false;
       }
-    }
-  }
+    } else return false;
+  };
 </script>
 
 {#if error}
@@ -153,11 +184,6 @@
 {/if}
 <button
   on:click={() => {
-    if (!response.paidParty && currentStepIndex === 4) {
-      currentStepIndex -= 2;
-      return;
-    }
-
     if (currentStepIndex > 0) currentStepIndex--;
     else dispatch("cancel");
   }}
@@ -174,8 +200,10 @@
         Party Type
       {:else if currentStepIndex === 1}
         Details
-      {:else if currentStepIndex === 2}
+      {:else if currentStepIndex === 2 && response.paidParty}
         Tickets
+      {:else if currentStepIndex === 2 && !response.paidParty}
+        Host
       {:else if currentStepIndex === 3}
         Host
       {/if}
@@ -196,10 +224,40 @@
   <PartyInfo1
     on:completion={(e) => {
       response = { ...response, ...e.detail };
-      currentStepIndex++;
+      if (response.paidParty) {
+        if (!stripeCheck) {
+          checkStripeAccount()
+            .then((result) => {
+              stripeCheck = true;
+
+              if (result) {
+                totalSteps = 4;
+                stripeCheckValid = true;
+                currentStepIndex++;
+              } else {
+                error =
+                  "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/hub/dashboard/account'>Account</>";
+              }
+            })
+            .catch((err) => {
+              error =
+                "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/hub/dashboard/account'>Account</>";
+            });
+        } else {
+          if (!stripeCheckValid) {
+            currentStepIndex -= 1;
+            error =
+              "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/hub/dashboard/account'>Account</>";
+          }
+        }
+      } else {
+        totalSteps = 3;
+        currentStepIndex++;
+      }
     }}
   />
-{:else if currentStepIndex === 1}
+{/if}
+{#if currentStepIndex === 1}
   <PartyInfo2
     data={response}
     on:completion={(e) => {
@@ -207,19 +265,67 @@
       currentStepIndex++;
     }}
   />
-{:else if currentStepIndex === 2}
+{/if}
+{#if currentStepIndex === 2 && response.paidParty}
   <PartyInfo3
     data={response}
     on:completion={(e) => {
       response = { ...response, ...e.detail };
-
-      if (!response.paidParty) {
-        currentStepIndex++;
-      }
       currentStepIndex++;
     }}
   />
-{:else if currentStepIndex === 3}
+{:else if currentStepIndex === 2 && !response.paidParty}
+  <h1 class="font-bold text-3xl text-white mb-1">Host</h1>
+  <h1 class="text-lg text-neutral-100 mb-4">Add a party flyer</h1>
+
+  <div class="relative inline-block">
+    <div
+      class="w-full h-[300px] border-[1px] flex flex-col items-center justify-center cursor-pointer rounded-md group p-4"
+      on:mouseup={() => fileInput.click()}
+    >
+      {#if file}
+        <img
+          src={URL.createObjectURL(file)}
+          alt="preview"
+          class="object-contain w-full h-full"
+        />
+      {:else}
+        <div>
+          <IconCirclePlus class="text-white group-hover:text-blue-400" />
+        </div>
+      {/if}
+    </div>
+
+    <input
+      type="file"
+      class="hidden"
+      bind:this={fileInput}
+      on:change={handleFileChange}
+      accept="image/*"
+    />
+    <!-- <p class="mt-2">{fileName}</p> -->
+  </div>
+
+  {#if file}
+    <button
+      on:click={() => {
+        createParty();
+        completion();
+      }}
+      class="bg-black text-white rounded-md p-2 w-full my-4"
+    >
+      Create Party
+    </button>
+  {:else}
+    <button
+      class="bg-black/50 border-[1px] border-black text-white rounded-md p-2 w-full my-4"
+      disabled
+    >
+      Create Party
+    </button>
+  {/if}
+{/if}
+{#if currentStepIndex === 3 && response.paidParty}
   <h1 class="font-bold text-3xl text-white mb-1">Host</h1>
   <h1 class="text-lg text-neutral-100 mb-4">Add a party flyer</h1>
 

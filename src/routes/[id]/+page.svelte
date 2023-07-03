@@ -3,12 +3,15 @@
   import { onMount } from "svelte";
   import { db, auth } from "../../lib/firebase";
   import {
+    addDoc,
     collection,
     doc,
     getDoc,
     getDocs,
+    increment,
     onSnapshot,
     query,
+    updateDoc,
     where,
   } from "firebase/firestore";
   import { DateTime } from "luxon";
@@ -20,11 +23,12 @@
     IconLocation,
     IconUser,
   } from "@tabler/icons-svelte";
-  import { authStore } from "../../stores/authStore";
+  // import { authStore } from "../../stores/authStore";
   import axios from "axios";
   import { goto } from "$app/navigation";
   import { fly } from "svelte/transition";
-  import { writable, derived } from "svelte/store";
+  import { writable, derived, get } from "svelte/store";
+  import { clickOutside } from "$lib/clickOutSide";
 
   // The current date/time as a store
   const now = writable(DateTime.now());
@@ -42,9 +46,13 @@
   let message: string = "";
   let validPhoneNumber: boolean = false;
 
+  let name: string = "";
+  let instagram: string = "";
+  let guestListPhone: string = "";
+
   const getHostStripeAccountId = async () => {
     const hostStripe = await getDoc(
-      doc(db, "stripe-accounts", $authStore.currentUser!["uid"])
+      doc(db, "stripe-accounts", party.hostAccountId)
     );
     if (hostStripe.exists()) {
       stripeAccountId = hostStripe.data().stripeAccountId;
@@ -55,14 +63,14 @@
     const unsubscribe = onSnapshot(
       doc(db, "parties", $page.params.id),
       (doc) => {
+        if (!doc.exists()) goto("/find");
+
         party = { id: doc.id, ...doc.data() };
       }
     );
-  });
 
-  $: if (!$authStore.isLoading) {
     getHostStripeAccountId();
-  }
+  });
 
   $: if (phoneNumber && phoneNumber.match(/\d/g)?.length === 10) {
     validPhoneNumber = true;
@@ -75,6 +83,77 @@
     description = description.replace(/\n/g, "<br />");
     party.description = description;
   }
+
+  const addToGuestList = async () => {
+    if (!name || !instagram || !guestListPhone) {
+      message = "Please fill out all fields.";
+      return;
+    }
+
+    try {
+      // Assuming there's a 'guest-list' collection in your firestore.
+      // Query for the guestList document
+      const guestListQuery = query(
+        collection(db, "guest-lists"),
+        where("partyId", "==", party.id)
+      );
+      const guestListSnapShot = await getDocs(guestListQuery);
+
+      if (guestListSnapShot.empty) {
+        console.error("No matching documents.");
+        return;
+      }
+
+      // Take the first doc. We assume that there's only one matching document because the partyId is unique.
+      const guestListDoc = guestListSnapShot.docs[0];
+
+      // Get a reference to the 'guests' subcollection
+      const guestsSubCollection = collection(guestListDoc.ref, "guests");
+
+      // Check if there are already documents in the 'guests' subcollection.
+      const snapshot = await getDocs(guestsSubCollection);
+
+      if (snapshot.empty) {
+        // The 'guests' subcollection does not have any documents, but Firestore will automatically create the subcollection when you add a document to it.
+        console.log(
+          "The 'guests' subcollection does not exist, it will be created."
+        );
+      }
+
+      // Add the new guest to the 'guests' subcollection.
+      await addDoc(guestsSubCollection, {
+        name,
+        instagram,
+        phone: guestListPhone,
+        partyId: party.id,
+      });
+
+      const addPartyAttendee = await updateDoc(doc(db, "parties", party.id), {
+        attendees: increment(1),
+      });
+
+      const updateHostAttendiesCount = await query(
+        collection(db, "hosts"),
+        where("parties", "array-contains", party.id)
+      );
+
+      const querySnapshot = await getDocs(updateHostAttendiesCount);
+      querySnapshot.forEach(async (document) => {
+        const hostDoc = doc(db, "hosts", document.id);
+        await updateDoc(hostDoc, { attendees: increment(1) });
+      });
+
+      // Clear the input fields after successful addition.
+      name = "";
+      instagram = "";
+      guestListPhone = "";
+
+      message = "You have been added to the guest list.";
+    } catch (error) {
+      message = "Failed to add to the guest list.";
+      console.error("Error adding to guest list: ", error);
+    }
+  };
 
   const purchaseTicket = async () => {
     if (!phoneNumber) return;
@@ -188,6 +267,26 @@
         <div class="flex-1 text-mainRed">
           <p class="font-semibold">{message}</p>
         </div>
+      {:else}
+        <div class="text-green-600">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <div class="flex-1 text-green-600">
+          <p class="font-semibold">{message}</p>
+        </div>
       {/if}
       <button
         class="text-gray-400 hover:text-gray-600 transition"
@@ -226,8 +325,15 @@
         }}
         class="w-6 h-6 absolute top-2 right-2 text-white"
       />
-      <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-bold">Enter your phone number</h1>
+      <div
+        class="flex flex-col gap-2"
+        use:clickOutside
+        on:click_outside={() => (phonenumberModal = false)}
+      >
+        <div>
+          <h1 class="text-2xl font-bold">Enter your phone number</h1>
+          <p class="text-gray-500">Phone number to receive your ticket</p>
+        </div>
         <input
           type="text"
           class="w-full border-[1px] rounded-md p-2"
@@ -263,7 +369,7 @@
   <div
     class="w-full h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
   >
-    <div class="w-full h-fit md:min-w-[50%] md:h-[80vh] p-5 md:sticky md:top-0 ">
+    <div class="w-full h-fit md:min-w-[50%] md:h-[80vh] p-5 md:sticky md:top-0">
       <div class="w-full h-full bg-white rounded-md drop-shadow-md">
         <img
           src={party.flyerPath}
@@ -313,7 +419,7 @@
         <p class="text-lg">{@html party.description}</p>
       </div>
 
-      {#if party.tickets}
+      {#if party.tickets && party.paidParty}
         <div class="flex flex-col gap-2">
           <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
             Tickets
@@ -333,7 +439,9 @@
                   {/if}
                 </div>
                 <div class="mt-2">
-                  <p class="font-bold text-lg">Price: ${formatPrice(ticket.price)}</p>
+                  <p class="font-bold text-lg">
+                    Price: ${formatPrice(ticket.price)}
+                  </p>
                   {#if ticket.quantity}
                     <p class="mt-2">{ticket.quantity} Left!</p>
                   {/if}
@@ -418,6 +526,41 @@
               {/if}
             </div>
           {/each}
+        </div>
+      {:else}
+        <div
+          class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg flex-col gap-4"
+        >
+          <h1 class="font-semibold">Get on the guest list</h1>
+          <form
+            on:submit|preventDefault={() => addToGuestList()}
+            class="flex flex-col gap-2 mt-2"
+          >
+            <input
+              type="text"
+              placeholder="Full Name"
+              class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
+              bind:value={name}
+            />
+            <input
+              type="text"
+              placeholder="Instagram"
+              class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
+              bind:value={instagram}
+            />
+            <input
+              type="text"
+              placeholder="Phone Number"
+              class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
+              bind:value={guestListPhone}
+            />
+            <button
+              type="submit"
+              class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
+            >
+              Submit
+            </button>
+          </form>
         </div>
       {/if}
     </div>

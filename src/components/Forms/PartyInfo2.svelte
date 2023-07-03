@@ -12,6 +12,7 @@
   let name: string = "";
   let autocomplete: google.maps.places.Autocomplete;
   let address: any;
+  let latAndLong: any;
   let privateAddress: boolean = false;
   let description: string = "";
   let date: string;
@@ -34,11 +35,12 @@
 
   function isEndTimeAfterStartTime(startTime: any, endTime: any) {
     // Parse the times using Luxon's DateTime
-    let start = DateTime.fromFormat(startTime, "h:mm a");
-    let end = DateTime.fromFormat(endTime, "h:mm a");
+    // let start = DateTime.fromFormat(startTime, "h:mm a");
+    // let end = DateTime.fromFormat(endTime, "h:mm a");
 
-    // Check if the end time is after the start time
-    return end > start;
+    // // Check if the end time is after the start time
+    // return end > start;
+    return true;
   }
 
   const options = {
@@ -47,7 +49,10 @@
   };
 
   const completion = () => {
-    if (
+    if (DateTime.fromISO(date) < DateTime.now()) {
+      error = "Date must be in the future";
+      return;
+    } else if (
       !name ||
       !address ||
       !selectedTimeStart ||
@@ -58,9 +63,7 @@
     ) {
       error = "Please fill out all fields";
       return;
-    }
-
-    if (!validEndTime) {
+    } else if (!validEndTime) {
       error = "End time must be after start time";
       return;
     }
@@ -71,6 +74,7 @@
       startTime: selectedTimeStart,
       endTime: selectedTimeEnd,
       address,
+      latAndLong,
       description,
       hostName,
       privateAddress,
@@ -129,6 +133,7 @@
     });
 
     function onPlaceChanged() {
+      latAndLong = autocomplete.getPlace().geometry?.location.toString();
       address = autocomplete.getPlace();
       address = address.formatted_address;
     }

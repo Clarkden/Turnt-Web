@@ -19,6 +19,9 @@ import {
   addDoc,
   increment,
   updateDoc,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import twilio from "twilio";
 
@@ -55,20 +58,18 @@ export async function POST({ request }: RequestEvent) {
           doc(db, "parties", paymentIntentSucceeded.metadata.partyId)
         );
 
-
         if (party.exists()) {
-
           const tickets = JSON.parse(party.data().tickets);
 
-            // console.log("tickets:", tickets, typeof tickets)
+          // console.log("tickets:", tickets, typeof tickets)
 
           // Get the index of the purchasedTicket
           // console.log("metadata ticket", paymentIntentSucceeded.metadata.ticketId)
           let ticketIndex = tickets.findIndex(
             (ticket: any) =>
-              parseInt(ticket.id) === parseInt(paymentIntentSucceeded.metadata.ticketId)
+              parseInt(ticket.id) ===
+              parseInt(paymentIntentSucceeded.metadata.ticketId)
           );
-
 
           if (ticketIndex > -1 && tickets[ticketIndex].quantity > 0) {
             // Decrement the quantity directly in the tickets array
@@ -98,22 +99,38 @@ export async function POST({ request }: RequestEvent) {
           }
         );
 
+        const updateHostAttendiesCount = await query(
+          collection(db, "hosts"),
+          where(
+            "parties",
+            "array-contains",
+            paymentIntentSucceeded.metadata.partyId
+          )
+        );
+
+        const querySnapshot = await getDocs(updateHostAttendiesCount);
+        querySnapshot.forEach(async (document) => {
+          const hostDoc = doc(db, "hosts", document.id);
+          await updateDoc(hostDoc, { attendees: increment(1) });
+        });
+
         const ticket = await addDoc(collection(db, "tickets"), {
           paymentIntentId: paymentIntentSucceeded.id,
           purchaserPhoneNumber:
             paymentIntentSucceeded.metadata.purchaserPhoneNumber,
           partyId: paymentIntentSucceeded.metadata.partyId,
           ticketCreated: Date.now(),
+          ticketInfo: paymentIntentSucceeded.metadata.ticketInfo,
         });
 
         client.messages
           .create({
-            body: "Test",
             // body: `Your link to your ticket is below 🎉:\n${
             //   ENVIRONMENT === "development"
             //     ? `http://localhost:4242/qrCode/${paymentIntentSucceeded.id}`
             //     : `https://turnt.party/qrCode/${paymentIntentSucceeded.id}`
             // }`,
+            body: `Don't forget your ticket! 🎉: https://turnt.party/qrCode/${paymentIntentSucceeded.id}`,
             from: "+18663958046",
             to: `+1${paymentIntentSucceeded.metadata.purchaserPhoneNumber}`,
           })

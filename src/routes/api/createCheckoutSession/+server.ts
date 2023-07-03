@@ -10,31 +10,25 @@ const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
 
 export async function POST({ request, url }: any) {
   const body = await request.json();
-  
+
   const convertToStripePrice = (price: number) => {
     return price * 100;
   };
 
-  const applicationFee = () => {
-    let fee = Math.ceil(
-      convertToStripePrice(parseFloat(body.ticket.price) * 0.05) +
-        Math.ceil(convertToStripePrice(parseFloat(body.ticket.price) * 0.029)) +
-        30
-    );
-    if (fee < 50) {
-      fee = 50;
-    }
-    return fee;
-  };
+  // const applicationFee = () => {
+  //   let fee = Math.ceil(
+  //     convertToStripePrice(parseFloat(body.ticket.price) * 0.05) +
+  //       Math.ceil(convertToStripePrice(parseFloat(body.ticket.price) * 0.029)) +
+  //       30
+  //   );
+  //   if (fee < 50) {
+  //     fee = 50;
+  //   }
+  //   return fee;
+  // };
 
-  const calculatTicketPrice = () => {
+  const calculateTicketPrice = () => {
     return convertToStripePrice(parseFloat(body.ticket.price));
-  };
-
-  const processingFee = () => {
-    return Math.ceil(
-      convertToStripePrice(parseFloat(body.ticket.price) * 0.029 + 0.3)
-    );
   };
 
   try {
@@ -44,7 +38,7 @@ export async function POST({ request, url }: any) {
         {
           price_data: {
             currency: "usd",
-            unit_amount: calculatTicketPrice(),
+            unit_amount: calculateTicketPrice(),
             product_data: {
               name: body.ticket.name + " Admission",
               // party_name: body.party.name,
@@ -52,25 +46,17 @@ export async function POST({ request, url }: any) {
           },
           quantity: 1,
         },
-        {
-          price_data: {
-            currency: "usd",
-            unit_amount: processingFee(),
-            product_data: {
-              name: "Stripe Processing Fee",
-            },
-          },
-          quantity: 1,
-        },
+
       ],
       payment_intent_data: {
-        application_fee_amount: applicationFee(),
+        application_fee_amount: Math.ceil(calculateTicketPrice() * 0.07),
         transfer_data: {
           destination: body.stripeAccountId,
         },
         metadata: {
           partyId: body.party.id,
           ticketId: body.ticket.id,
+          ticketInfo: JSON.stringify(body.ticket),
           purchaserPhoneNumber: body.purchaserPhoneNumber,
         },
       },

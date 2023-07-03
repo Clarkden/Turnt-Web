@@ -2,10 +2,15 @@
 export default {
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
+    
     extend: {
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+      },
       colors: {
         mainRed: "#F94144",
         matteBlack: "#28282B",
+        stripe: "#6772e5"
       },
       dropShadow: {
         glow: [

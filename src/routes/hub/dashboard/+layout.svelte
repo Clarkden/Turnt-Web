@@ -11,9 +11,17 @@
     IconX,
     IconSearch,
   } from "@tabler/icons-svelte";
-  import { authHandlers, memberType } from "../../../stores/authStore";
   import { slide } from "svelte/transition";
   import { clickOutside } from "../../../lib/clickOutSide";
+  import { logout } from "$lib/stores/auth";
+
+  const handleLogout = async () => {
+    logout().then((success) => {
+      if (success) {
+        window.location.href = "/login";
+      }
+    });
+  };
 
   let mobileNavOpen = false;
 
@@ -54,29 +62,29 @@
       >
 
       <a
-        href="/hub/dashboard/settings"
+        href="/hub/dashboard/account"
         class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
-          $page.url.pathname === "/hub/dashboard/settings"
+          $page.url.pathname === "/hub/dashboard/account"
             ? ""
             : "text-neutral-400"
         }`}
       >
         <IconSettings size={24} stroke={2} />
-        Settings</a
+        Account</a
       >
       <a
-            href="/find"
-            class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
-              $page.url.pathname === "/find" ? "" : "text-neutral-400"
-            }`}
-          >
-            <IconSearch size={24} stroke={2} />
-            Back To Find</a
-          >
+        href="/find"
+        class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
+          $page.url.pathname === "/find" ? "" : "text-neutral-400"
+        }`}
+      >
+        <IconSearch size={24} stroke={2} />
+        Back To Find</a
+      >
     </ul>
 
     <div class="flex flex-1 flex-col items-center justify-center">
-      {#if !$memberType.isPro}
+      <!-- {#if !$memberType.isPro}
         <div
           class="flex flex-col h-[60%] w-[90%] items-center justify-center rounded-md text-center bg-gradient-to-br from-[#F94144] to-[#F3722C]"
         >
@@ -88,17 +96,17 @@
             >Upgrade</a
           >
         </div>
-      {/if}
+      {/if} -->
     </div>
     <div class="flex flex-col items-start gap-4">
       <a
         href="/"
-        class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white"
+        class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white text-lg"
         ><IconHelp size={24} stroke={2} />Help</a
       >
       <button
-        class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white"
-        on:click={() => authHandlers.logout()}
+        class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white text-lg"
+        on:click={() => handleLogout()}
       >
         <IconLogout size={24} stroke={2} />
         Logout</button
@@ -106,7 +114,7 @@
     </div>
   </nav>
   <nav
-    class="md:w-[275px] w-full flex md:hidden flex-col gap-4 text-white h-12 relative z-50 bg-matteBlack"
+    class="md:w-[275px] w-full flex md:hidden flex-col gap-4 text-white h-fit md:h-12 relative z-50 bg-matteBlack"
   >
     <div
       class="flex flex-row items-center justify-between w-full p-5 border-b-[1px] border-neutral-500 bg-matteBlack"
@@ -151,15 +159,15 @@
           >
 
           <a
-            href="/hub/dashboard/settings"
+            href="/hub/dashboard/account"
             class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
-              $page.url.pathname === "/hub/dashboard/settings"
+              $page.url.pathname === "/hub/dashboard/account"
                 ? ""
                 : "text-neutral-400"
             }`}
           >
             <IconSettings size={24} stroke={2} />
-            Settings</a
+            Account</a
           >
 
           <a
@@ -172,7 +180,7 @@
             Back To Find</a
           >
 
-          <div class="flex flex-row items-center justify-center">
+          <!-- <div class="flex flex-row items-center justify-center">
             {#if !$memberType.isPro}
               <div
                 class="flex w-full items-center justify-between p-3 rounded-md text-center bg-gradient-to-br from-[#F94144] to-[#F3722C]"
@@ -189,16 +197,16 @@
                 >
               </div>
             {/if}
-          </div>
+          </div>  -->
           <div class="flex flex-col items-start gap-4">
             <a
               href="/"
-              class="flex flex-row items-center gap-2 text-neutral-400"
+              class="flex flex-row items-center gap-2 text-neutral-400 text-lg"
               ><IconHelp size={24} stroke={2} />Help</a
             >
             <button
-              class="flex flex-row items-center gap-2 text-neutral-400"
-              on:click={() => authHandlers.logout()}
+              class="flex flex-row items-center gap-2 text-neutral-400 text-lg"
+              on:click={() => handleLogout()}
             >
               <IconLogout size={24} stroke={2} />
               Logout</button
@@ -209,7 +217,7 @@
     {/if}
   </nav>
 
-  <div class="h-full w-full py-10 px-2 md:px-10 relative overflow-scroll z-0">
+  <div class="h-full w-full  relative overflow-scroll z-0">
     <slot />
   </div>
 </div>

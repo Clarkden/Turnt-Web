@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { IconCalendar } from "@tabler/icons-svelte";
+  import { IconCalendar, IconQuestionMark } from "@tabler/icons-svelte";
 
   import { Ticket } from "../../lib/types";
   import { IconCirclePlus } from "@tabler/icons-svelte";
@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
   import { clickOutside } from "../../lib/clickOutSide";
   import { DateTime } from "luxon";
+  import { fly } from "svelte/transition";
   const dispatch = createEventDispatcher();
 
   let tickets: Ticket[] = [];
@@ -26,6 +27,7 @@
   let timeOptions: string[] = [];
   let showTimeStartDropdown = false;
   let showTimeEndDropdown = false;
+  let error: string = "";
 
   export let data: any;
 
@@ -42,6 +44,11 @@
 
     if (ticketSaleEnd && !selectedTimeEnd) {
       selectedTimeEnd = "12:00 AM";
+    }
+
+    if (ticketPrice < 1) {
+      error = "Ticket price must be greater than 0";
+      return;
     }
 
     tickets = [
@@ -67,6 +74,7 @@
     selectedTimeStart = "";
     selectedTimeEnd = "";
     ticketPrice = 0;
+    showAdvancedOptions = false;
   };
 
   const completion = () => {
@@ -114,7 +122,56 @@
 </script>
 
 <h1 class="font-bold text-3xl text-white mb-4">Let's make some tickets</h1>
-
+{#if error}
+  <div
+    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
+    in:fly={{ y: 100, duration: 200 }}
+    out:fly={{ y: 100, duration: 200 }}
+  >
+    <div class="flex items-center space-x-3">
+      <div class="text-mainRed">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </div>
+      <div class="flex-1 text-mainRed">
+        <p class="font-semibold">{error}</p>
+      </div>
+      <button
+        class="text-gray-400 hover:text-gray-600 transition"
+        on:click={() => {
+          error = "";
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+{/if}
 <div class="w-full h-fit text-white">
   {#if creatingTicket}
     <form
@@ -325,7 +382,96 @@
       <div class="bg-matteBlack p-4 rounded-md flex flex-col">
         <h1 class="text-lg font-bold">{ticket.name}</h1>
         {#if ticket.price}
-          <p>${ticket.price}</p>
+          <div class="flex flex-row gap-5">
+            <p>
+              Price: <span class="text-green-400"
+                >${ticket.price.toFixed(2)}</span
+              >
+            </p>
+            <p class="flex flex-row gap-3 items-center">
+              You Profit: <span class="text-green-400"
+                >${(ticket.price - ticket.price * 0.07).toFixed(2)}</span
+              >
+            </p>
+            <div
+              tabindex="0"
+              role="link"
+              aria-label="tooltip 1"
+              class="focus:outline-none focus:ring-gray-300 rounded-full focus:ring-offset-2 focus:ring-2 focus:bg-gray-200 relative mt-20 md:mt-0 group"
+            >
+              <div class=" cursor-pointer">
+                <svg
+                  aria-haspopup="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="icon icon-tabler icon-tabler-info-circle"
+                  width="25"
+                  height="25"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="#A0AEC0"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" />
+                  <circle cx="12" cy="12" r="9" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                  <polyline points="11 12 12 12 12 16 13 16" />
+                </svg>
+              </div>
+              <div
+                id="tooltip1"
+                role="tooltip"
+                class="z-20 -mt-16 w-64 absolute group-hover:inline-block hidden transition duration-150 ease-in-out left-0 ml-8 shadow-lg bg-white p-4 rounded"
+              >
+                <svg
+                  class="absolute left-0 -ml-2 bottom-0 top-0 h-full"
+                  width="9px"
+                  height="16px"
+                  viewBox="0 0 9 16"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                >
+                  <g
+                    id="Page-1"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                  >
+                    <g
+                      id="Tooltips-"
+                      transform="translate(-874.000000, -1029.000000)"
+                      fill="#FFFFFF"
+                    >
+                      <g
+                        id="Group-3-Copy-16"
+                        transform="translate(850.000000, 975.000000)"
+                      >
+                        <g
+                          id="Group-2"
+                          transform="translate(24.000000, 0.000000)"
+                        >
+                          <polygon
+                            id="Triangle"
+                            transform="translate(4.500000, 62.000000) rotate(-90.000000) translate(-4.500000, -62.000000) "
+                            points="4.5 57.5 12.5 66.5 -3.5 66.5"
+                          />
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </svg>
+                <p class="text-sm font-bold text-gray-800 pb-1">
+                  Application Fee
+                </p>
+                <p class="text-xs leading-4 text-gray-600 pb-3">
+                  We take a 7% application fee to keep our platform running.
+                </p>
+              </div>
+            </div>
+          </div>
         {/if}
         {#if ticket.gender}
           <p>{ticket.gender}</p>
@@ -377,46 +523,3 @@
     </button>
   {/if}
 </div>
-
-<!-- {#each tickets as ticket}
-  <div class="w-full h-fit bg-matteBlack rounded-md p-3">
-    <div class="flex flex-col gap-2">
-      <label for="name">Ticket Name</label>
-      <input
-        type="text"
-        name="name"
-        id="name"
-        placeholder="Ticket Name"
-        bind:value={ticket.name}
-        class="border-[1px] p-1 rounded-md"
-      />
-    </div>
-    <div class="flex flex-col gap-2">
-      <label for="price">Ticket Price</label>
-      <input
-        type="number"
-        name="price"
-        id="price"
-        placeholder="Ticket Price"
-        bind:value={ticket.price}
-        class="border-[1px] p-1 rounded-md"
-      />
-    </div>
-    {#if}
-    <div>
-      <div class="flex flex-col gap-2">
-        <label for="quantity">Ticket Quantity</label>
-        <input
-          type="number"
-          name="quantity"
-          id="quantity"
-          placeholder="Ticket Quantity"
-          bind:value={ticket.quantity}
-          class="border-[1px] p-1 rounded-md"
-        />
-      </div>
-    </div>
-    {/if}
-  </div>
-  {JSON.stringify(ticket)}
-{/each} -->

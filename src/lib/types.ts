@@ -54,6 +54,7 @@ export class Party {
   description: string;
   date: string;
   location: string;
+  longAndLat: string;
   startTime: string;
   endTime: string;
   paidParty: boolean;
@@ -70,6 +71,7 @@ export class Party {
     description: string = "",
     date: string = "",
     location: string = "",
+    latAndLong: string = "",
     startTime: string = "",
     endTime: string = "",
     paidParty: boolean = false,
@@ -85,6 +87,7 @@ export class Party {
     this.description = description;
     this.date = date;
     this.location = location;
+    this.longAndLat = latAndLong;
     this.startTime = startTime;
     this.endTime = endTime;
     this.paidParty = paidParty;
@@ -103,6 +106,7 @@ export class Party {
       description: this.description,
       date: this.date,
       location: this.location,
+      longAndLat: this.longAndLat,
       startTime: this.startTime,
       endTime: this.endTime,
       paidParty: this.paidParty,

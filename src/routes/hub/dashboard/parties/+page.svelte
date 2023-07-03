@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { authStore, memberType } from "../../../../stores/authStore";
+  // import { authStore, memberType } from "../../../../stores/authStore";
   import { db } from "../../../../lib/firebase";
   import {
     setDoc,
@@ -18,6 +18,8 @@
   import { IconDots } from "@tabler/icons-svelte";
   import { DateTime } from "luxon";
   import PartyComponent from "../../../../components/PartyComponent.svelte";
+  import { onMount } from "svelte";
+  import { page } from "$app/stores";
 
   let usersParties: any[] = [];
   let showPartyForm: boolean = false;
@@ -31,35 +33,37 @@
   const splitParties = () => {
     const now = DateTime.now();
     usersParties.forEach((party) => {
-      const partyDate = DateTime.fromISO(party.date);
-      if (partyDate.startOf("day") < now.startOf("day"))
-        pastParties.push(party);
-      else if (partyDate.startOf("day") > now.startOf("day"))
-        upcomingParties.push(party);
+      const partyDate = DateTime.fromISO(party.date).set({
+        hour: DateTime.fromFormat(party.endTime, "h:mm a").hour,
+        minute: DateTime.fromFormat(party.endTime, "h:mm a").minute,
+      });
+
+      if (partyDate < now) pastParties.push(party);
+      else if (partyDate > now) upcomingParties.push(party);
       else todayParties.push(party);
     });
   };
 
   $: if (usersParties.length > 0) splitParties();
 
-  $: if (!$authStore.isLoading && $authStore.currentUser) {
+  onMount(() => {
     const unsubscribe = onSnapshot(
       query(
         collection(db, "parties"),
-        where("hostAccountId", "==", $authStore.currentUser["uid"])
+        where("hostAccountId", "==", $page.data.uid)
       ),
       (snapshot) => {
-        const parties: any = [];
+        let parties: any = [];
         snapshot.forEach((doc) => {
-          parties.push({ id: doc.id, ...doc.data() });
+          parties = [...parties, { id: doc.id, ...doc.data() }];
         });
         usersParties = parties;
       }
     );
-  }
+  });
 </script>
 
-<div class="w-full h-full overflow-scroll">
+<div class="w-full h-full overflow-scroll p-4 md:p-10">
   {#if showPartyForm}
     <div
       class="absolute w-full h-full bg-black/50 -m-2 -my-3 md:-m-10 flex flex-col items-center justify-center z-50"
@@ -93,30 +97,38 @@
       class="bg-white p-2 rounded-md hover:bg-gray-200">Qr Code Scanner</a
     >
   </div>
-  <div class="flex flex-col gap-5 mt-5">
+  <div class="flex flex-col gap-10 mt-5">
     {#if usersParties.length > 0}
       {#if todayParties.length > 0}
-        <h1 class="text-2xl font-bold text-neutral-200">Today's Parties</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
-          {#each todayParties as party}
-            <PartyComponent {party} />
-          {/each}
+        <div>
+          <h1 class="text-2xl font-bold text-neutral-200 mb-2">Today's Parties</h1>
+          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+            {#each todayParties as party}
+              <PartyComponent {party} />
+            {/each}
+          </div>
         </div>
       {/if}
       {#if upcomingParties.length > 0}
-        <h1 class="text-2xl font-bold text-neutral-200">Your Upcoming Parties</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
-          {#each upcomingParties as party}
-            <PartyComponent {party} />
-          {/each}
+        <div>
+          <h1 class="text-2xl font-bold text-neutral-200 mb-2">
+            Your Upcoming Parties
+          </h1>
+          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+            {#each upcomingParties as party}
+              <PartyComponent {party} />
+            {/each}
+          </div>
         </div>
       {/if}
       {#if pastParties.length > 0}
-        <h1 class="text-2xl font-bold text-neutral-200">Past Parties</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
-          {#each pastParties as party}
-            <PartyComponent {party} />
-          {/each}
+        <div>
+          <h1 class="text-2xl font-bold text-neutral-200 mb-2">Past Parties</h1>
+          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+            {#each pastParties as party}
+              <PartyComponent {party} />
+            {/each}
+          </div>
         </div>
       {/if}
     {/if}

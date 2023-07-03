@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { authStore } from "../../stores/authStore";
+  // import { authStore } from "../../stores/authStore";
   import { db } from "../../lib/firebase";
   import { getDocs, collection, query, where } from "firebase/firestore";
   import { onMount } from "svelte";
@@ -8,14 +8,23 @@
   let thisMonthsParties: any = [];
   let thisWeeksParties: any = [];
   let todaysParties: any = [];
-  let selectedRange: string = "thisMonth";
+  let nearbyParties: any = [];
+  let findNearbyParties: boolean = false;
+  let selectedView: string = "thisMonth";
+  let userLocation: string = "";
+  let loadingParties: boolean = true;
+  let loadingLocation: boolean = false;
+  let loadingLocationError: string = "";
 
-  $: parties =
-    selectedRange === "thisMonth"
-      ? thisMonthsParties
-      : selectedRange === "thisWeek"
-      ? thisWeeksParties
-      : todaysParties;
+  let parties: any = [];
+  //   $: parties =
+  //     selectedView === "thisMonth"
+  //       ? thisMonthsParties
+  //       : selectedView === "thisWeek"
+  //       ? thisWeeksParties
+  //       : selectedView === "nearby"
+  //       ? nearbyParties
+  //       : todaysParties;
 
   const getThisMonthsParties = async () => {
     let now = DateTime.local();
@@ -37,21 +46,135 @@
     }));
 
     thisMonthsParties = parties;
+    loadingParties = false;
   };
 
   $: if (thisMonthsParties.length > 0) {
+    let todays: any = [];
+    let thisWeeks: any = [];
+
+    thisMonthsParties = thisMonthsParties.filter((party: any) => {
+      let partyDate = DateTime.fromISO(party.date);
+      let partyEndTime = DateTime.fromFormat(party.endTime, "h:mm a");
+
+      // combine the date and the time to get the exact end time
+      let partyEnd = DateTime.fromObject({
+        year: partyDate.year,
+        month: partyDate.month,
+        day: partyDate.day,
+        hour: partyEndTime.hour,
+        minute: partyEndTime.minute,
+      });
+
+      let now = DateTime.local();
+
+      // Exclude parties that have already ended
+      return partyEnd > now;
+    });
+
     thisMonthsParties.forEach((party: any) => {
       let partyDate = DateTime.fromISO(party.date);
       let now = DateTime.local();
-      if (partyDate.startOf("day") < now.startOf("day")) {
-        todaysParties.push(party);
-      } else if (
-        partyDate.startOf("day") > now.startOf("day") &&
+
+      if (partyDate.startOf("day") <= now.startOf("day")) {
+        todays = [...todays, party];
+      }
+      if (
+        partyDate.startOf("day") >= now.startOf("day") &&
         partyDate.startOf("day") < now.plus({ weeks: 1 }).startOf("day")
       ) {
-        thisWeeksParties.push(party);
+        thisWeeks = [...thisWeeks, party];
       }
     });
+
+    todaysParties = todays;
+    thisWeeksParties = thisWeeks;
+  }
+
+  function calculateDistance(coord1: string, coord2: string) {
+    const R = 6371; // Radius of the Earth in kilometers
+
+    const [lat1, lon1] = coord1.slice(1, -1).split(", ").map(Number);
+    const [lat2, lon2] = coord2.slice(1, -1).split(", ").map(Number);
+
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
+
+    const lat1Rad = degreesToRadians(lat1);
+    const lat2Rad = degreesToRadians(lat2);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.sin(dLon / 2) *
+        Math.sin(dLon / 2) *
+        Math.cos(lat1Rad) *
+        Math.cos(lat2Rad);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance;
+  }
+
+  function degreesToRadians(degrees: any) {
+    return degrees * (Math.PI / 180);
+  }
+
+  const getNearbyParties = async () => {
+    nearbyParties = [];
+    // console.log("getting nearby parties", userLocation, nearbyParties);
+
+    if (selectedView === "thisMonth") {
+      await thisMonthsParties.forEach((party: any) => {
+        let distance = calculateDistance(userLocation, party.latAndLong);
+        // console.log(party.name, distance);
+
+        if (distance < 20) {
+          nearbyParties = [...nearbyParties, party];
+        }
+      });
+    } else if (selectedView === "thisWeek") {
+      await thisWeeksParties.forEach((party: any) => {
+        let distance = calculateDistance(userLocation, party.latAndLong);
+        // console.log(party.name, distance);
+
+        if (distance < 20) {
+          nearbyParties = [...nearbyParties, party];
+        }
+      });
+    } else if (selectedView === "today") {
+      await todaysParties.forEach((party: any) => {
+        let distance = calculateDistance(userLocation, party.latAndLong);
+        // console.log(party.name, distance);
+
+        if (distance < 20) {
+          nearbyParties = [...nearbyParties, party];
+        }
+      });
+    }
+    // console.log("nearby parties", nearbyParties);
+  };
+
+  $: console.log(loadingLocationError);
+
+  $: if (findNearbyParties && userLocation !== "") {
+    getNearbyParties();
+    parties = nearbyParties;
+  }
+
+  $: if (selectedView && findNearbyParties && userLocation !== "") {
+    getNearbyParties();
+    parties = nearbyParties;
+  }
+
+  $: if (selectedView && !findNearbyParties) {
+    parties =
+      selectedView === "thisMonth"
+        ? thisMonthsParties
+        : selectedView === "thisWeek"
+        ? thisWeeksParties
+        : selectedView === "nearby"
+        ? nearbyParties
+        : todaysParties;
   }
 
   onMount(() => {
@@ -59,71 +182,176 @@
   });
 </script>
 
-<!-- <div class="flex flex-row items-center justify-around">
-  <button
-    class="text-mainRed font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-red-600 border border-mainRed"
-    on:click={() => (selectedRange = "thisMonth")}
-  >
-    This Month
-  </button>
-  <button
-    class="text-mainRed font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-red-600 border border-mainRed"
-    on:click={() => (selectedRange = "thisWeek")}
-  >
-    This Week
-  </button>
-  <button
-    class="text-mainRed font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-red-600 border border-mainRed"
-    on:click={() => (selectedRange = "today")}
-  >
-    Today
-  </button>
-</div> -->
+<div
+  class="flex flex-col sm:flex-row sm:gap-4 w-full  justify-between"
+>
+  <div class="flex flex-row gap-4  my-4 p-4 w-full sm:w-fit">
+    <button
+      class={`
+      px-4 py-2 rounded text-white  border
+      ${
+        selectedView === "thisMonth"
+          ? " text-mainRed border-mainRed bg-mainRed/50"
+          : "bg-gray-200/25"
+      }
+    `}
+      on:click={() => {
+        selectedView = "thisMonth";
+      }}
+    >
+      This Month
+    </button>
+    <button
+      class={`px-4 py-2 rounded  text-white bg-gray-200/25 border
+       ${
+         selectedView === "thisWeek"
+           ? " text-mainRed border-mainRed bg-mainRed/50"
+           : "bg-gray-200/25"
+       }`}
+      on:click={() => {
+        selectedView = "thisWeek";
+      }}
+    >
+      This Week
+    </button>
+    <button
+      class={`px-4 py-2 rounded  text-white  bg-gray-200/25 border
+       ${
+         selectedView === "today"
+           ? " text-mainRed border-mainRed bg-mainRed/50"
+           : "bg-gray-200/25"
+       }`}
+      on:click={() => {
+        selectedView = "today";
+      }}
+    >
+      Today
+    </button>
+  </div>
+  <div class="flex flex-row gap-4 w-fit h-fit sm:my-4 p-4">
+    <button
+      class={`px-4 py-2 rounded  text-white bg-gray-200/25 border
+       ${
+         findNearbyParties
+           ? " text-mainRed border-mainRed bg-mainRed/50"
+           : "bg-gray-200/25"
+       }`}
+      on:click={() => {
+        findNearbyParties = !findNearbyParties;
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-  {#each parties as party (party.id)}
-    <div class="rounded overflow-hidden shadow-lg m-2 bg-white">
-      <img
-        class="w-full h-64 object-cover"
-        src={party.flyerPath}
-        alt="Party flyer"
-      />
-      <div class="px-6 py-4">
-        <div class="flex flex-row justify-between items-center">
-          <div class="font-bold text-xl mb-2">{party.name}</div>
-          <a
-            href="/{party.id}"
-            class="inline-block bg-mainRed hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 ease-in-out"
-          >
-            View
-          </a>
-        </div>
-        <p
-          class="text-gray-700 text-base overflow-ellipsis overflow-hidden mt-3"
-        >
-          {party.description}
-        </p>
-      </div>
-      <div class="px-6 pt-4 pb-2">
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-          >Date: {party.date}</span
-        >
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-          >Start Time: {party.startTime}</span
-        >
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-          >End Time: {party.endTime}</span
-        >
-        {#if party.ageLimit > 0}
-          <span
-            class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-            >Age Limit: {party.ageLimit}+</span
-          >
-        {/if}
-      </div>
-    </div>
-  {/each}
+        if (userLocation !== "") {
+          getNearbyParties();
+        } else {
+          loadingLocation = true;
+
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              userLocation = `(${position.coords.latitude}, ${position.coords.longitude})`;
+              loadingLocation = false;
+            },
+            (error) => {
+              loadingLocation = false;
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  loadingLocationError =
+                    "User denied the request for Geolocation.";
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  loadingLocationError = "Location information is unavailable.";
+                  break;
+                case error.TIMEOUT:
+                  loadingLocationError =
+                    "The request to get user location timed out.";
+                  break;
+                default:
+                  loadingLocationError = "An unknown error occurred.";
+                  break;
+              }
+              findNearbyParties = false;
+            },
+            {
+              timeout: 5000,
+              maximumAge: 1000000,
+            }
+          );
+        }
+      }}
+    >
+      {#if loadingLocation}
+        <span class="animate-pulse">Loading...</span>
+      {:else if loadingLocationError}
+        <span class="text-red-300">Couldn't get location</span>
+      {:else}
+        <span>Find Nearby</span>
+      {/if}
+    </button>
+  </div>
 </div>
+{#if !loadingParties}
+  {#if parties.length > 0}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+      {#each parties as party (party.id)}
+        <a
+          href={`/${party.id}`}
+          class="rounded overflow-hidden shadow-lg bg-white flex flex-col justify-between relative h-[500px] group"
+        >
+          <img
+            class="w-full h-full object-cover absolute z-0"
+            src={party.flyerPath}
+            alt="Party flyer"
+          />
+          <div
+            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-black group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition duration-500 ease-in-out"
+          >
+            <div class="px-6 py-4">
+              <div class="flex flex-row justify-between items-center">
+                <div class="font-bold text-xl mb-2">{party.name}</div>
+              </div>
+              <p
+                class="text-gray-300 text-base overflow-ellipsis overflow-hidden mt-3"
+              >
+                {party.description}
+              </p>
+            </div>
+            <div class="px-6 pt-4 pb-2">
+              <span
+                class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                >When:
+                {#if DateTime.fromISO(party.date).hasSame(DateTime.local(), "day")}
+                  Today
+                {:else if DateTime.local()
+                  .plus({ days: 1 })
+                  .hasSame(DateTime.fromISO(party.date), "day")}
+                  Tomorrow
+                {:else}
+                  {DateTime.fromISO(party.date).toLocaleString(
+                    DateTime.DATE_FULL
+                  )}
+                {/if}</span
+              >
+              <span
+                class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                >Time: {party.startTime} - {party.endTime}</span
+              >
+              {#if party.ageLimit > 0}
+                <span
+                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >Age Limit: {party.ageLimit}+</span
+                >
+              {/if}
+            </div>
+          </div>
+        </a>
+      {/each}
+    </div>
+  {:else}
+    <div class="flex flex-col items-center justify-center h-[100vh] text-white">
+      <div class="text-2xl font-bold">No parties found</div>
+      <div class="text-xl">Try changing the view</div>
+    </div>
+  {/if}
+{:else}
+  <div class="flex flex-col items-center justify-center h-[100vh] text-white">
+    <div class="text-2xl font-bold">Loading...</div>
+  </div>
+{/if}
