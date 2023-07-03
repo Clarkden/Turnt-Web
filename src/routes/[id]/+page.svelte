@@ -39,7 +39,7 @@
   }, 1000);
 
   let party: any = {};
-  let stripeAccountId: string = "";
+  // let stripeAccountId: string = "";
   let phonenumberModal: boolean = false;
   let phoneNumber: string = "";
   let selectedTicket: any = null;
@@ -55,8 +55,8 @@
       doc(db, "stripe-accounts", party.hostAccountId)
     );
     if (hostStripe.exists()) {
-      stripeAccountId = hostStripe.data().stripeAccountId;
-    } else return;
+      return hostStripe.data().stripeAccountId;
+    } else return null;
   };
 
   onMount(() => {
@@ -69,7 +69,7 @@
       }
     );
 
-    getHostStripeAccountId();
+    // getHostStripeAccountId();
   });
 
   $: if (phoneNumber && phoneNumber.match(/\d/g)?.length === 10) {
@@ -162,7 +162,7 @@
       let checkoutSession = await axios.post("/api/createCheckoutSession", {
         party,
         ticket: selectedTicket,
-        stripeAccountId: stripeAccountId,
+        stripeAccountId: await getHostStripeAccountId(),
         purchaserPhoneNumber: phoneNumber,
       });
       goto(checkoutSession.data.url);

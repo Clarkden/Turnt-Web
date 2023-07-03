@@ -104,79 +104,17 @@
 </svelte:head>
 
 <body class="h-screen w-screen overflow-clip bg-matteBlack font-poppins">
-  {#if !$page.route.id?.includes("hub")}
-    <nav
-      class={`h-16 bg-[#F94144] text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
-    >
-      <a
-        href="/"
-        class="h-full flex flex-col items-center justify-center font-extrabold text-2xl"
-        >turnt.party</a
+  <div class="overflow-scroll w-full h-full">
+    {#if !$page.route.id?.includes("hub")}
+      <nav
+        class={`h-16 bg-[#F94144] text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
       >
-      <ul class="flex flex-row gap-4">
-        <li>
-          <a href="/find" class="font-light hover:text-matteBlack"
-            >Find Parties</a
-          >
-        </li>
-
-        {#if $user}
-          <li>
-            <a href="/hub/dashboard" class="font-light hover:text-matteBlack"
-              >Dashboard</a
-            >
-          </li>
-          <button
-            on:click={() => {
-              handleLogout();
-            }}
-            class="font-light hover:text-matteBlack">Logout</button
-          >
-        {:else}
-          <li>
-            <a href="/login" class="font-light hover:text-matteBlack">Login</a>
-          </li>
-          <li>
-            <a href="/register" class="font-light hover:text-matteBlack"
-              >Register</a
-            >
-          </li>
-        {/if}
-      </ul>
-    </nav>
-
-    <nav
-      class={`h-16 bg-[#F94144] text-white w-full md:hidden flex flex-row items-center justify-between relative ${
-        !showMobileNav && "drop-shadow-lg"
-      } z-50`}
-    >
-      <div class="flex flex-row justify-between w-full px-4">
         <a
           href="/"
           class="h-full flex flex-col items-center justify-center font-extrabold text-2xl"
           >turnt.party</a
         >
-
-        <button
-          on:click={() => {
-            showMobileNav = !showMobileNav;
-          }}
-          transition:fade
-        >
-          {#if showMobileNav}
-            <IconX class="w-6 h-6" />
-          {:else}
-            <IconMenu2 class="w-6 h-6" />
-          {/if}
-        </button>
-      </div>
-
-      {#if showMobileNav}
-        <ul
-          class="flex flex-col gap-4 absolute bg-mainRed w-full top-[63px] p-3 drop-shadow-lg z-50"
-          in:slide
-          out:slide
-        >
+        <ul class="flex flex-row gap-4">
           <li>
             <a href="/find" class="font-light hover:text-matteBlack"
               >Find Parties</a
@@ -190,8 +128,10 @@
               >
             </li>
             <button
-              on:click={() => handleLogout()}
-              class="font-light hover:text-matteBlack text-start">Logout</button
+              on:click={() => {
+                handleLogout();
+              }}
+              class="font-light hover:text-matteBlack">Logout</button
             >
           {:else}
             <li>
@@ -205,11 +145,75 @@
             </li>
           {/if}
         </ul>
-      {/if}
-    </nav>
-  {/if}
+      </nav>
 
-  <div class="overflow-scroll w-full h-full">
+      <nav
+        class={`h-16 bg-[#F94144] text-white w-full md:hidden flex flex-row items-center justify-between relative ${
+          !showMobileNav && "drop-shadow-lg"
+        } z-50`}
+      >
+        <div class="flex flex-row justify-between w-full px-4">
+          <a
+            href="/"
+            class="h-full flex flex-col items-center justify-center font-extrabold text-2xl"
+            >turnt.party</a
+          >
+
+          <button
+            on:click={() => {
+              showMobileNav = !showMobileNav;
+            }}
+            transition:fade
+          >
+            {#if showMobileNav}
+              <IconX class="w-6 h-6" />
+            {:else}
+              <IconMenu2 class="w-6 h-6" />
+            {/if}
+          </button>
+        </div>
+
+        {#if showMobileNav}
+          <ul
+            class="flex flex-col gap-4 absolute bg-mainRed w-full top-[63px] p-3 drop-shadow-lg z-50"
+            in:slide
+            out:slide
+          >
+            <li>
+              <a href="/find" class="font-light hover:text-matteBlack"
+                >Find Parties</a
+              >
+            </li>
+
+            {#if $user}
+              <li>
+                <a
+                  href="/hub/dashboard"
+                  class="font-light hover:text-matteBlack">Dashboard</a
+                >
+              </li>
+              <button
+                on:click={() => handleLogout()}
+                class="font-light hover:text-matteBlack text-start"
+                >Logout</button
+              >
+            {:else}
+              <li>
+                <a href="/login" class="font-light hover:text-matteBlack"
+                  >Login</a
+                >
+              </li>
+              <li>
+                <a href="/register" class="font-light hover:text-matteBlack"
+                  >Register</a
+                >
+              </li>
+            {/if}
+          </ul>
+        {/if}
+      </nav>
+    {/if}
+
     <slot />
   </div>
 </body>
