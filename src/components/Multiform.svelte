@@ -61,8 +61,7 @@
     );
 
     if (findDuplicateAddressOnDate.docs.length > 0) {
-      error =
-        "You cannot have two parties at the same address on the same day.";
+      alert("You cannot have two parties at the same address on the same day.");
       return;
     }
 
@@ -110,6 +109,8 @@
 
         await setDoc(doc(db, "hosts", $page.data.uid), hostData);
       }
+
+      completion();
     } else {
       console.log("no party");
     }
@@ -361,7 +362,6 @@
     <button
       on:click={() => {
         createParty();
-        completion();
       }}
       class="bg-black text-white rounded-md p-2 w-full my-4"
     >

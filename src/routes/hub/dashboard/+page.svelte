@@ -116,21 +116,23 @@
       }
 
       return (stripeAccountId = hostStripe.data().stripeAccountId);
-    } else return;
+    } else return null;
   };
 
   const getRecentTransactions = async () => {
     try {
-      const accountTransactions = await axios.post(
-        "/api/getRecentTransactions",
-        {
-          stripeAccountId: stripeAccountId,
-        }
-      );
+      if (stripeAccountId) {
+        const accountTransactions = await axios.post(
+          "/api/getRecentTransactions",
+          {
+            stripeAccountId: stripeAccountId,
+          }
+        );
 
-      if (accountTransactions.data.data.length > 0) {
-        recentTransactions = accountTransactions.data.data;
-        console.log(recentTransactions);
+        if (accountTransactions.data.data.length > 0) {
+          recentTransactions = accountTransactions.data.data;
+          console.log(recentTransactions);
+        }
       }
     } catch (err) {
       console.log(err);

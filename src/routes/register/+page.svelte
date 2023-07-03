@@ -4,6 +4,8 @@
   // import { authStore, authHandlers } from "../../stores/authStore";
   import { IconBrandGoogle } from "@tabler/icons-svelte";
   import { page } from "$app/stores";
+  import { browser } from "$app/environment";
+  import { user } from "$lib/stores/auth";
 
   let email: string;
   let password: string;
@@ -25,9 +27,11 @@
     });
   };
 
-  // $: if ($page.data.uid) {
-  //   window.location.href = "/hub/dashboard";
-  // }
+  $: if (browser) {
+    if ($user) {
+      window.location.href = "/hub/dashboard";
+    }
+  }
 </script>
 
 <svelte:head>

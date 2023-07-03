@@ -30,6 +30,12 @@
     })
   };
 
+  $: if(browser) {
+    if($user) {
+      window.location.href = "/hub/dashboard";
+    }
+  }
+
 </script>
 
 <svelte:head>

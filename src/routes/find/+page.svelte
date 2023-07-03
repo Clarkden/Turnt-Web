@@ -15,6 +15,7 @@
   let loadingParties: boolean = true;
   let loadingLocation: boolean = false;
   let loadingLocationError: string = "";
+  let nearbyDistance: number = 10;
 
   let parties: any = [];
   //   $: parties =
@@ -128,7 +129,7 @@
         let distance = calculateDistance(userLocation, party.latAndLong);
         // console.log(party.name, distance);
 
-        if (distance < 20) {
+        if (distance < nearbyDistance) {
           nearbyParties = [...nearbyParties, party];
         }
       });
@@ -137,7 +138,7 @@
         let distance = calculateDistance(userLocation, party.latAndLong);
         // console.log(party.name, distance);
 
-        if (distance < 20) {
+        if (distance < nearbyDistance) {
           nearbyParties = [...nearbyParties, party];
         }
       });
@@ -146,7 +147,7 @@
         let distance = calculateDistance(userLocation, party.latAndLong);
         // console.log(party.name, distance);
 
-        if (distance < 20) {
+        if (distance < nearbyDistance) {
           nearbyParties = [...nearbyParties, party];
         }
       });
@@ -162,6 +163,11 @@
   }
 
   $: if (selectedView && findNearbyParties && userLocation !== "") {
+    getNearbyParties();
+    parties = nearbyParties;
+  }
+
+  $: if(nearbyDistance) {
     getNearbyParties();
     parties = nearbyParties;
   }
@@ -182,10 +188,8 @@
   });
 </script>
 
-<div
-  class="flex flex-col sm:flex-row sm:gap-4 w-full  justify-between"
->
-  <div class="flex flex-row gap-4  my-4 p-4 w-full sm:w-fit">
+<div class="flex flex-col sm:flex-row sm:gap-4 w-full justify-between">
+  <div class="flex flex-row gap-4 my-4 p-4 w-full sm:w-fit">
     <button
       class={`
       px-4 py-2 rounded text-white  border
@@ -285,6 +289,14 @@
         <span>Find Nearby</span>
       {/if}
     </button>
+
+    <select bind:value={nearbyDistance} class="px-4 py-2 rounded  text-white bg-gray-200/25 border cursor-pointer">
+      <option value={5}>5 miles</option>
+      <option value={10}>10 miles</option>
+      <option value={20}>20 miles</option>
+      <option value={50}>50 miles</option>
+      <option value={100}>100 miles</option>
+    </select>
   </div>
 </div>
 {#if !loadingParties}

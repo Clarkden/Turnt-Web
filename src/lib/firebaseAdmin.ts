@@ -15,6 +15,8 @@ async function makeApp() {
     return apps[0]!;
   }
 
+  console.log(FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'))
+
   return initializeApp({
     credential: await cert({
       privateKey: FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'),

@@ -45,6 +45,7 @@
   let selectedTicket: any = null;
   let message: string = "";
   let validPhoneNumber: boolean = false;
+  let countryCode: string = "+1";
 
   let name: string = "";
   let instagram: string = "";
@@ -72,7 +73,12 @@
     // getHostStripeAccountId();
   });
 
-  $: if (phoneNumber && phoneNumber.match(/\d/g)?.length === 10) {
+  $: if (
+    phoneNumber &&
+    phoneNumber.match(
+      /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+    )
+  ) {
     validPhoneNumber = true;
   } else {
     validPhoneNumber = false;
@@ -163,7 +169,7 @@
         party,
         ticket: selectedTicket,
         stripeAccountId: await getHostStripeAccountId(),
-        purchaserPhoneNumber: phoneNumber,
+        purchaserPhoneNumber: countryCode + phoneNumber,
       });
       goto(checkoutSession.data.url);
     } catch (error) {
@@ -334,12 +340,23 @@
           <h1 class="text-2xl font-bold">Enter your phone number</h1>
           <p class="text-gray-500">Phone number to receive your ticket</p>
         </div>
-        <input
-          type="text"
-          class="w-full border-[1px] rounded-md p-2"
-          placeholder="Phone Number"
-          bind:value={phoneNumber}
-        />
+        <div class="flex gap-2">
+          <select
+            bind:value={countryCode}
+            class="w-1/4 border-[1px] rounded-md p-2"
+          >
+            <!-- List of country codes. Could be dynamically populated -->
+            <option value="+1">US (+1)</option>
+            <!-- <option value="+44">UK (+44)</option> -->
+            <!-- Add other countries here -->
+          </select>
+          <input
+            type="text"
+            class="w-3/4 border-[1px] rounded-md p-2"
+            placeholder="Phone Number"
+            bind:value={phoneNumber}
+          />
+        </div>
         {#if !validPhoneNumber}
           <button
             class="w-full bg-primary-600 rounded-md p-2 bg-mainRed/25 border border-mainRed text-black"

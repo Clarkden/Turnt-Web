@@ -123,6 +123,8 @@ export async function POST({ request }: RequestEvent) {
           ticketInfo: paymentIntentSucceeded.metadata.ticketInfo,
         });
 
+        console.log({message: "Attempting to send message", link: `https://turnt.party/qrCode/${paymentIntentSucceeded.id}`, to: `+1${paymentIntentSucceeded.metadata.purchaserPhoneNumber}`})
+
         client.messages
           .create({
             // body: `Your link to your ticket is below 🎉:\n${
@@ -132,7 +134,7 @@ export async function POST({ request }: RequestEvent) {
             // }`,
             body: `Don't forget your ticket! 🎉: https://turnt.party/qrCode/${paymentIntentSucceeded.id}`,
             from: "+18663958046",
-            to: `+1${paymentIntentSucceeded.metadata.purchaserPhoneNumber}`,
+            to: `${paymentIntentSucceeded.metadata.purchaserPhoneNumber}`,
           })
           .then((message: any) => console.log(message.sid));
       } catch (err) {
