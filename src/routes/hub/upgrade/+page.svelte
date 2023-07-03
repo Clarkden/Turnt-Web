@@ -1,7 +1,7 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { db } from "../../../lib/firebase";
   import { getDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
-  import { authStore, memberType } from "../../../stores/authStore";
+  // import { authStore, memberType } from "../../../stores/authStore";
 
   const upgrade = () => {
     const user = $authStore.currentUser;
@@ -58,4 +58,4 @@
     }}>Downgrade</button
   >
   <h1>{$memberType.isPro}</h1>
-</div>
+</div> -->
