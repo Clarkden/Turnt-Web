@@ -55,7 +55,7 @@
         >
           Sign in to your account
         </h1>
-        <button
+        <!-- <button
           class="border-[1px] border-gray-500 hover:bg-gray-500 rounded w-full py-2 text-white flex flex-row items-center justify-center"
           on:click={() => {
             handleGoogleSubmit();
@@ -64,7 +64,7 @@
           <IconBrandGoogle class="w-5 h-5 mr-2" stroke={3} />
           Log in with Google</button
         >
-        <div class="w-full h-[1px] bg-gray-500" />
+        <div class="w-full h-[1px] bg-gray-500" /> -->
         <form
           class="space-y-4 md:space-y-6"
           on:submit|preventDefault={() => {
