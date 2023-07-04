@@ -90,7 +90,7 @@
 </script>
 
 <svelte:head>
-  <title>Lit</title>
+  <title>Turnt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
     rel="preconnect"

@@ -21,10 +21,6 @@ async function makeApp() {
       clientEmail: FIREBASE_ADMIN_CLIENT_EMAIL,
       projectId: PUBLIC_FIREBASE_PROJECT_ID,
     }),
-    // credential: applicationDefault(),
-    // projectId: PUBLIC_FIREBASE_PROJECT_ID,
-    // databaseURL: `https://${PUBLIC_FIREBASE_PROJECT_ID}.firebaseio.com`,
-    // credential: credential.cert(serviceAccount),
   });
 }
 export const firebase = await makeApp();
