@@ -1,9 +1,9 @@
 <script lang="ts">
   import { doc, setDoc, updateDoc } from "firebase/firestore";
-  import PartyEditInfo2 from "./EditForms/PartyEditInfo2.svelte";
   import PartyEditInfo3 from "./EditForms/PartyEditInfo3.svelte";
   import { db } from "$lib/firebase";
   import { createEventDispatcher } from "svelte";
+  import { stringify } from "postcss";
 
   const dispatch = createEventDispatcher();
 
@@ -11,16 +11,17 @@
   let localParty: any = party;
 
   const saveParty = async (e: any) => {
+
     const savedParty = await updateDoc(doc(db, "parties", localParty.id), {
-      ...e.detail,
+      tickets: JSON.stringify(e.details),
     });
 
     dispatch("save");
   };
 </script>
 
-<PartyEditInfo2
+<PartyEditInfo3
   data={localParty}
-  on:completion={(e) => saveParty(e)}
+  on:save={(e) => saveParty(e)}
   on:cancel={() => dispatch("save")}
 />

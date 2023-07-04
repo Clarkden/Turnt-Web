@@ -7,6 +7,7 @@
     collection,
     where,
     getDocs,
+    onSnapshot,
   } from "firebase/firestore";
   // import { authStore, stripeStore } from "../../../../../../stores/authStore";
   import { page } from "$app/stores";
@@ -17,6 +18,7 @@
   import { fade, fly } from "svelte/transition";
   import { IconX } from "@tabler/icons-svelte";
   import EditParty from "../../../../../../components/EditParty.svelte";
+  import EditTickets from "../../../../../../components/EditTickets.svelte";
 
   let party: any = null;
   let partyId: any = $page.params.id;
@@ -31,6 +33,7 @@
   let loading: boolean = true;
   let stripeAccountId: string = "";
   let editPartyModal: boolean = false;
+  let editTicketsModal: boolean = false;
 
   const getStripeAccountId = async () => {
     try {
@@ -72,25 +75,25 @@
     }
   }
 
-  const getParty = async () => {
-    try {
-      const foundParty = await getDoc(doc(db, "parties", partyId));
+  // const getParty = async () => {
+  //   try {
+  //     const foundParty = await getDoc(doc(db, "parties", partyId));
 
-      if (foundParty.exists()) {
-        if ($page.data.uid !== foundParty.data().hostAccountId) {
-          goto("/hub/dashboard/parties");
-        }
+  //     if (foundParty.exists()) {
+  //       if ($page.data.uid !== foundParty.data().hostAccountId) {
+  //         goto("/hub/dashboard/parties");
+  //       }
 
-        party = { id: foundParty.id, ...foundParty.data() };
-      } else {
-        goto("/hub/dashboard/parties");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      loading = false;
-    }
-  };
+  //       party = { id: foundParty.id, ...foundParty.data() };
+  //     } else {
+  //       goto("/hub/dashboard/parties");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     loading = false;
+  //   }
+  // };
 
   const viewGuestList = async () => {
     if (party.paidParty) return;
@@ -160,10 +163,6 @@
     }
   };
 
-  const saveParty = async (party: any) => {
-    
-  }
-
   $: if (party) {
     if (party.hostAccountId !== $page.data.uid) {
       goto("/hub/dashboard/");
@@ -171,32 +170,113 @@
   }
 
   onMount(() => {
-    getParty();
-    console.log("Got Party", party);
+    const unsubscribe = onSnapshot(
+      doc(db, "parties", $page.params.id),
+      (doc) => {
+        if (!doc.exists()) goto("/find");
+
+        party = { id: doc.id, ...doc.data() };
+      }
+    );
+
+    // getHostStripeAccountId();
+  });
+
+  onMount(() => {
+    // getParty();
+    // console.log("Got Party", party);
     getStripeAccountId();
-    console.log("Got Stripe Account Id", stripeAccountId);
+    // console.log("Got Stripe Account Id", stripeAccountId);
     calculateRevenue();
-    console.log("Calculated Revenue", revenue);
+    // console.log("Calculated Revenue", revenue);
     getPayments();
-    console.log("Got Payments", payments);
+    // console.log("Got Payments", payments);
   });
 </script>
 
+{#if message}
+  <div
+    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white z-50"
+  >
+    <div class="flex items-center space-x-3">
+      <div class="text-green-600">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <div class="flex-1 text-green-600">
+        <p class="font-semibold">{message}</p>
+      </div>
+      <button
+        class="text-gray-400 hover:text-gray-600 transition"
+        on:click={() => {
+          message = "";
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+{/if}
+
 {#if editPartyModal}
   <div
-    class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center md:p-none"
+    class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center pt-16 md:p-none"
     in:fly
     out:fly
   >
     <div
-      class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-white rounded-md shadow-lg z-50 overflow-scroll"
+      class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-mainRed rounded-md shadow-lg z-50 overflow-scroll"
     >
       <div class="p-5 h-full">
         <EditParty
           {party}
-          on:cancel={() => (editPartyModal = false)}
-          on:save={(e) => {
-            saveParty(e.detail);
+          on:save={() => {
+            editPartyModal = false;
+          }}
+        />
+      </div>
+    </div>
+  </div>
+{/if}
+{#if editTicketsModal}
+  <div
+    class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center pt-16 md:p-none"
+    in:fly
+    out:fly
+  >
+    <div
+      class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-mainRed rounded-md shadow-lg z-50 overflow-scroll"
+    >
+      <div class="p-5 h-full">
+        <EditTickets
+          {party}
+          on:save={() => {
+            editTicketsModal = false;
           }}
         />
       </div>
@@ -385,7 +465,19 @@
             </button>
             <button
               on:click={() => {
-                // cancelPartyModal = true;
+                editTicketsModal = true;
+              }}
+              class="bg-blue-500 rounded h-[50px] text-white"
+            >
+              Edit Tickets
+            </button>
+            <button
+              on:click={() => {
+                navigator.clipboard.writeText(`turnt.party/${party.id}`);
+                setTimeout(() => {
+                  message = "";
+                }, 3000);
+                message = "Copied to clipboard!";
               }}
               class="bg-green-500 rounded h-[50px] text-white"
             >

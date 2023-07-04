@@ -121,7 +121,6 @@
   });
 </script>
 
-<h1 class="font-bold text-3xl text-white mb-4">Let's make some tickets</h1>
 {#if error}
   <div
     class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
@@ -366,7 +365,7 @@
     </form>
   {:else}
     <button
-      class="bg-matteBlack text-white rounded-md p-3 w-full flex flex-row gap-2 items-center justify-center"
+      class="bg-green-500 text-white rounded-md p-3 w-full flex flex-row gap-2 items-center justify-center mt-4"
       on:click={() => {
         creatingTicket = true;
         // tickets = [...tickets, new Ticket(tickets.length + 1)];
@@ -382,9 +381,9 @@
       <div class="bg-matteBlack p-4 rounded-md flex flex-col">
         <h1 class="text-lg font-bold">{ticket.name}</h1>
         {#if ticket.price}
-          <div class="flex md:flex-row md:gap-5 flex-col">
+          <div class="flex flex-col md:flex-row md:gap-5">
             <p>
-              Price: <span class="text-green-400"
+              Ticket Price: <span class="text-green-400"
                 >${ticket.price.toFixed(2)}</span
               >
             </p>
@@ -393,82 +392,84 @@
                 >${(ticket.price - ticket.price * 0.07).toFixed(2)}</span
               >
             </p>
-            <div
-              tabindex="0"
-              role="link"
-              aria-label="tooltip 1"
-              class="focus:outline-none focus:ring-gray-300 rounded-full focus:ring-offset-2 focus:ring-2 focus:bg-gray-200 relative md:mt-0 group"
-            >
-              <div class=" cursor-pointer">
-                <svg
-                  aria-haspopup="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon icon-tabler icon-tabler-info-circle"
-                  width="25"
-                  height="25"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="#A0AEC0"
-                  fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" />
-                  <circle cx="12" cy="12" r="9" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                  <polyline points="11 12 12 12 12 16 13 16" />
-                </svg>
-              </div>
+            <div class="flex flex-row">
               <div
-                id="tooltip1"
-                role="tooltip"
-                class="z-20 -mt-16 w-64 absolute group-hover:inline-block hidden transition duration-150 ease-in-out left-0 ml-8 shadow-lg bg-white p-4 rounded"
+                tabindex="0"
+                role="link"
+                aria-label="tooltip 1"
+                class="focus:outline-none focus:ring-gray-300 rounded-full focus:ring-offset-2 focus:ring-2 focus:bg-gray-200 relative md:mt-0 group"
               >
-                <svg
-                  class="absolute left-0 -ml-2 bottom-0 top-0 h-full"
-                  width="9px"
-                  height="16px"
-                  viewBox="0 0 9 16"
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                >
-                  <g
-                    id="Page-1"
-                    stroke="none"
-                    stroke-width="1"
+                <div class=" cursor-pointer">
+                  <svg
+                    aria-haspopup="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="icon icon-tabler icon-tabler-info-circle"
+                    width="25"
+                    height="25"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="#A0AEC0"
                     fill="none"
-                    fill-rule="evenodd"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <circle cx="12" cy="12" r="9" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                    <polyline points="11 12 12 12 12 16 13 16" />
+                  </svg>
+                </div>
+                <div
+                  id="tooltip1"
+                  role="tooltip"
+                  class="z-20 -mt-16 w-64 absolute group-hover:inline-block hidden transition duration-150 ease-in-out left-0 ml-8 shadow-lg bg-white p-4 rounded"
+                >
+                  <svg
+                    class="absolute left-0 -ml-2 bottom-0 top-0 h-full"
+                    width="9px"
+                    height="16px"
+                    viewBox="0 0 9 16"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
                   >
                     <g
-                      id="Tooltips-"
-                      transform="translate(-874.000000, -1029.000000)"
-                      fill="#FFFFFF"
+                      id="Page-1"
+                      stroke="none"
+                      stroke-width="1"
+                      fill="none"
+                      fill-rule="evenodd"
                     >
                       <g
-                        id="Group-3-Copy-16"
-                        transform="translate(850.000000, 975.000000)"
+                        id="Tooltips-"
+                        transform="translate(-874.000000, -1029.000000)"
+                        fill="#FFFFFF"
                       >
                         <g
-                          id="Group-2"
-                          transform="translate(24.000000, 0.000000)"
+                          id="Group-3-Copy-16"
+                          transform="translate(850.000000, 975.000000)"
                         >
-                          <polygon
-                            id="Triangle"
-                            transform="translate(4.500000, 62.000000) rotate(-90.000000) translate(-4.500000, -62.000000) "
-                            points="4.5 57.5 12.5 66.5 -3.5 66.5"
-                          />
+                          <g
+                            id="Group-2"
+                            transform="translate(24.000000, 0.000000)"
+                          >
+                            <polygon
+                              id="Triangle"
+                              transform="translate(4.500000, 62.000000) rotate(-90.000000) translate(-4.500000, -62.000000) "
+                              points="4.5 57.5 12.5 66.5 -3.5 66.5"
+                            />
+                          </g>
                         </g>
                       </g>
                     </g>
-                  </g>
-                </svg>
-                <p class="text-sm font-bold text-gray-800 pb-1">
-                  Application Fee
-                </p>
-                <p class="text-xs leading-4 text-gray-600 pb-3">
-                  We take a 7% application fee to keep our platform running.
-                </p>
+                  </svg>
+                  <p class="text-sm font-bold text-gray-800 pb-1">
+                    Application Fee
+                  </p>
+                  <p class="text-xs leading-4 text-gray-600 pb-3">
+                    We take a 7% application fee to keep our platform running.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -503,23 +504,34 @@
       </div>
     {/each}
   </div>
-  {#if tickets.length > 0}
+  <div class="flex flex-row gap-2">
     <button
       on:click={() => {
-        completion();
+        dispatch("cancel");
       }}
       type="submit"
       class="bg-black text-white p-2 rounded-md w-full"
     >
-      Next
+      Cancel
     </button>
-  {:else}
-    <button
-      type="submit"
-      class="bg-black/50 border-[1px] border-black text-white p-2 rounded-md w-full"
-      disabled
-    >
-      Next
-    </button>
-  {/if}
+    {#if tickets.length > 0}
+      <button
+        on:click={() => {
+          completion();
+        }}
+        type="submit"
+        class="bg-black text-white p-2 rounded-md w-full"
+      >
+        Save
+      </button>
+    {:else}
+      <button
+        type="submit"
+        class="bg-black/50 border-[1px] border-black text-white p-2 rounded-md w-full"
+        disabled
+      >
+        Save
+      </button>
+    {/if}
+  </div>
 </div>

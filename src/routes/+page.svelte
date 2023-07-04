@@ -27,7 +27,7 @@
         >Start Hosting</a
       >
     </div>
-    <div
+    <!-- <div
       class="w-full min-h-[fit] h-[50vh] flex flex-col-reverse md:flex-row items-center justify-around px-5 md:px-20"
     >
       <div class="w-full h-full flex flex-col">
@@ -49,6 +49,6 @@
           <p class="font-thin text-lg text-neutral-100">Compared to select competitors</p>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>

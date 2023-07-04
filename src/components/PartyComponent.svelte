@@ -144,27 +144,18 @@
   <div
     class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b bg from-transparent to-black text-white"
   >
-    <div class="px-6 py-4">
+    <div class="px-2 py-4">
       <div class="flex flex-col justify-between items-start md:items-start">
-        <div class="font-bold text-xl md:mb-2 mt-4 md:mt-0">{party.name}</div>
+        <div class="font-bold text-xl mb-2 mt-4 md:mt-0">{party.name}</div>
         {#if DateTime.fromISO(party.date).set( { hour: DateTime.fromFormat(party.endTime, "h:mm a").hour, minute: DateTime.fromFormat(party.endTime, "h:mm a").minute } ) > DateTime.local()}
           <div class="flex flex-row gap-2 w-full">
             <!-- Share button -->
-            <li class="flex flex-row gap-1 w-full">
-              <button
-                class=" bg-sky-500 hover:bg-500-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 ease-in-out flex flex-row items-center gap-2 w-full md:w-[auto]"
-                on:click={() =>
-                  copyToClipBoard(`https://turnt.party/${party.id}`)}
-              >
-                <IconShare2 />
-                Share
-              </button>
-            </li>
+            
 
             <!-- View button -->
             <a
               href="/{party.id}"
-              class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 ease-in-out flex flex-row items-center gap-2 w-full md:w-[auto]"
+              class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-md transition-colors duration-300 ease-in-out flex flex-row items-center justify-center gap-2 w-full md:w-[auto]"
             >
               <IconEye />
               View

@@ -102,10 +102,9 @@
     const hostStripe = await getDoc(doc(db, "stripe-accounts", $page.data.uid));
     if (hostStripe.exists()) {
       try {
-        const checkStripeAccount = await axios.post(`/api/checkStripeAccount`, {
-          stripeAccountId: hostStripe.data().stripeAccountId,
-        });
-
+        const checkStripeAccount = await axios.get(
+          `/api/checkStripeAccount?id=${hostStripe.data().stripeAccountId}`
+        );
         if (
           checkStripeAccount.data.details_submitted &&
           checkStripeAccount.request.status === 200
@@ -131,7 +130,7 @@
 
         if (accountTransactions.data.data.length > 0) {
           recentTransactions = accountTransactions.data.data;
-          console.log(recentTransactions);
+          // console.log(recentTransactions);
         }
       }
     } catch (err) {
@@ -177,7 +176,7 @@
 </script>
 
 <section
-  class="flex flex-col sm:flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-8 h-fit overflow-scroll p-2 md:p-10"
+  class="flex flex-col sm:flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-8 h-fit overflow-scroll p-2 px-4 md:p-10"
 >
   <div class="h-fit lg:h-full lg:overflow-y-auto">
     <div class="mb-5 md:mb-10">
