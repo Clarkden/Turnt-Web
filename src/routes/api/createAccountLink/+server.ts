@@ -17,11 +17,11 @@ export async function POST(event) {
       refresh_url:
         ENVIRONMENT === "development"
           ? "http://localhost:4242/hub/dashboard/account/refreshLink"
-          : "https//turnt.party/hub/dashboard/account/refreshLink",
+          : "https://www.turnt.party/hub/dashboard/account/refreshLink",
       return_url:
         ENVIRONMENT === "development"
           ? "http://localhost:4242/hub/dashboard/account"
-          : "https//turnt.party/hub/dashboard/account",
+          : "https://www.turnt.party/hub/dashboard/account",
       type: "account_onboarding",
     });
 

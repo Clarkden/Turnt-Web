@@ -104,7 +104,7 @@
 </svelte:head>
 
 <body class="h-screen w-screen overflow-clip bg-matteBlack font-poppins">
-  <div class="overflow-scroll w-full h-full pb-16">
+  <div class="overflow-scroll w-full h-full pb-16 md:pb-0">
     {#if !$page.route.id?.includes("hub")}
       <nav
         class={`h-16 bg-[#F94144] text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
