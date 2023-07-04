@@ -124,7 +124,7 @@
         `/api/checkStripeAccount?id=${stripeId.data().stripeAccountId}`
       );
 
-      if (returnedStripeAccount.data.details_submitted) {
+      if (returnedStripeAccount.data.details_submitted && returnedStripeAccount.data.charges_enabled) {
         return true;
       } else {
         return false;
