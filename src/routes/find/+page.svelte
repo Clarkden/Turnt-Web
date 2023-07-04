@@ -46,6 +46,11 @@
       ...doc.data(),
     }));
 
+    if (parties.length < 1) {
+      loadingParties = false;
+      return;
+    }
+
     thisMonthsParties = parties;
     loadingParties = false;
   };
@@ -184,9 +189,7 @@
   }
 
   onMount(() => {
-    getThisMonthsParties().then(() => {
-      loadingParties = false;
-    });
+    getThisMonthsParties();
   });
 </script>
 
