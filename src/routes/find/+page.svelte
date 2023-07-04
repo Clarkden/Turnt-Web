@@ -167,7 +167,7 @@
     parties = nearbyParties;
   }
 
-  $: if(nearbyDistance) {
+  $: if (nearbyDistance) {
     getNearbyParties();
     parties = nearbyParties;
   }
@@ -184,7 +184,9 @@
   }
 
   onMount(() => {
-    getThisMonthsParties();
+    getThisMonthsParties().then(() => {
+      loadingParties = false;
+    });
   });
 </script>
 
@@ -290,7 +292,10 @@
       {/if}
     </button>
 
-    <select bind:value={nearbyDistance} class="px-4 py-2 rounded  text-white bg-gray-200/25 border cursor-pointer">
+    <select
+      bind:value={nearbyDistance}
+      class="px-4 py-2 rounded text-white bg-gray-200/25 border cursor-pointer"
+    >
       <option value={5}>5 miles</option>
       <option value={10}>10 miles</option>
       <option value={20}>20 miles</option>
