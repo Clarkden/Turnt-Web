@@ -195,7 +195,7 @@
 
 <div class="flex flex-col sm:flex-row sm:gap-4 w-full justify-between">
   <div class="flex flex-row gap-4 my-4 p-4 w-full sm:w-fit">
-    <div class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1">
+    <div class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1 items-center">
       <p>When:</p>
       <select bind:value={selectedView} class="border-none cursor-pointer outline-none">
         <option value="thisMonth">This Month</option>
