@@ -384,7 +384,7 @@
 
 {#if party}
   <div
-    class="w-full h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
+    class="w-full h-fit  min-h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
   >
     <div class="w-full h-fit md:min-w-[50%] md:h-[80vh] p-5 md:sticky md:top-0">
       <div class="w-full h-full bg-white rounded-md drop-shadow-md">
