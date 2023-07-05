@@ -43,10 +43,10 @@ export async function POST({ request, url }: any) {
               name: body.ticket.name + " Admission",
               // party_name: body.party.name,
             },
+            tax_behavior: "exclusive",
           },
           quantity: 1,
         },
-
       ],
       payment_intent_data: {
         application_fee_amount: Math.ceil(calculateTicketPrice() * 0.07),
