@@ -22,7 +22,7 @@
       </div>
       <p class="font-light text-neutral-300 my-5">Charge less, Party more</p>
       <a
-        href="/hub/dashboard"
+        href="/dashboard"
         class="bg-white p-2 rounded-md font-medium hover:bg-yellow-200 transition"
         >Start Hosting</a
       >

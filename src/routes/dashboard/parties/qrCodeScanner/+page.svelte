@@ -148,7 +148,7 @@
 <section class="p-4 flex flex-col gap-4 items-start">
   <button
     on:click={() => {
-      goto("/hub/dashboard/parties");
+      goto("/dashboard/parties");
     }}
     class="flex flex-row gap-2 justify-center text-white"
   >

@@ -2,9 +2,9 @@
   // import { authStore } from "../../../../stores/authStore";
   import axios from "axios";
   import { doc, getDoc, collection, setDoc } from "firebase/firestore";
-  import { db } from "../../../../lib/firebase";
+  import { db } from "$lib/firebase";
   import { goto } from "$app/navigation";
-  import stripeIcon from "../../../../assets/images/stripe-icon.svg";
+  import stripeIcon from "../../../assets/images/stripe-icon.svg";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
 

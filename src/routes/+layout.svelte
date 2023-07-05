@@ -104,7 +104,7 @@
 </svelte:head>
 
 <body class="h-fit min-h-screen w-screen overflow-scroll bg-matteBlack font-poppins">
-    {#if !$page.route.id?.includes("hub")}
+    {#if !$page.route.id?.includes("dashboard")}
       <nav
         class={`h-16 bg-[#F94144] text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
       >
@@ -122,7 +122,7 @@
 
           {#if $user}
             <li>
-              <a href="/hub/dashboard" class="font-light hover:text-matteBlack"
+              <a href="/dashboard" class="font-light hover:text-matteBlack"
                 >Dashboard</a
               >
             </li>
@@ -187,7 +187,7 @@
             {#if $user}
               <li>
                 <a
-                  href="/hub/dashboard"
+                  href="/dashboard"
                   class="font-light hover:text-matteBlack">Dashboard</a
                 >
               </li>

@@ -68,7 +68,7 @@ export async function POST({ request }: any) {
                   from: "+18663958046",
                   to: `+1${document.data().metadata.purchaserPhoneNumber}`,
                 })
-                .then((message: any) => console.log(message.sid));
+                .then((message: any) => console.log(message.sid)).catch((err: any) => console.log(err));
 
               deleteDoc(doc(db, "payments", document.id));
             });

@@ -13,7 +13,7 @@
   const handleSubmit = async () => {
     login(email, password).then((success) => {
       if (success) {
-        window.location.href = "/hub/dashboard";
+        window.location.href = "/dashboard";
       } else {
         error = "Invalid email or password";
       }
@@ -23,7 +23,7 @@
   const handleGoogleSubmit = async () => {
     loginWithGoogle().then((success) => {
       if (success) {
-        window.location.href = "/hub/dashboard";
+        window.location.href = "/dashboard";
       } else {
         error = "Invalid email or password";
       }
@@ -32,7 +32,7 @@
 
   $: if(browser) {
     if($user) {
-      window.location.href = "/hub/dashboard";
+      window.location.href = "/dashboard";
     }
   }
 

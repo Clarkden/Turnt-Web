@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { auth, db } from "../../../lib/firebase";
+  import { auth, db } from "$lib/firebase";
   import {
     setDoc,
     doc,
@@ -13,7 +13,7 @@
   } from "firebase/firestore";
   import { get } from "svelte/store";
   import { DateTime } from "luxon";
-  import PartyComponent from "../../../components/PartyComponent.svelte";
+  import PartyComponent from "../../components/PartyComponent.svelte";
   import { IconEye } from "@tabler/icons-svelte";
   import axios from "axios";
   import { user } from "$lib/stores/auth";
@@ -217,7 +217,7 @@
             </h1>
           </div>
         {:else if !stripeAccountId}
-          <a href="/hub/dashboard/account" class="w-full col-span-full">
+          <a href="/dashboard/account" class="w-full col-span-full">
             <div
               class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
             >
@@ -293,7 +293,7 @@
           class="w-full bg-white h-fit flex flex-row gap-3 rounded-md p-4 justify-between relative"
         >
           <a
-            href="/hub/dashboard/parties"
+            href="/dashboard/parties"
             class="text-black flex flex-row items-center justify-center gap-2 w-full h-full hover:text-mainRed"
           >
             <IconEye /> View All
@@ -305,7 +305,7 @@
         class="bg-white w-full h-fit p-5 rounded-md flex flex-col items-start justify-start"
       >
         <h1 class="font-semibold text-lg">Get Started</h1>
-        <a href="/hub/dashboard/parties" class="text-mainRed font-medium"
+        <a href="/dashboard/parties" class="text-mainRed font-medium"
           >Host a Party</a
         >
       </div>

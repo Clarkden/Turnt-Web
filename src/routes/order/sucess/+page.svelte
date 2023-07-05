@@ -37,7 +37,7 @@
 
         if (party.exists()) partyLocation = party.data().address;
       } else {
-        goto("/hub/find");
+        goto("/find");
       }
     } catch (error) {
       console.log(error);

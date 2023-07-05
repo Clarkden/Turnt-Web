@@ -15,7 +15,7 @@
     query,
     where,
   } from "firebase/firestore";
-  import { db, storage } from "../lib/firebase";
+  import { db, storage } from "$lib/firebase";
   import type { Party } from "$lib/types";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import axios from "axios";
@@ -237,18 +237,18 @@
                 currentStepIndex++;
               } else {
                 error =
-                  "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/hub/dashboard/account'>Account</>";
+                  "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
               }
             })
             .catch((err) => {
               error =
-                "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/hub/dashboard/account'>Account</>";
+                "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
             });
         } else {
           if (!stripeCheckValid) {
             currentStepIndex -= 1;
             error =
-              "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/hub/dashboard/account'>Account</>";
+              "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
           }
         }
       } else {

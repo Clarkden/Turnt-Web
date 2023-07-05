@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db } from "../../../../../../lib/firebase";
+  import { db } from "$lib/firebase";
   import {
     getDoc,
     doc,
@@ -17,8 +17,8 @@
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { IconX } from "@tabler/icons-svelte";
-  import EditParty from "../../../../../../components/EditParty.svelte";
-  import EditTickets from "../../../../../../components/EditTickets.svelte";
+  import EditParty from "../../../../../components/EditParty.svelte";
+  import EditTickets from "../../../../../components/EditTickets.svelte";
 
   let party: any = null;
   let partyId: any = $page.params.id;
@@ -81,12 +81,12 @@
 
   //     if (foundParty.exists()) {
   //       if ($page.data.uid !== foundParty.data().hostAccountId) {
-  //         goto("/hub/dashboard/parties");
+  //         goto("/dashboard/parties");
   //       }
 
   //       party = { id: foundParty.id, ...foundParty.data() };
   //     } else {
-  //       goto("/hub/dashboard/parties");
+  //       goto("/dashboard/parties");
   //     }
   //   } catch (error) {
   //     console.log(error);
@@ -165,7 +165,7 @@
 
   $: if (party) {
     if (party.hostAccountId !== $page.data.uid) {
-      goto("/hub/dashboard/");
+      goto("/dashboard/");
     }
   }
 
@@ -396,7 +396,7 @@
   <div class="flex flex-row items-center gap-2 mb-4">
     <button
       class="flex flex-row items-center gap-2 text-white hover:text-gray-300 transition"
-      on:click={() => goto("/hub/dashboard/parties")}
+      on:click={() => goto("/dashboard/parties")}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -451,7 +451,7 @@
               on:click={() => {
                 cancelPartyModal = true;
               }}
-              class="bg-red-500 rounded h-[50px] text-white"
+              class="bg-red-500 hover:bg-red-400 rounded h-[50px] text-white"
             >
               Cancel Party
             </button>
@@ -459,7 +459,7 @@
               on:click={() => {
                 editPartyModal = true;
               }}
-              class="bg-yellow-500 rounded h-[50px] text-white"
+              class="bg-yellow-500 hover:bg-yellow-400 rounded h-[50px] text-white"
             >
               Edit Party
             </button>
@@ -467,7 +467,7 @@
               on:click={() => {
                 editTicketsModal = true;
               }}
-              class="bg-blue-500 rounded h-[50px] text-white"
+              class="bg-blue-500 hover:bg-blue-400 rounded h-[50px] text-white"
             >
               Edit Tickets
             </button>
@@ -479,7 +479,7 @@
                 }, 3000);
                 message = "Copied to clipboard!";
               }}
-              class="bg-green-500 rounded h-[50px] text-white"
+              class="bg-green-500 hover:bg-green-400 rounded h-[50px] text-white"
             >
               Share Party
             </button>

@@ -1,6 +1,6 @@
 <script lang="ts">
   // import { authStore, memberType } from "../../../../stores/authStore";
-  import { db } from "../../../../lib/firebase";
+  import { db } from "$lib/firebase";
   import {
     setDoc,
     doc,
@@ -13,11 +13,11 @@
   } from "firebase/firestore";
   import { fade, fly, slide } from "svelte/transition";
 
-  import { Party, Ticket } from "../../../../lib/types";
-  import Multiform from "../../../../components/Multiform.svelte";
+  import { Party, Ticket } from "$lib/types";
+  import Multiform from "../../../components/Multiform.svelte";
   import { IconDots } from "@tabler/icons-svelte";
   import { DateTime } from "luxon";
-  import PartyComponent from "../../../../components/PartyComponent.svelte";
+  import PartyComponent from "../../../components/PartyComponent.svelte";
   import { onMount } from "svelte";
   import { page } from "$app/stores";
 
@@ -93,7 +93,7 @@
       class="bg-white p-2 rounded-md hover:bg-gray-200">New Party</button
     >
     <a
-      href="/hub/dashboard/parties/qrCodeScanner"
+      href="/dashboard/parties/qrCodeScanner"
       class="bg-white p-2 rounded-md hover:bg-gray-200">Qr Code Scanner</a
     >
   </div>

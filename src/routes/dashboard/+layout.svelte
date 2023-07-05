@@ -12,7 +12,7 @@
     IconSearch,
   } from "@tabler/icons-svelte";
   import { slide } from "svelte/transition";
-  import { clickOutside } from "../../../lib/clickOutSide";
+  import { clickOutside } from "../../lib/clickOutSide";
   import { logout } from "$lib/stores/auth";
 
   const handleLogout = async () => {
@@ -30,9 +30,9 @@
   }
 </script>
 
-<div class="flex flex-col md:flex-row h-full">
+<div class="flex flex-col md:flex-row h-full md:h-screen">
   <nav
-    class=" md:w-[275px] h-full p-5 py-10 hidden md:flex flex-col gap-4 text-white border-r-[1px] border-neutral-500"
+    class="  p-5 py-10 hidden md:flex flex-col gap-4 text-white border-r-[1px] border-neutral-500 md:w-[275px] md:h-screen md:sticky md:top-0 md:left-0"
   >
     <h1
       class="font-extrabold text-3xl mb-10 text-[#F94144] pb-4 border-b-[1px] border-neutral-500"
@@ -41,20 +41,18 @@
     </h1>
     <ul class="flex flex-col gap-5">
       <a
-        href="/hub/dashboard"
+        href="/dashboard"
         class={`flex flex-row items-center gap-2 text-lg hover:text-white ${
-          $page.url.pathname === "/hub/dashboard" ? "" : "text-neutral-400"
+          $page.url.pathname === "/dashboard" ? "" : "text-neutral-400"
         }`}
       >
         <IconLayoutGrid size={24} stroke={2} />
         Main</a
       >
       <a
-        href="/hub/dashboard/parties"
+        href="/dashboard/parties"
         class={`flex flex-row items-center gap-2 text-lg hover:text-white ${
-          $page.url.pathname === "/hub/dashboard/parties"
-            ? ""
-            : "text-neutral-400"
+          $page.url.pathname === "/dashboard/parties" ? "" : "text-neutral-400"
         }`}
       >
         <IconBalloon size={24} stroke={2} />
@@ -62,11 +60,9 @@
       >
 
       <a
-        href="/hub/dashboard/account"
+        href="/dashboard/account"
         class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
-          $page.url.pathname === "/hub/dashboard/account"
-            ? ""
-            : "text-neutral-400"
+          $page.url.pathname === "/dashboard/account" ? "" : "text-neutral-400"
         }`}
       >
         <IconSettings size={24} stroke={2} />
@@ -91,7 +87,7 @@
           <h1 class="text-lg font-semibold">Upgrade to pro</h1>
           <p class="text-neutral-100">Get 1 month free</p>
           <a
-            href="/hub/upgrade"
+            href="/upgrade"
             class="p-1 px-4 mt-4 rounded bg-white text-black font-medium"
             >Upgrade</a
           >
@@ -138,18 +134,18 @@
       >
         <ul class="flex flex-col gap-5">
           <a
-            href="/hub/dashboard"
+            href="/dashboard"
             class={`flex flex-row items-center gap-2 text-lg hover:text-white ${
-              $page.url.pathname === "/hub/dashboard" ? "" : "text-neutral-400"
+              $page.url.pathname === "/dashboard" ? "" : "text-neutral-400"
             }`}
           >
             <IconLayoutGrid size={24} stroke={2} />
             Main</a
           >
           <a
-            href="/hub/dashboard/parties"
+            href="/dashboard/parties"
             class={`flex flex-row items-center gap-2 text-lg hover:text-white ${
-              $page.url.pathname === "/hub/dashboard/parties"
+              $page.url.pathname === "/dashboard/parties"
                 ? ""
                 : "text-neutral-400"
             }`}
@@ -159,9 +155,9 @@
           >
 
           <a
-            href="/hub/dashboard/account"
+            href="/dashboard/account"
             class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
-              $page.url.pathname === "/hub/dashboard/account"
+              $page.url.pathname === "/dashboard/account"
                 ? ""
                 : "text-neutral-400"
             }`}
@@ -191,7 +187,7 @@
                 </div>
 
                 <a
-                  href="/hub/upgrade"
+                  href="/upgrade"
                   class="p-1 px-4 rounded bg-white text-black font-medium"
                   >Upgrade</a
                 >
@@ -217,7 +213,7 @@
     {/if}
   </nav>
 
-  <div class="h-full w-full  relative overflow-scroll z-0">
+  <div class="h-full w-full relative overflow-scroll z-0">
     <slot />
   </div>
 </div>

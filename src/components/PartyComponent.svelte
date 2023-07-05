@@ -199,9 +199,9 @@
         <!-- Delete button -->
         <a
           class="bg-yellow-500 hover:bg-yellow-400 text-white font-bold py-2 px-4 rounded-b-sm shadow-md transition-colors duration-300 ease-in-out flex flex-row items-center gap-2 w-full justify-center"
-          href={$page.url.pathname === "/hub/dashboard"
-            ? "/hub/dashboard/parties"
-            : `/hub/dashboard/parties/manage/${party.id}`}
+          href={$page.url.pathname === "/dashboard"
+            ? "/dashboard/parties"
+            : `/dashboard/parties/manage/${party.id}`}
         >
           <IconAlertCircle />
           {DateTime.fromISO(party.date).set({
