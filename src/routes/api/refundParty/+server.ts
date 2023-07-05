@@ -48,31 +48,35 @@ export async function POST({ request }: any) {
         )
       );
 
-      allTicketPurchases.forEach((document) => {
-        const refund = stripe.refunds
-          .create(
-            {
-              payment_intent: document.id,
-              // refund_application_fee: false,
-              reverse_transfer: true,
-            },
-            {
-              stripeAccount: body.stripeAccountId,
-            }
-          )
-          .then(() => {
-            client.messages
-              .create({
-                body: "A party you purchased tickets for has been cancelled. You have been refunded and will see the funds in your account within 5-10 business days.",
-                from: "+18663958046",
-                to: `+1${document.data().metadata.purchaserPhoneNumber}`,
-              })
-              .then((message: any) => console.log(message.sid));
+      try {
+        allTicketPurchases.forEach((document) => {
+          const refund = stripe.refunds
+            .create(
+              {
+                payment_intent: document.id,
+                // refund_application_fee: false,
+                reverse_transfer: true,
+              },
+              {
+                stripeAccount: body.stripeAccountId,
+              }
+            )
+            .then(() => {
+              client.messages
+                .create({
+                  body: "A party you purchased tickets for has been cancelled. You have been refunded and will see the funds in your account within 5-10 business days.",
+                  from: "+18663958046",
+                  to: `+1${document.data().metadata.purchaserPhoneNumber}`,
+                })
+                .then((message: any) => console.log(message.sid));
 
-            deleteDoc(doc(db, "payments", document.id));
-          });
-        console.log("Refunded: ", document.id);
-      });
+              deleteDoc(doc(db, "payments", document.id));
+            });
+          console.log("Refunded: ", document.id);
+        });
+      } catch (err) {
+        console.log(err);
+      }
 
       const deleteParty = await deleteDoc(doc(db, "parties", body.partyId));
       const deleteHostParty = await updateDoc(
