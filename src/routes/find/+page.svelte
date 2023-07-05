@@ -197,7 +197,7 @@
   <div class="flex flex-row gap-4 my-4 p-4 w-full sm:w-fit">
     <div class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1 items-center">
       <p>When:</p>
-      <select bind:value={selectedView} class="border-none cursor-pointer outline-none">
+      <select bind:value={selectedView} class="border-none cursor-pointer outline-none bg-white">
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
         <option value="today">Today</option>
