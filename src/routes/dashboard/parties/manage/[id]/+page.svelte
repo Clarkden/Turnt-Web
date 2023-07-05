@@ -65,6 +65,8 @@
         // if(JSON.ap(partyCancelResponse).message === "Party deleted successfully")
       } catch (error) {
         console.log(error);
+      } finally {
+        goto("/dashboard/parties");
       }
     } else {
       error = "Please type 'cancel' to confirm cancellation";
