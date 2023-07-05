@@ -195,55 +195,23 @@
 
 <div class="flex flex-col sm:flex-row sm:gap-4 w-full justify-between">
   <div class="flex flex-row gap-4 my-4 p-4 w-full sm:w-fit">
-    <button
-      class={`
-      px-4 py-2 rounded text-white  border
-      ${
-        selectedView === "thisMonth"
-          ? " text-mainRed border-mainRed bg-mainRed/50"
-          : "bg-gray-200/25"
-      }
-    `}
-      on:click={() => {
-        selectedView = "thisMonth";
-      }}
-    >
-      This Month
-    </button>
-    <button
-      class={`px-4 py-2 rounded  text-white bg-gray-200/25 border
-       ${
-         selectedView === "thisWeek"
-           ? " text-mainRed border-mainRed bg-mainRed/50"
-           : "bg-gray-200/25"
-       }`}
-      on:click={() => {
-        selectedView = "thisWeek";
-      }}
-    >
-      This Week
-    </button>
-    <button
-      class={`px-4 py-2 rounded  text-white  bg-gray-200/25 border
-       ${
-         selectedView === "today"
-           ? " text-mainRed border-mainRed bg-mainRed/50"
-           : "bg-gray-200/25"
-       }`}
-      on:click={() => {
-        selectedView = "today";
-      }}
-    >
-      Today
-    </button>
+    <div class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1">
+      <p>When:</p>
+      <select bind:value={selectedView} class="border-none cursor-pointer outline-none">
+        <option value="thisMonth">This Month</option>
+        <option value="thisWeek">This Week</option>
+        <option value="today">Today</option>
+        <option value="nearby">Nearby</option>
+      </select>
+    </div>
   </div>
   <div class="flex flex-row gap-4 w-fit h-fit sm:my-4 p-4">
     <button
-      class={`px-4 py-2 rounded  text-white bg-gray-200/25 border
+      class={`px-4 py-2 rounded  text-black hover:bg-mainRed/75 hover:text-white 
        ${
          findNearbyParties
-           ? " text-mainRed border-mainRed bg-mainRed/50"
-           : "bg-gray-200/25"
+           ? " bg-mainRed text-white"
+           : "bg-white"
        }`}
       on:click={() => {
         findNearbyParties = !findNearbyParties;
@@ -297,7 +265,7 @@
 
     <select
       bind:value={nearbyDistance}
-      class="px-4 py-2 rounded text-white bg-gray-200/25 border cursor-pointer"
+      class="px-4 py-2 rounded  bg-white text-black border cursor-pointer outline-none"
     >
       <option value={5}>5 miles</option>
       <option value={10}>10 miles</option>
