@@ -36,11 +36,7 @@ export async function POST({ request }: any) {
   try {
     const party = await getDoc(doc(db, "parties", body.partyId));
 
-    if (
-      party.exists() &&
-      party.data().paidParty &&
-      party.data().attendies > 0
-    ) {
+    if (party.exists() && party.data().paidParty) {
       const allTicketPurchases = await getDocs(
         query(
           collection(db, "payments"),
@@ -48,34 +44,37 @@ export async function POST({ request }: any) {
         )
       );
 
-      try {
-        allTicketPurchases.forEach((document) => {
-          const refund = stripe.refunds
-            .create(
-              {
-                payment_intent: document.id,
-                // refund_application_fee: false,
-                reverse_transfer: true,
-              },
-              {
-                stripeAccount: body.stripeAccountId,
-              }
-            )
-            .then(() => {
-              client.messages
-                .create({
-                  body: "A party you purchased tickets for has been cancelled. You have been refunded and will see the funds in your account within 5-10 business days.",
-                  from: "+18663958046",
-                  to: `+1${document.data().metadata.purchaserPhoneNumber}`,
-                })
-                .then((message: any) => console.log(message.sid)).catch((err: any) => console.log(err));
+      if (party.data().attendies > 0) {
+        try {
+          allTicketPurchases.forEach((document) => {
+            const refund = stripe.refunds
+              .create(
+                {
+                  payment_intent: document.id,
+                  // refund_application_fee: false,
+                  reverse_transfer: true,
+                },
+                {
+                  stripeAccount: body.stripeAccountId,
+                }
+              )
+              .then(() => {
+                client.messages
+                  .create({
+                    body: "A party you purchased tickets for has been cancelled. You have been refunded and will see the funds in your account within 5-10 business days.",
+                    from: "+18663958046",
+                    to: `+1${document.data().metadata.purchaserPhoneNumber}`,
+                  })
+                  .then((message: any) => console.log(message.sid))
+                  .catch((err: any) => console.log(err));
 
-              deleteDoc(doc(db, "payments", document.id));
-            });
-          console.log("Refunded: ", document.id);
-        });
-      } catch (err) {
-        console.log(err);
+                deleteDoc(doc(db, "payments", document.id));
+              });
+            console.log("Refunded: ", document.id);
+          });
+        } catch (err) {
+          console.log(err);
+        }
       }
 
       const deleteParty = await deleteDoc(doc(db, "parties", body.partyId));
