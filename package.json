@@ -44,8 +44,11 @@
 		"luxon": "^3.3.0",
 		"stripe": "^12.10.0",
 		"svelte-inview": "^4.0.0",
+		"svelte-particles": "^2.10.1",
 		"svelte-qrcode-image": "^1.0.0-rc.2",
 		"svelte-stripe": "^0.0.22",
+		"tailwindcss-animate": "^1.0.6",
+		"tsparticles": "^2.10.1",
 		"twilio": "^4.12.0"
 	}
 }

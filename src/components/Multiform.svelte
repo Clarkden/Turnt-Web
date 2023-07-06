@@ -37,6 +37,7 @@
   let error: string = "";
   let stripeCheck: boolean = false;
   let stripeCheckValid: boolean = false;
+  let creatingParty: boolean = false;
 
   const handleFileChange = (e: any) => {
     file = e.target.files[0];
@@ -50,69 +51,76 @@
   const createParty = async () => {
     if (!file) return;
 
-    const now = new Date();
+    try {
+      const now = new Date();
 
-    const findDuplicateAddressOnDate = await getDocs(
-      query(
-        collection(db, "parties"),
-        where("address", "==", response.address),
-        where("date", "==", response.date)
-      )
-    );
+      const findDuplicateAddressOnDate = await getDocs(
+        query(
+          collection(db, "parties"),
+          where("address", "==", response.address),
+          where("date", "==", response.date)
+        )
+      );
 
-    if (findDuplicateAddressOnDate.docs.length > 0) {
-      alert("You cannot have two parties at the same address on the same day.");
-      return;
-    }
-
-    const storageRef = ref(storage, `images/${now.getTime()}`);
-
-    let path = await uploadBytes(storageRef, file).then(async (snapshot) => {
-      return await getDownloadURL(snapshot.ref);
-    });
-
-    response = {
-      ...response,
-      hostAccountId: $page.data.uid,
-      createdAt: new Date(),
-      flyerPath: path,
-      attendies: 0,
-    };
-
-    let party: Party = response;
-
-    if (party) {
-      const docRef = await addDoc(collection(db, "parties"), party);
-
-      if (!party.paidParty) {
-        const guestList = await addDoc(collection(db, "guest-lists"), {
-          partyId: docRef.id,
-          hostAccountId: $page.data.uid,
-        });
-        const guestsSubCollection = await collection(guestList, "guests");
+      if (findDuplicateAddressOnDate.docs.length > 0) {
+        alert(
+          "You cannot have two parties at the same address on the same day."
+        );
+        return;
       }
 
-      const hostData = await getDoc(doc(db, "hosts", $page.data.uid));
+      const storageRef = ref(storage, `images/${now.getTime()}`);
 
-      if (hostData.exists()) {
-        const updatedHostData = {
-          attendies: hostData.data().attendies + 1,
-          parties: [...hostData.data().parties, docRef.id],
-        };
+      let path = await uploadBytes(storageRef, file).then(async (snapshot) => {
+        return await getDownloadURL(snapshot.ref);
+      });
 
-        await updateDoc(doc(db, "hosts", $page.data.uid), updatedHostData);
+      response = {
+        ...response,
+        hostAccountId: $page.data.uid,
+        createdAt: new Date(),
+        flyerPath: path,
+        attendies: 0,
+      };
+
+      let party: Party = response;
+
+      if (party) {
+        const docRef = await addDoc(collection(db, "parties"), party);
+
+        if (!party.paidParty) {
+          const guestList = await addDoc(collection(db, "guest-lists"), {
+            partyId: docRef.id,
+            hostAccountId: $page.data.uid,
+          });
+          const guestsSubCollection = await collection(guestList, "guests");
+        }
+
+        const hostData = await getDoc(doc(db, "hosts", $page.data.uid));
+
+        if (hostData.exists()) {
+          const updatedHostData = {
+            attendies: hostData.data().attendies + 1,
+            parties: [...hostData.data().parties, docRef.id],
+          };
+
+          await updateDoc(doc(db, "hosts", $page.data.uid), updatedHostData);
+        } else {
+          const hostData = {
+            attendies: 0,
+            parties: [docRef.id],
+          };
+
+          await setDoc(doc(db, "hosts", $page.data.uid), hostData);
+        }
       } else {
-        const hostData = {
-          attendies: 0,
-          parties: [docRef.id],
-        };
-
-        await setDoc(doc(db, "hosts", $page.data.uid), hostData);
+        console.log("no party");
       }
-
+    } catch (err) {
+      console.log(err);
+    } finally {
+      creatingParty = false;
       completion();
-    } else {
-      console.log("no party");
     }
   };
 
@@ -124,7 +132,10 @@
         `/api/checkStripeAccount?id=${stripeId.data().stripeAccountId}`
       );
 
-      if (returnedStripeAccount.data.details_submitted && returnedStripeAccount.data.charges_enabled) {
+      if (
+        returnedStripeAccount.data.details_submitted &&
+        returnedStripeAccount.data.charges_enabled
+      ) {
         return true;
       } else {
         return false;
@@ -308,15 +319,25 @@
   </div>
 
   {#if file}
-    <button
-      on:click={() => {
-        createParty();
-        completion();
-      }}
-      class="bg-black text-white rounded-md p-2 w-full my-4"
-    >
-      Create Party
-    </button>
+    {#if !creatingParty}
+      <button
+        on:click={() => {
+          creatingParty = true;
+          createParty();
+          // completion();
+        }}
+        class="bg-black text-white rounded-md p-2 w-full my-4"
+      >
+        Create Party
+      </button>
+    {:else}
+      <button
+        class="bg-black/50 border-[1px] border-black text-white rounded-md p-2 w-full my-4"
+        disabled
+      >
+        Create Party
+      </button>
+    {/if}
   {:else}
     <button
       class="bg-black/50 border-[1px] border-black text-white rounded-md p-2 w-full my-4"

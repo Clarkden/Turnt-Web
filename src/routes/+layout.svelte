@@ -16,7 +16,7 @@
   import { fade, slide } from "svelte/transition";
   import { logout, user } from "$lib/stores/auth";
   import { navigating } from "$app/stores";
-  // import whiteIcon 
+  // import whiteIcon
 
   let showMobileNav: boolean = false;
 
@@ -32,7 +32,7 @@
     showMobileNav = false;
   }
 
-  $: scrollY = 0
+  $: scrollY = 0;
 
   // $: console.log("Server Data", $page.data.uid);
   // $: console.log("Client Data", $user?.uid);
@@ -115,19 +115,19 @@
       id="termly-consent-preferences">Consent Preferences</a> -->
 </svelte:head>
 
-<svelte:window bind:scrollY={scrollY} />
+<svelte:window bind:scrollY />
 
-<body
-  class="h-fit min-h-screen w-screen bg-matteBlack font-poppins relative"
->
-<!-- <body
+<body class="h-fit min-h-screen w-screen bg-matteBlack font-poppins relative">
+  <!-- <body
   class="h-fit min-h-screen w-screen overflow-scroll bg-matteBlack font-poppins relative"
 > -->
   {#if !$page.route.id?.includes("dashboard")}
     <nav
-      class={`h-16 ${scrollY > 50 ? "bg-matteBlack/75" : "bg-[#F94144]"}  transition sticky top-0 text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
+      class={`h-16 ${
+        scrollY > 50 ? "bg-matteBlack" : "bg-[#F94144]"
+      }  transition duration-500 sticky top-0 text-white w-full hidden md:flex flex-row items-center justify-between px-4 z-50`}
     >
-    <!-- <img src="/logo.png" class="h-8 w-8" /> -->
+      <!-- <img src="/logo.png" class="h-8 w-8" /> -->
       <a
         href="/"
         class="h-full flex flex-col items-center justify-center font-extrabold text-2xl drop-shadow-md"
@@ -166,9 +166,9 @@
     </nav>
 
     <nav
-      class={`h-16 bg-[#F94144] text-white w-full md:hidden flex flex-row items-center justify-between relative ${
-        !showMobileNav && "drop-shadow-lg"
-      } z-50`}
+      class={`h-16 ${
+        scrollY > 50 ? "bg-matteBlack" : "bg-[#F94144]"
+      }  transition duration-500 sticky top-0 text-white w-full md:hidden flex flex-row items-center justify-between  z-50`}
     >
       <div class="flex flex-row justify-between w-full px-4">
         <a
@@ -193,7 +193,7 @@
 
       {#if showMobileNav}
         <ul
-          class="flex flex-col gap-4 absolute bg-mainRed w-full top-[63px] p-3 drop-shadow-lg z-50"
+          class={`flex flex-col gap-4 absolute bg-matteBlack w-full top-[63px] p-3  z-50`}
           in:slide
           out:slide
         >
@@ -230,5 +230,4 @@
   {/if}
 
   <slot />
- 
 </body>

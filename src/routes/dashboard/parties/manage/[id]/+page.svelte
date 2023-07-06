@@ -175,7 +175,7 @@
     const unsubscribe = onSnapshot(
       doc(db, "parties", $page.params.id),
       (doc) => {
-        if (!doc.exists()) goto("/find");
+        if (!doc.exists()) window.location.href = "/dashboard/parties";
 
         party = { id: doc.id, ...doc.data() };
       }

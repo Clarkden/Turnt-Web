@@ -102,7 +102,7 @@
       {#if todayParties.length > 0}
         <div>
           <h1 class="text-2xl font-bold text-neutral-200 mb-2">Today's Parties</h1>
-          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 md:gap-10">
             {#each todayParties as party}
               <PartyComponent {party} />
             {/each}
@@ -114,7 +114,7 @@
           <h1 class="text-2xl font-bold text-neutral-200 mb-2">
             Your Upcoming Parties
           </h1>
-          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 md:gap-10">
             {#each upcomingParties as party}
               <PartyComponent {party} />
             {/each}

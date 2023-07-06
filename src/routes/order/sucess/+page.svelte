@@ -59,10 +59,10 @@
 </script>
 
 <div
-  class="container h-full w-full flex flex-col items-center justify-center bg-matteBlack"
+  class="container h-screen w-full flex flex-col items-center justify-center bg-matteBlack"
 >
   <div
-    class="w-[90%] md:w-[400px] border-2 border-mainRed bg-matteBlack h-[80%] flex flex-col p-6 rounded-lg shadow-lg"
+    class="w-[90%] md:w-[400px] border-2 border-mainRed bg-matteBlack flex flex-col p-6 rounded-lg shadow-lg h-fit"
   >
     <h1 class="text-3xl text-mainRed font-extrabold mt-4 tracking-tight">
       Have a great time!
