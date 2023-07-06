@@ -102,12 +102,12 @@
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
-  <script
+  <!-- <script
     type="text/javascript"
     src="https://app.termly.io/embed.min.js"
     data-auto-block="on"
     data-website-uuid="a0f726f2-59b8-425c-ad2b-fe43745a05f1"
-  ></script>
+  ></script> -->
   <!-- <a href="#"
       onclick="window.displayPreferenceModal();return false;"
       id="termly-consent-preferences">Consent Preferences</a> -->
