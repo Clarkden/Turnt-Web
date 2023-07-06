@@ -32,6 +32,8 @@
     showMobileNav = false;
   }
 
+  $: scrollY = 0
+
   // $: console.log("Server Data", $page.data.uid);
   // $: console.log("Client Data", $user?.uid);
 
@@ -113,12 +115,17 @@
       id="termly-consent-preferences">Consent Preferences</a> -->
 </svelte:head>
 
+<svelte:window bind:scrollY={scrollY} />
+
 <body
-  class="h-fit min-h-screen w-screen overflow-scroll bg-matteBlack font-poppins"
+  class="h-fit min-h-screen w-screen bg-matteBlack font-poppins relative"
 >
+<!-- <body
+  class="h-fit min-h-screen w-screen overflow-scroll bg-matteBlack font-poppins relative"
+> -->
   {#if !$page.route.id?.includes("dashboard")}
     <nav
-      class={`h-16 bg-[#F94144] text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
+      class={`h-16 ${scrollY > 50 ? "bg-matteBlack/75" : "bg-[#F94144]"}  transition sticky top-0 text-white w-full hidden md:flex flex-row items-center justify-between px-4`}
     >
     <!-- <img src="/logo.png" class="h-8 w-8" /> -->
       <a
