@@ -104,6 +104,10 @@
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The better party platform" />
+  <meta name="keywords" content="party, parties, turnt, turntapp, turntparty, turnt party" />
+  <meta name="author" content="Turnt" />
   <!-- <script
     type="text/javascript"
     src="https://app.termly.io/embed.min.js"

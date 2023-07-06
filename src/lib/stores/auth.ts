@@ -63,7 +63,7 @@ export async function login(email: string, password: string): Promise<boolean> {
 export async function loginWithGoogle(): Promise<boolean> {
   try {
     const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
+    await signInWithPopup(auth, provider);
     return true;
   } catch (error) {
     console.error(error);
