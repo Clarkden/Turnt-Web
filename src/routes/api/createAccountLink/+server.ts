@@ -3,15 +3,19 @@ import axios from "axios";
 // const stripe = await loadStripe(process.env.PUBLIC_STRIPE_KEY!);
 import { PRIVATE_STRIPE_KEY } from "$env/static/private";
 import { ENVIRONMENT } from "$env/static/private";
+import { getAuth } from "firebase-admin/auth";
 import Stripe from "stripe";
 const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
   apiVersion: "2022-11-15",
 });
 
-export async function POST(event) {
+export async function POST(event: any) {
   try {
     const body = await event.request.json();
 
+    // getAuth()
+    //   .verifyIdToken(body.token)
+    //   .then(async (decodedToken) => {
     const accountLink = await stripe.accountLinks.create({
       account: body.id,
       refresh_url:
@@ -25,10 +29,12 @@ export async function POST(event) {
       type: "account_onboarding",
     });
 
-    
-
-
     return new Response(JSON.stringify(accountLink));
+    // })
+    // .catch((error) => {
+    //   console.error(error);
+    //   return new Response(JSON.stringify(error));
+    // });
   } catch (err) {
     throw new Error(String(err));
   }
