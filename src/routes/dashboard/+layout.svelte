@@ -14,6 +14,7 @@
   import { slide } from "svelte/transition";
   import { clickOutside } from "../../lib/clickOutSide";
   import { logout } from "$lib/stores/auth";
+  import redIcon from "../../assets/images/redIcon.png";
 
   const handleLogout = async () => {
     logout().then((success) => {
@@ -34,11 +35,12 @@
   <nav
     class="  p-5 py-10 hidden md:flex flex-col gap-4 text-white border-r-[1px] border-neutral-500 md:w-[275px] md:h-screen md:sticky md:top-0 md:left-0"
   >
-    <h1
-      class="font-extrabold text-3xl mb-10 text-[#F94144] pb-4 border-b-[1px] border-neutral-500"
+    <div
+      class="flex flex-row gap-2 pb-4 border-b-[1px] border-neutral-500 mb-10 items-center"
     >
-      turnt.party
-    </h1>
+      <!-- <img src={redIcon} alt="Turnt Logo" class="w-12 h-[auto]" /> -->
+      <a class="font-extrabold text-3xl text-[#F94144]" href="/">Turnt</a>
+    </div>
     <ul class="flex flex-col gap-5">
       <a
         href="/dashboard"
@@ -115,7 +117,7 @@
     <div
       class="flex flex-row items-center justify-between w-full p-5 border-b-[1px] border-neutral-500 bg-matteBlack"
     >
-      <h1 class="font-extrabold text-3xl text-[#F94144]">turnt.party</h1>
+      <a class="font-extrabold text-3xl text-[#F94144]" href="/">Turnt</a>
       {#if !mobileNavOpen}
         <button on:click={() => (mobileNavOpen = !mobileNavOpen)}>
           <IconMenu2 size={24} stroke={2} />

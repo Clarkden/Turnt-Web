@@ -237,12 +237,12 @@
                 currentStepIndex++;
               } else {
                 error =
-                  "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
+                  "You must finish linking your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
               }
             })
             .catch((err) => {
               error =
-                "You must link your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
+                "You must finish linking your account to create a paid party.<br>Head to the account tab <a class='text-black underline' href='/dashboard/account'>Account</>";
             });
         } else {
           if (!stripeCheckValid) {
