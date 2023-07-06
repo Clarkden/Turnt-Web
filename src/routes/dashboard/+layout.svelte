@@ -98,7 +98,7 @@
     </div>
     <div class="flex flex-col items-start gap-4">
       <a
-        href="/"
+        href="https://discord.gg/jeK3AaHZM6"
         class="flex flex-row items-center gap-2 text-neutral-400 hover:text-white text-lg"
         ><IconHelp size={24} stroke={2} />Help</a
       >
@@ -198,7 +198,7 @@
           </div>  -->
           <div class="flex flex-col items-start gap-4">
             <a
-              href="/"
+              href="https://discord.gg/jeK3AaHZM6"
               class="flex flex-row items-center gap-2 text-neutral-400 text-lg"
               ><IconHelp size={24} stroke={2} />Help</a
             >
