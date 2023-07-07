@@ -15,7 +15,7 @@
   let loadingParties: boolean = true;
   let loadingLocation: boolean = false;
   let loadingLocationError: string = "";
-  let nearbyDistance: number = 10;
+  let nearbyDistance: number = 0;
 
   let parties: any = [];
   //   $: parties =
@@ -160,7 +160,6 @@
     // console.log("nearby parties", nearbyParties);
   };
 
-
   $: if (findNearbyParties && userLocation !== "") {
     getNearbyParties();
     parties = nearbyParties;
@@ -192,16 +191,11 @@
   });
 </script>
 
-<div class="flex flex-col sm:flex-row sm:gap-4 w-full justify-between">
-  <div class="flex flex-row gap-4 md:my-4 md:p-4 px-4 py-4 w-full sm:w-fit">
-    <div
-      class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1 items-center"
-    >
-      <p>When:</p>
-      <select
-        bind:value={selectedView}
-        class="border-none cursor-pointer outline-none bg-white"
-      >
+<div class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10">
+  <div class="flex flex-row gap-4">
+    <div class="flex flex-row gap-1 items-center border rounded px-4 py-2 bg-white">
+      <p class="m-0">When:</p>
+      <select bind:value={selectedView} class="border-none cursor-pointer outline-none bg-white">
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
         <option value="today">Today</option>
@@ -209,18 +203,19 @@
       </select>
     </div>
   </div>
-  <div class="flex flex-row gap-4 w-fit h-fit md:my-4 px-4 py-4">
-    <button
-      class={`px-4 py-2 rounded  text-black hover:bg-mainRed/75 hover:text-white 
-       ${findNearbyParties ? " bg-mainRed text-white" : "bg-white"}`}
-      on:click={() => {
-        findNearbyParties = !findNearbyParties;
-
+  <div class="flex flex-row gap-4">
+    <select
+      bind:value={nearbyDistance}
+      on:change={() => {
+        if (nearbyDistance === 0) {
+          findNearbyParties = false;
+          return;
+        }
+        findNearbyParties = true;
         if (userLocation !== "") {
           getNearbyParties();
         } else {
           loadingLocation = true;
-
           navigator.geolocation.getCurrentPosition(
             (position) => {
               userLocation = `(${position.coords.latitude}, ${position.coords.longitude})`;
@@ -253,20 +248,9 @@
           );
         }
       }}
+      class="px-4 py-2 text-black border rounded cursor-pointer outline-none bg-white"
     >
-      {#if loadingLocation}
-        <span class="animate-pulse">Loading...</span>
-      {:else if loadingLocationError}
-        <span class="text-red-300">Couldn't get location</span>
-      {:else}
-        <span>Find Nearby</span>
-      {/if}
-    </button>
-
-    <select
-      bind:value={nearbyDistance}
-      class="px-4 py-2 rounded bg-white text-black border cursor-pointer outline-none"
-    >
+      <option value={0} selected>Anywhere</option>
       <option value={5}>5 miles</option>
       <option value={10}>10 miles</option>
       <option value={20}>20 miles</option>
@@ -275,9 +259,11 @@
     </select>
   </div>
 </div>
+
+
 {#if !loadingParties}
   {#if parties.length > 0}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto">
       {#each parties as party (party.id)}
         <a
           href={`/${party.id}`}
@@ -289,7 +275,7 @@
             alt="Party flyer"
           />
           <div
-            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-black group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition duration-500 ease-in-out"
+            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-black group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out"
           >
             <div class="px-6 py-4">
               <div class="flex flex-row justify-between items-center">
