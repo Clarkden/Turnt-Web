@@ -21,7 +21,8 @@
   import axios from "axios";
   import { fly } from "svelte/transition";
   import { page } from "$app/stores";
-  import { get } from "svelte/store";
+  import { analytics } from "$lib/firebase";
+  import { logEvent } from "firebase/analytics";
   // import {v4 as uuid} from "uuid";
 
   const dispatch = createEventDispatcher();
@@ -87,6 +88,11 @@
 
       if (party) {
         const docRef = await addDoc(collection(db, "parties"), party);
+
+        logEvent(analytics, "party_created", {
+          partyId: docRef.id,
+          hostAccountId: $page.data.uid,
+        });
 
         if (!party.paidParty) {
           const guestList = await addDoc(collection(db, "guest-lists"), {

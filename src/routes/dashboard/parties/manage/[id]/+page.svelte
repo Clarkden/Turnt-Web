@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db } from "$lib/firebase";
+  import { analytics, db } from "$lib/firebase";
   import {
     getDoc,
     doc,
@@ -19,6 +19,7 @@
   import { IconX } from "@tabler/icons-svelte";
   import EditParty from "../../../../../components/EditParty.svelte";
   import EditTickets from "../../../../../components/EditTickets.svelte";
+  import { logEvent } from "firebase/analytics";
 
   let party: any = null;
   let partyId: any = $page.params.id;
@@ -61,6 +62,12 @@
         });
 
         cancelPartyModal = false;
+
+        logEvent(analytics, "party_cancelled", {
+          partyId: party.id,
+          hostAccountId: party.hostAccountId,
+          stripeAccountId: stripeAccountId,
+        });
 
         // if(JSON.ap(partyCancelResponse).message === "Party deleted successfully")
       } catch (error) {
