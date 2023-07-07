@@ -74,6 +74,7 @@
     // getHostStripeAccountId();
   });
 
+
   $: if (
     phoneNumber &&
     phoneNumber.match(
@@ -460,7 +461,7 @@
                   <p class="font-bold text-lg">
                     Price: ${formatPrice(ticket.price)}
                   </p>
-                  {#if ticket.quantity}
+                  {#if ticket.quantityLimit}
                     <p class="mt-2">{ticket.quantity} Left!</p>
                   {/if}
                 </div>
@@ -468,15 +469,24 @@
               {#if ticket.saleStartDate}
                 {#if isTicketSaleWindowOpen(ticket)}
                   <div class="flex items-center">
-                    <button
-                      on:click={() => {
-                        selectedTicket = ticket;
-                        phonenumberModal = true;
-                      }}
-                      class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
-                    >
-                      Buy
-                    </button>
+                    {#if ticket.quantityLimit && parseInt(ticket.quantity) <= 0}
+                      <button
+                        class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
+                        disabled
+                      >
+                        Sold Out
+                      </button>
+                    {:else}
+                      <button
+                        on:click={() => {
+                          selectedTicket = ticket;
+                          phonenumberModal = true;
+                        }}
+                        class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
+                      >
+                        Buy
+                      </button>
+                    {/if}
                   </div>
                 {:else}
                   <div class="flex items-center">
@@ -531,15 +541,24 @@
                 {/if}
               {:else}
                 <div class="flex items-center">
-                  <button
-                    on:click={() => {
-                      selectedTicket = ticket;
-                      phonenumberModal = true;
-                    }}
-                    class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
-                  >
-                    Buy
-                  </button>
+                  {#if ticket.quantityLimit && parseInt(ticket.quantity) <= 0}
+                    <button
+                      class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
+                      disabled
+                    >
+                      Sold Out
+                    </button>
+                  {:else}
+                    <button
+                      on:click={() => {
+                        selectedTicket = ticket;
+                        phonenumberModal = true;
+                      }}
+                      class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
+                    >
+                      Buy
+                    </button>
+                  {/if}
                 </div>
               {/if}
             </div>

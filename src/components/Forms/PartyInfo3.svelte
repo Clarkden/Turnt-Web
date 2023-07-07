@@ -21,6 +21,7 @@
   let ticketSaleStart: string = "";
   let ticketSaleEnd: string = "";
   let ticketPrice: number = 0;
+  let ticketQuantityLimit: boolean = false;
 
   let selectedTimeStart: string;
   let selectedTimeEnd: string;
@@ -58,6 +59,7 @@
         ticketName,
         ticketGender,
         ticketQuantity,
+        ticketQuantityLimit,
         ticketSaleStart,
         ticketSaleEnd,
         selectedTimeStart,
@@ -69,6 +71,7 @@
     ticketName = "";
     ticketGender = "";
     ticketQuantity = 0;
+    ticketQuantityLimit = false;
     ticketSaleStart = "";
     ticketSaleEnd = "";
     selectedTimeStart = "";
@@ -233,19 +236,39 @@
             }}
           >
             <option selected={true}>Select Gender (Optional)</option>
-            {#each genders as gender}
+            {#each genders as gender (gender)}
               <option>{gender}</option>
             {/each}
           </select>
+          <div class="flex flex-row gap-2">
+            <div class="flex flex-col min-w-fit gap-2">
+              <label for="private" class="text-white">Limit Quantity?</label>
+              <div class="flex flex-row gap-1">
+                <div
+                  on:mousedown={() =>
+                    (ticketQuantityLimit = !ticketQuantityLimit)}
+                  class={`w-14 h-8  rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
+                    ticketQuantityLimit
+                      ? "justify-end bg-green-400"
+                      : "justify-start bg-gray-400"
+                  }`}
+                >
+                  <div class="w-6 h-6 rounded-full bg-white" />
+                </div>
+              </div>
+            </div>
 
-          <label for="ticketQuantity">Quantity</label>
-          <input
-            id="ticketQuantity"
-            name="ticketQuantity"
-            type="number"
-            bind:value={ticketQuantity}
-            class="border-[1px] rounded-md border-black p-1 text-black"
-          />
+            <div class="flex flex-col">
+              <label for="ticketQuantity">Quantity</label>
+              <input
+                id="ticketQuantity"
+                name="ticketQuantity"
+                type="number"
+                bind:value={ticketQuantity}
+                class="border-[1px] rounded-md border-black p-1 text-black"
+              />
+            </div>
+          </div>
           <div class="flex flex-row justify-between items-center gap-2">
             <div class="flex flex-col gap-1 w-full">
               <label for="ticketSaleStart">Sale Start</label>
@@ -493,6 +516,9 @@
               </p>
             </div>
           </div>
+        {/if}
+        {#if ticket.quantityLimit}
+          <p>Quantity: {ticket.quantity}</p>
         {/if}
         <button
           class="bg-mainRed rounded px-4 py-2 mt-4 w-fit"

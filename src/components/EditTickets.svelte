@@ -10,10 +10,12 @@
   export let party: any;
   let localParty: any = party;
 
-  const saveParty = async (e: any) => {
+  const saveTickets = async (e: any) => {
+
+    if(!e.detail) return;
 
     const savedParty = await updateDoc(doc(db, "parties", localParty.id), {
-      tickets: JSON.stringify(e.details),
+      tickets: JSON.stringify(e.detail),
     });
 
     dispatch("save");
@@ -22,6 +24,6 @@
 
 <PartyEditInfo3
   data={localParty}
-  on:save={(e) => saveParty(e)}
+  on:completion={(e) => saveTickets(e)}
   on:cancel={() => dispatch("save")}
 />

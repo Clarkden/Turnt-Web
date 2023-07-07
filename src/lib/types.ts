@@ -3,6 +3,7 @@ export class Ticket {
   name: string;
   gender: string;
   quantity: number;
+  quantityLimit: boolean;
   saleStartDate: string;
   saleEndDate: string;
   saleStartTime: string;
@@ -15,6 +16,7 @@ export class Ticket {
     name: string = "",
     gender: string = "",
     quantity: number = 0,
+    quantityLimit: boolean = false,
     saleStartDate: string = "",
     saleEndDate: string = "",
     saleStartTime: string = "",
@@ -26,6 +28,7 @@ export class Ticket {
     this.name = name;
     this.gender = gender;
     this.quantity = quantity;
+    this.quantityLimit = quantityLimit;
     this.saleStartDate = saleStartDate;
     this.saleEndDate = saleEndDate;
     this.saleStartTime = saleStartTime;

@@ -33,34 +33,47 @@
   const splitParties = () => {
     const now = DateTime.now();
     usersParties.forEach((party) => {
-      const partyDate = DateTime.fromISO(party.date).set({
-        hour: DateTime.fromFormat(party.endTime, "h:mm a").hour,
-        minute: DateTime.fromFormat(party.endTime, "h:mm a").minute,
-      });
+        const partyDate = DateTime.fromISO(party.date).set({
+            hour: DateTime.fromFormat(party.endTime, "h:mm a").hour,
+            minute: DateTime.fromFormat(party.endTime, "h:mm a").minute,
+        });
 
-      if (partyDate < now) pastParties.push(party);
-      else if (partyDate > now) upcomingParties.push(party);
-      else todayParties.push(party);
+        // Check for duplicates
+        const isDuplicateInPastParties = pastParties.some(p => p.id === party.id);
+        const isDuplicateInUpcomingParties = upcomingParties.some(p => p.id === party.id);
+        const isDuplicateInTodayParties = todayParties.some(p => p.id === party.id);
+
+        if (partyDate < now && !isDuplicateInPastParties) {
+            pastParties = [...pastParties, party];
+        }
+        else if (partyDate > now && !isDuplicateInUpcomingParties) {
+            upcomingParties = [...upcomingParties, party];
+        }
+        else if (!isDuplicateInTodayParties) {
+            todayParties = [...todayParties, party];
+        }
     });
-  };
+};
 
-  $: if (usersParties.length > 0) splitParties();
+
+  // $: if (usersParties.length > 0) splitParties();
 
   onMount(() => {
-    const unsubscribe = onSnapshot(
-      query(
-        collection(db, "parties"),
-        where("hostAccountId", "==", $page.data.uid)
-      ),
-      (snapshot) => {
-        let parties: any = [];
-        snapshot.forEach((doc) => {
-          parties = [...parties, { id: doc.id, ...doc.data() }];
-        });
-        usersParties = parties;
-      }
-    );
-  });
+  const unsubscribe = onSnapshot(
+    query(
+      collection(db, "parties"),
+      where("hostAccountId", "==", $page.data.uid)
+    ),
+    (snapshot) => {
+      let parties: any = [];
+      snapshot.forEach((doc) => {
+        parties = [...parties, { id: doc.id, ...doc.data() }];
+      });
+      usersParties = parties;
+      splitParties();
+    }
+  );
+});
 </script>
 
 <div class="w-full h-full overflow-scroll p-4 md:p-10">
@@ -103,8 +116,8 @@
         <div>
           <h1 class="text-2xl font-bold text-neutral-200 mb-2">Today's Parties</h1>
           <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 md:gap-10">
-            {#each todayParties as party}
-              <PartyComponent {party} />
+            {#each todayParties as todayParty (todayParty.id)}
+              <PartyComponent party={todayParty} />
             {/each}
           </div>
         </div>
@@ -115,8 +128,8 @@
             Your Upcoming Parties
           </h1>
           <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 md:gap-10">
-            {#each upcomingParties as party}
-              <PartyComponent {party} />
+            {#each upcomingParties as upComingParty (upComingParty.id)}
+              <PartyComponent party={upComingParty} />
             {/each}
           </div>
         </div>
@@ -125,8 +138,8 @@
         <div>
           <h1 class="text-2xl font-bold text-neutral-200 mb-2">Past Parties</h1>
           <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
-            {#each pastParties as party}
-              <PartyComponent {party} />
+            {#each pastParties as pastParty (pastParty.id)}
+              <PartyComponent party={pastParty} />
             {/each}
           </div>
         </div>

@@ -18,6 +18,7 @@
   let ticketName: string = "";
   let ticketGender: string = "";
   let ticketQuantity: number = 0;
+  let ticketQuantityLimit: boolean = false;
   let ticketSaleStart: string = "";
   let ticketSaleEnd: string = "";
   let ticketPrice: number = 0;
@@ -51,6 +52,11 @@
       return;
     }
 
+    if (ticketQuantityLimit && ticketQuantity < 1) {
+      error = "Ticket quantity must be greater than 0";
+      return;
+    }
+
     tickets = [
       ...tickets,
       new Ticket(
@@ -58,6 +64,7 @@
         ticketName,
         ticketGender,
         ticketQuantity,
+        ticketQuantityLimit,
         ticketSaleStart,
         ticketSaleEnd,
         selectedTimeStart,
@@ -69,6 +76,7 @@
     ticketName = "";
     ticketGender = "";
     ticketQuantity = 0;
+    ticketQuantityLimit = false;
     ticketSaleStart = "";
     ticketSaleEnd = "";
     selectedTimeStart = "";
@@ -79,9 +87,8 @@
 
   const completion = () => {
     dispatch("completion", {
-      tickets: JSON.stringify(tickets),
+      tickets
     });
-    // console.log(tickets);
   };
 
   const selectTime = (dropdown: string, time: string) => {
@@ -93,6 +100,7 @@
       showTimeEndDropdown = false;
     }
   };
+
 
   onMount(() => {
     for (let i = 0; i < 24; i++) {
@@ -232,19 +240,39 @@
             }}
           >
             <option selected={true}>Select Gender (Optional)</option>
-            {#each genders as gender}
+            {#each genders as gender (gender)}
               <option>{gender}</option>
             {/each}
           </select>
+          <div class="flex flex-row gap-2">
+            <div class="flex flex-col min-w-fit gap-2">
+              <label for="private" class="text-white">Limit Quantity?</label>
+              <div class="flex flex-row gap-1">
+                <div
+                  on:mousedown={() =>
+                    (ticketQuantityLimit = !ticketQuantityLimit)}
+                  class={`w-14 h-8  rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
+                    ticketQuantityLimit
+                      ? "justify-end bg-green-400"
+                      : "justify-start bg-gray-400"
+                  }`}
+                >
+                  <div class="w-6 h-6 rounded-full bg-white" />
+                </div>
+              </div>
+            </div>
 
-          <label for="ticketQuantity">Quantity</label>
-          <input
-            id="ticketQuantity"
-            name="ticketQuantity"
-            type="number"
-            bind:value={ticketQuantity}
-            class="border-[1px] rounded-md border-black p-1 text-black"
-          />
+            <div class="flex flex-col">
+              <label for="ticketQuantity">Quantity</label>
+              <input
+                id="ticketQuantity"
+                name="ticketQuantity"
+                type="number"
+                bind:value={ticketQuantity}
+                class="border-[1px] rounded-md border-black p-1 text-black"
+              />
+            </div>
+          </div>
           <div class="flex flex-row justify-between items-center gap-2">
             <div class="flex flex-col gap-1 w-full">
               <label for="ticketSaleStart">Sale Start</label>
@@ -377,7 +405,7 @@
     >
   {/if}
   <div class="flex flex-col gap-3 my-4">
-    {#each tickets as ticket}
+    {#each tickets as ticket (ticket.id)}
       <div class="bg-matteBlack p-4 rounded-md flex flex-col">
         <h1 class="text-lg font-bold">{ticket.name}</h1>
         {#if ticket.price}
@@ -495,12 +523,23 @@
             </div>
           </div>
         {/if}
-        <button
-          class="bg-mainRed rounded px-4 py-2 mt-4 w-fit"
-          on:click={() => {
-            tickets = tickets.filter((t) => t.id !== ticket.id);
-          }}>Remove Ticket</button
-        >
+        {#if ticket.quantityLimit}
+          <p>Quantity: {ticket.quantity}</p>
+        {/if}
+        <div class="flex flex-row gap-2">
+          <button
+            class="bg-mainRed rounded px-4 py-2 mt-4 w-fit"
+            on:click={() => {
+              tickets = tickets.filter((t) => t.id !== ticket.id);
+            }}>Remove Ticket</button
+          >
+          <!-- <button
+            class="bg-yellow-500 rounded px-4 py-2 mt-4 w-fit"
+            on:click={() => {
+              tickets = tickets.filter((t) => t.id !== ticket.id);
+            }}>Edit Ticket</button
+          > -->
+        </div>
       </div>
     {/each}
   </div>
