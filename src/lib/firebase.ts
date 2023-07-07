@@ -56,4 +56,10 @@ export const db = initializeFirestore(app, {
 export const auth = getAuth(app);
 // await setPersistence(auth, browserLocalPersistence);
 export const storage = getStorage(app);
-export const analytics = getAnalytics(app);
+export let analytics: any;
+// export const analytics = getAnalytics(app);
+
+if(typeof window !== "undefined") {
+  analytics = getAnalytics(app);
+}
+

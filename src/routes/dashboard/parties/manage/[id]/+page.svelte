@@ -20,6 +20,7 @@
   import EditParty from "../../../../../components/EditParty.svelte";
   import EditTickets from "../../../../../components/EditTickets.svelte";
   import { logEvent } from "firebase/analytics";
+  import { browser } from "$app/environment";
 
   let party: any = null;
   let partyId: any = $page.params.id;
@@ -63,11 +64,13 @@
 
         cancelPartyModal = false;
 
-        logEvent(analytics, "party_cancelled", {
-          partyId: party.id,
-          hostAccountId: party.hostAccountId,
-          stripeAccountId: stripeAccountId,
-        });
+        if (browser) {
+          logEvent(analytics, "party_cancelled", {
+            partyId: party.id,
+            hostAccountId: party.hostAccountId,
+            stripeAccountId: stripeAccountId,
+          });
+        }
 
         // if(JSON.ap(partyCancelResponse).message === "Party deleted successfully")
       } catch (error) {

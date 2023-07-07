@@ -23,6 +23,7 @@
   import { page } from "$app/stores";
   import { analytics } from "$lib/firebase";
   import { logEvent } from "firebase/analytics";
+  import { browser } from "$app/environment";
   // import {v4 as uuid} from "uuid";
 
   const dispatch = createEventDispatcher();
@@ -89,10 +90,12 @@
       if (party) {
         const docRef = await addDoc(collection(db, "parties"), party);
 
-        logEvent(analytics, "party_created", {
-          partyId: docRef.id,
-          hostAccountId: $page.data.uid,
-        });
+        if (browser) {
+          logEvent(analytics, "party_created", {
+            partyId: docRef.id,
+            hostAccountId: $page.data.uid,
+          });
+        }
 
         if (!party.paidParty) {
           const guestList = await addDoc(collection(db, "guest-lists"), {
