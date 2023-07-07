@@ -195,9 +195,14 @@
 
 <div class="flex flex-col sm:flex-row sm:gap-4 w-full justify-between">
   <div class="flex flex-row gap-4 md:my-4 md:p-4 px-4 py-4 w-full sm:w-fit">
-    <div class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1 items-center">
+    <div
+      class="w-fit border rounded px-4 py-2 bg-white flex flex-row gap-1 items-center"
+    >
       <p>When:</p>
-      <select bind:value={selectedView} class="border-none cursor-pointer outline-none bg-white">
+      <select
+        bind:value={selectedView}
+        class="border-none cursor-pointer outline-none bg-white"
+      >
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
         <option value="today">Today</option>
@@ -208,11 +213,7 @@
   <div class="flex flex-row gap-4 w-fit h-fit md:my-4 px-4 py-4">
     <button
       class={`px-4 py-2 rounded  text-black hover:bg-mainRed/75 hover:text-white 
-       ${
-         findNearbyParties
-           ? " bg-mainRed text-white"
-           : "bg-white"
-       }`}
+       ${findNearbyParties ? " bg-mainRed text-white" : "bg-white"}`}
       on:click={() => {
         findNearbyParties = !findNearbyParties;
 
@@ -265,7 +266,7 @@
 
     <select
       bind:value={nearbyDistance}
-      class="px-4 py-2 rounded  bg-white text-black border cursor-pointer outline-none"
+      class="px-4 py-2 rounded bg-white text-black border cursor-pointer outline-none"
     >
       <option value={5}>5 miles</option>
       <option value={10}>10 miles</option>
@@ -325,6 +326,12 @@
                 <span
                   class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
                   >Age Limit: {party.ageLimit}+</span
+                >
+              {/if}
+              {#if party.externalEvent}
+                <span
+                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >Not hosted on turnt</span
                 >
               {/if}
             </div>

@@ -26,7 +26,7 @@
 
 <div class="overflow-x-auto">
   <div class="w-full">
-    <div class="bg-white shadow-md rounded my-6 overflow-hidden">
+    <div class="bg-white shadow-md rounded my-6 overflow-scroll">
       {#if viewIndividual}
         <div
           class="transition-div p-6 w-full"

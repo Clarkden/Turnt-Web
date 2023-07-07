@@ -28,7 +28,7 @@
   </div>
 {/if}
 
-<section class="p-2 px-4 md:p-10 relative">
+<section class="p-2 px-4 md:p-10 relative h-[100vh] w-full">
   <div class="flex flex-row gap-2">
     <button
       on:click={() => (creatingExternalParty = !creatingExternalParty)}
