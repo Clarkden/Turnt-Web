@@ -15,6 +15,11 @@ export async function load({ cookies }: LayoutServerLoadEvent) {
 
     const admin = await getDoc(doc(db, "admins", user.uid));
 
+
+    if (!admin.exists()) {
+      throw redirect(307, "/dashboard");
+    }
+
     return {
       uid: user?.uid,
       admin: admin.exists(),

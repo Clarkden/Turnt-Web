@@ -29,7 +29,7 @@
   import { fly } from "svelte/transition";
   import { writable, derived, get } from "svelte/store";
   import { clickOutside } from "$lib/clickOutSide";
-  import OgImage2 from "../../assets/images/OgImage2.png"
+  import OgImage2 from "../../assets/images/OgImage2.png";
 
   // The current date/time as a store
   const now = writable(DateTime.now());
@@ -229,7 +229,6 @@
   }
 </script>
 
-
 {#if message}
   <div
     class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
@@ -386,7 +385,7 @@
 
 {#if party}
   <div
-    class="w-full h-fit  min-h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
+    class="w-full h-fit min-h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
   >
     <div class="w-full h-fit md:min-w-[50%] md:h-[80vh] p-5 md:sticky md:top-0">
       <div class="w-full h-full bg-white rounded-md drop-shadow-md">
@@ -438,7 +437,7 @@
         <p class="text-lg">{@html party.description}</p>
       </div>
 
-      {#if party.tickets && party.paidParty}
+      {#if party.tickets && party.paidParty && !party.externalEvent}
         <div class="flex flex-col gap-2">
           <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
             Tickets
@@ -546,6 +545,18 @@
             </div>
           {/each}
         </div>
+      {:else if party.externalEvent}
+        {#if party.externalEventLink}
+          <div>
+            <a href={party.externalEventLink} target="_blank">
+              <button
+                class="py-2 px-4 bg-violet-500 hover:bg-violet-400 text-white rounded-md"
+              >
+                Visit Party Page
+              </button>
+            </a>
+          </div>
+        {/if}
       {:else}
         <div
           class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg flex-col gap-4"

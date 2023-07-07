@@ -10,6 +10,7 @@
     IconMenu2,
     IconX,
     IconSearch,
+    IconUser,
   } from "@tabler/icons-svelte";
   import { slide } from "svelte/transition";
   import { clickOutside } from "../../lib/clickOutSide";
@@ -29,6 +30,9 @@
   $: if ($navigating) {
     mobileNavOpen = false;
   }
+
+  export let data: any;
+  $: ({ admin } = data);
 </script>
 
 <div class="flex flex-col md:flex-row h-full md:h-screen">
@@ -79,6 +83,17 @@
         <IconSearch size={24} stroke={2} />
         Back To Find</a
       >
+      {#if admin}
+        <a
+          href="/dashboard/admin"
+          class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
+            $page.url.pathname === "/dashboard/admin" ? "" : "text-neutral-400"
+          }`}
+        >
+          <IconUser size={24} stroke={2} />
+          Admin</a
+        >
+      {/if}
     </ul>
 
     <div class="flex flex-1 flex-col items-center justify-center">
@@ -177,6 +192,18 @@
             <IconSearch size={24} stroke={2} />
             Back To Find</a
           >
+
+          {#if admin}
+            <a
+              href="/dashboard/admin"
+              class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
+                $page.url.pathname === "/dashboard/admin" ? "" : "text-neutral-400"
+              }`}
+            >
+              <IconUser size={24} stroke={2} />
+              Admin</a
+            >
+          {/if}
 
           <!-- <div class="flex flex-row items-center justify-center">
             {#if !$memberType.isPro}

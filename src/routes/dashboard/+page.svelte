@@ -57,29 +57,6 @@
     upComingAndFutureParties = upComingAndFutureParties.slice(0, 1);
   };
 
-  // const retrieveConnectAccount = async () => {
-  //   try {
-  //     const account = await getDoc(doc(db, "stripe-accounts", $page.data.uid));
-  //     if (account.exists()) {
-  //       await axios
-  //         .get(
-  //           `/api/retrieveConnectAccountBalance?id=${
-  //             account.data().stripeAccountId
-  //           }`
-  //         )
-  //         .then((res) => {
-  //           stripeAccountBalanceAvailable = res.data.available[0].amount / 100;
-  //           stripeAccountBalancePending = res.data.pending[0].amount / 100;
-  //         })
-  //         .catch((err) => {
-  //           console.log(err);
-  //         });
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
   const retrieveConnectAccountBalance = async () => {
     if (!stripeAccountId) return;
 

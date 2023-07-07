@@ -34,19 +34,19 @@ export class Ticket {
     this.ageLimit = ageLimit;
   }
 
-  getInformation(): object {
-    return {
-      id: this.id,
-      name: this.name,
-      gender: this.gender,
-      quantity: this.quantity,
-      saleStart: this.saleStartDate,
-      saleEnd: this.saleEndDate,
-      saleStartTime: this.saleStartTime,
-      saleEndTime: this.saleEndTime,
-      price: this.price,
-    };
-  }
+  // getInformation(): object {
+  //   return {
+  //     id: this.id,
+  //     name: this.name,
+  //     gender: this.gender,
+  //     quantity: this.quantity,
+  //     saleStart: this.saleStartDate,
+  //     saleEnd: this.saleEndDate,
+  //     saleStartTime: this.saleStartTime,
+  //     saleEndTime: this.saleEndTime,
+  //     price: this.price,
+  //   };
+  // }
 }
 
 export class Party {
@@ -65,6 +65,8 @@ export class Party {
   flyerPath: string;
   privateAddress: boolean;
   ageLimit: number;
+  externalEvent: boolean;
+  externalEventLink: string;
 
   constructor(
     name: string = "",
@@ -81,7 +83,9 @@ export class Party {
     createdAt: string = "",
     flyerPath: string = "",
     privateAddress: boolean = false,
-    ageLimit: number = 0
+    ageLimit: number = 0,
+    externalEvent: boolean,
+    externalEventLink: string
   ) {
     this.name = name;
     this.description = description;
@@ -98,24 +102,26 @@ export class Party {
     this.flyerPath = flyerPath;
     this.privateAddress = privateAddress;
     this.ageLimit = ageLimit;
+    this.externalEvent = externalEvent;
+    this.externalEventLink = externalEventLink;
   }
 
-  getInformation(): object {
-    return {
-      name: this.name,
-      description: this.description,
-      date: this.date,
-      location: this.location,
-      longAndLat: this.longAndLat,
-      startTime: this.startTime,
-      endTime: this.endTime,
-      paidParty: this.paidParty,
-      tickets: this.tickets,
-      hostName: this.hostName,
-      hostAccountID: this.hostAccountID,
-      createdAt: this.createdAt,
-      flyerPath: this.flyerPath,
-      privateAddress: this.privateAddress,
-    };
-  }
+  // getInformation(): object {
+  //   return {
+  //     name: this.name,
+  //     description: this.description,
+  //     date: this.date,
+  //     location: this.location,
+  //     longAndLat: this.longAndLat,
+  //     startTime: this.startTime,
+  //     endTime: this.endTime,
+  //     paidParty: this.paidParty,
+  //     tickets: this.tickets,
+  //     hostName: this.hostName,
+  //     hostAccountID: this.hostAccountID,
+  //     createdAt: this.createdAt,
+  //     flyerPath: this.flyerPath,
+  //     privateAddress: this.privateAddress,
+  //   };
+  // }
 }
