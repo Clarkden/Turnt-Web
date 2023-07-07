@@ -50,10 +50,8 @@
   };
 
   const completion = () => {
-    if (DateTime.fromISO(date) < DateTime.now()) {
-      error = "Date must be in the future";
-      return;
-    } else if (
+    
+    if (
       !name ||
       !address ||
       !selectedTimeStart ||
