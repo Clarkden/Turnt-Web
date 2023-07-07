@@ -59,24 +59,24 @@
     let todays: any = [];
     let thisWeeks: any = [];
 
-    thisMonthsParties = thisMonthsParties.filter((party: any) => {
-      let partyDate = DateTime.fromISO(party.date);
-      let partyEndTime = DateTime.fromFormat(party.endTime, "h:mm a");
+    // thisMonthsParties = thisMonthsParties.filter((party: any) => {
+    //   let partyDate = DateTime.fromISO(party.date);
+    //   let partyEndTime = DateTime.fromFormat(party.endTime, "h:mm a");
 
-      // combine the date and the time to get the exact end time
-      let partyEnd = DateTime.fromObject({
-        year: partyDate.year,
-        month: partyDate.month,
-        day: partyDate.day,
-        hour: partyEndTime.hour,
-        minute: partyEndTime.minute,
-      });
+    //   // combine the date and the time to get the exact end time
+    //   let partyEnd = DateTime.fromObject({
+    //     year: partyDate.year,
+    //     month: partyDate.month,
+    //     day: partyDate.day,
+    //     hour: partyEndTime.hour,
+    //     minute: partyEndTime.minute,
+    //   });
 
-      let now = DateTime.local();
+    //   let now = DateTime.local();
 
-      // Exclude parties that have already ended
-      return partyEnd > now;
-    });
+    //   // Exclude parties that have already ended
+    //   return partyEnd > now;
+    // });
 
     thisMonthsParties.forEach((party: any) => {
       let partyDate = DateTime.fromISO(party.date);
@@ -160,7 +160,6 @@
     // console.log("nearby parties", nearbyParties);
   };
 
-  $: console.log(loadingLocationError);
 
   $: if (findNearbyParties && userLocation !== "") {
     getNearbyParties();
