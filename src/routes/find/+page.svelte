@@ -4,7 +4,17 @@
   import { getDocs, collection, query, where } from "firebase/firestore";
   import { onMount } from "svelte";
   import { DateTime } from "luxon";
-  import Particles from "../../components/Particles.svelte";
+  import Particles from "svelte-particles";
+  import { loadFull } from "tsparticles";
+  import FireWorks from "../../assets/particles/particles.json";
+
+  let onParticlesLoaded = (event: any) => {
+    const particlesContainer = event.detail.particles;
+  };
+
+  let particlesInit = async (engine: any) => {
+    await loadFull(engine);
+  };
 
   let thisMonthsParties: any = [];
   let thisWeeksParties: any = [];
@@ -19,14 +29,6 @@
   let nearbyDistance: number = 0;
 
   let parties: any = [];
-  //   $: parties =
-  //     selectedView === "thisMonth"
-  //       ? thisMonthsParties
-  //       : selectedView === "thisWeek"
-  //       ? thisWeeksParties
-  //       : selectedView === "nearby"
-  //       ? nearbyParties
-  //       : todaysParties;
 
   const getThisMonthsParties = async () => {
     let now = DateTime.local();
@@ -191,13 +193,18 @@
     getThisMonthsParties();
   });
 </script>
-
-<Particles />
-
+<Particles
+    id="tsparticles"
+    options={FireWorks}
+    on:particlesLoaded={onParticlesLoaded}
+    {particlesInit}
+    class="absolute z-0"
+  />
 <div
-  class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-10"
+  class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-50"
 >
-  <div class="flex flex-row gap-4">
+  
+  <div class="flex flex-row gap-4 z-20">
     <div
       class="flex flex-row gap-1 items-center border rounded px-4 py-2 bg-white"
     >
@@ -213,7 +220,7 @@
       </select>
     </div>
   </div>
-  <div class="flex flex-row gap-4">
+  <div class="flex flex-row gap-4 z-20">
     <select
       bind:value={nearbyDistance}
       on:change={() => {
@@ -273,7 +280,7 @@
 {#if !loadingParties}
   {#if parties.length > 0}
     <div
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto z-50"
     >
       {#each parties as party (party.id)}
         <a
@@ -281,7 +288,7 @@
           class="rounded overflow-hidden shadow-lg bg-white flex flex-col justify-between relative h-[500px] group"
         >
           <img
-            class="w-full h-full object-cover absolute z-0"
+            class="w-full h-full object-cover absolute z-20"
             src={party.flyerPath}
             alt="Party flyer"
           />
@@ -336,13 +343,13 @@
       {/each}
     </div>
   {:else}
-    <div class="flex flex-col items-center justify-center h-[100vh] text-white">
+    <div class="flex flex-col items-center justify-center h-[100vh] text-white z-50">
       <div class="text-2xl font-bold">No parties found</div>
-      <div class="text-xl">Try changing the view</div>
+      <div class="text-xl">Try a different option</div>
     </div>
   {/if}
 {:else}
-  <div class="flex flex-col items-center justify-center h-[100vh] text-white">
+  <div class="flex flex-col items-center justify-center h-[100vh] text-white z-50">
     <div class="text-2xl font-bold">Loading...</div>
   </div>
 {/if}
