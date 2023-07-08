@@ -154,7 +154,7 @@
   {#if !$page.route.id?.includes("dashboard")}
     <nav
       class={`h-16 ${
-        scrollY > 50 ? "bg-matteBlack" : "bg-[#F94144]"
+        scrollY > 50 ? "bg-matteBlack/50 backdrop-blur-lg" : "bg-[#F94144]"
       }  transition duration-500 sticky top-0 text-white w-full hidden md:flex flex-row items-center justify-between px-4 z-50`}
     >
       <!-- <img src="/logo.png" class="h-8 w-8" /> -->
@@ -197,7 +197,7 @@
 
     <nav
       class={`h-16 ${
-        scrollY > 50 ? "bg-matteBlack" : "bg-[#F94144]"
+        scrollY > 50 ? "bg-bg-matteBlack/50 backdrop-blur-lg" : "bg-[#F94144]"
       }  transition duration-500 sticky top-0 text-white w-full md:hidden flex flex-row items-center justify-between  z-50`}
     >
       <div class="flex flex-row justify-between w-full px-4">
@@ -223,7 +223,7 @@
 
       {#if showMobileNav}
         <ul
-          class={`flex flex-col gap-4 absolute bg-matteBlack w-full top-[63px] p-3  z-50`}
+          class={`flex flex-col gap-4 absolute bg-matteBlack/50 backdrop-blur-lg w-full top-[63px] p-3  z-50`}
           in:slide
           out:slide
         >
