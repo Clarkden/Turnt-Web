@@ -5,58 +5,14 @@
   import { fade, fly } from "svelte/transition";
   import Particles from "svelte-particles";
   import { loadFull } from "tsparticles";
+  import { onMount } from "svelte";
 
-  let particlesUrl = "https://particles.js.org/samples/presets/fire.html"; // placeholder, replace it with a real url
-
-  let particlesConfig = {
-    particles: {
-      color: {
-        value: "#000",
-      },
-      links: {
-        enable: true,
-        color: "#000",
-      },
-      move: {
-        enable: true,
-      },
-      number: {
-        value: 100,
-      },
-    },
-  };
-
-  let onParticlesLoaded = (event: any) => {
-    const particlesContainer = event.detail.particles;
-
-    // you can use particlesContainer to call all the Container class
-    // (from the core library) methods like play, pause, refresh, start, stop
-  };
-
-  let particlesInit = async (engine: any) => {
-    // you can use main to customize the tsParticles instance adding presets or custom shapes
-    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-    // starting from v2 you can add only the features you need reducing the bundle size
-    await loadFull(engine);
-  };
 </script>
 
-<!-- <Particles
-    id="tsparticles"
-    class="foo bar"
-    options="{particlesConfig}"
-    on:particlesLoaded="{onParticlesLoaded}"
-    particlesInit="{particlesInit}"
-/> -->
 
-<Particles
-  id="tsparticles"
-  class="foo bar"
-  url={particlesUrl}
-  on:particlesLoaded={onParticlesLoaded}
-  {particlesInit}
-/>
+
 <div class="h-full w-full bg-mainRed overflow-hidden relative">
+
   <section
     class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit my-40 md:my-0 relative px-5 lg:px-40"
   >
@@ -99,6 +55,7 @@
       />
     </div>
   </section>
+  
   <!-- <section class="h-48 bg-matteBlack/50 rounded" /> -->
   <!-- <section
     class="w-full min-h-[fit] h-[70vh] md:h-[50vh] grid grid-cols-1 md:grid-cols-2 md:gap-20 px-5 lg:px-40 sm:my-28 md:my-20"

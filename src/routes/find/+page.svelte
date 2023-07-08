@@ -4,6 +4,7 @@
   import { getDocs, collection, query, where } from "firebase/firestore";
   import { onMount } from "svelte";
   import { DateTime } from "luxon";
+  import Particles from "../../components/Particles.svelte";
 
   let thisMonthsParties: any = [];
   let thisWeeksParties: any = [];
@@ -191,11 +192,20 @@
   });
 </script>
 
-<div class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10">
+<Particles />
+
+<div
+  class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-10"
+>
   <div class="flex flex-row gap-4">
-    <div class="flex flex-row gap-1 items-center border rounded px-4 py-2 bg-white">
+    <div
+      class="flex flex-row gap-1 items-center border rounded px-4 py-2 bg-white"
+    >
       <p class="m-0">When:</p>
-      <select bind:value={selectedView} class="border-none cursor-pointer outline-none bg-white">
+      <select
+        bind:value={selectedView}
+        class="border-none cursor-pointer outline-none bg-white"
+      >
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
         <option value="today">Today</option>
@@ -260,10 +270,11 @@
   </div>
 </div>
 
-
 {#if !loadingParties}
   {#if parties.length > 0}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto">
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto"
+    >
       {#each parties as party (party.id)}
         <a
           href={`/${party.id}`}
@@ -281,11 +292,11 @@
               <div class="flex flex-row justify-between items-center">
                 <div class="font-bold text-xl mb-2">{party.name}</div>
               </div>
-              <p
+              <!-- <p
                 class="text-gray-300 text-base overflow-ellipsis overflow-hidden mt-3"
               >
                 {party.description}
-              </p>
+              </p> -->
             </div>
             <div class="px-6 pt-4 pb-2">
               <span
