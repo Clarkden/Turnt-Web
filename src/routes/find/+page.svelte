@@ -293,7 +293,7 @@
             alt="Party flyer"
           />
           <div
-            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-black group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out"
+            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-black group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out z-50"
           >
             <div class="px-6 py-4">
               <div class="flex flex-row justify-between items-center">
