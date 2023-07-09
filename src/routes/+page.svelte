@@ -32,7 +32,7 @@
       <div class="flex flex-row gap-3 items-center">
         <div>
           <a
-            href="/dashboard"
+            href="/find"
             class="bg-emerald-200 border border-emerald-500 hover:bg-white p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
             >Find Parties
             <!-- <IconArrowRight
