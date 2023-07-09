@@ -16,7 +16,7 @@
   import { fade, slide } from "svelte/transition";
   import { logout, user } from "$lib/stores/auth";
   import { navigating } from "$app/stores";
-  import OgImage from "../assets/images/OgImage.png"
+  import OgImage from "../assets/images/OgImage.png";
   // import whiteIcon
 
   let showMobileNav: boolean = false;
@@ -97,7 +97,7 @@
   <title>Turnt - The Better Party Platform</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com"  />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
     rel="stylesheet"
@@ -123,10 +123,7 @@
     property="og:description"
     content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
   />
-  <meta
-    property="og:image"
-    content={OgImage}
-  />
+  <meta property="og:image" content={OgImage} />
   <!-- Replace with your image URL -->
 
   <!-- Twitter -->
@@ -138,10 +135,7 @@
     property="twitter:description"
     content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
   />
-  <meta
-    property="twitter:image"
-    content={OgImage}
-  />
+  <meta property="twitter:image" content={OgImage} />
   <!-- Replace with your image URL -->
 </svelte:head>
 
@@ -222,39 +216,43 @@
       </div>
 
       {#if showMobileNav}
-        <ul
-          class={`flex flex-col gap-4 absolute bg-matteBlack/50 backdrop-blur-lg w-full top-[63px] p-3  z-50`}
+        <div
+          class={`flex flex-col gap-4 absolute bg-violet-100  w-full top-[63px] p-3  z-50`}
           in:slide
           out:slide
         >
-          <li>
-            <a href="/find" class="font-light hover:text-matteBlack"
-              >Find Parties</a
-            >
-          </li>
+          <ul class="flex flex-col gap-4" >
+            <li>
+              <a href="/find" class="font-light text-black hover:text-gray-500"
+                >Find Parties</a
+              >
+            </li>
 
-          {#if $user}
-            <li>
-              <a href="/dashboard" class="font-light hover:text-matteBlack"
-                >Dashboard</a
+            {#if $user}
+              <li>
+                <a href="/dashboard" class="font-light text-black hover:text-gray-500"
+                  >Dashboard</a
+                >
+              </li>
+              <button
+                on:click={() => handleLogout()}
+                class="font-light hover:text-gray-500 text-black text-start"
+                >Logout</button
               >
-            </li>
-            <button
-              on:click={() => handleLogout()}
-              class="font-light hover:text-matteBlack text-start">Logout</button
-            >
-          {:else}
-            <li>
-              <a href="/login" class="font-light hover:text-matteBlack">Login</a
-              >
-            </li>
-            <li>
-              <a href="/register" class="font-light hover:text-matteBlack"
-                >Register</a
-              >
-            </li>
-          {/if}
-        </ul>
+            {:else}
+              <li>
+                <a href="/login" class="font-light text-black hover:text-gray-500"
+                  >Login</a
+                >
+              </li>
+              <li>
+                <a href="/register" class="font-light text-black hover:text-gray-500"
+                  >Register</a
+                >
+              </li>
+            {/if}
+          </ul>
+        </div>
       {/if}
     </nav>
   {/if}

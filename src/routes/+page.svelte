@@ -1,18 +1,9 @@
 <script lang="ts">
   import { IconArrowRight, IconBrandDiscord } from "@tabler/icons-svelte";
   import MainDash from "../assets/images/MainDash.png";
-  import { inview } from "svelte-inview";
-  import { fade, fly } from "svelte/transition";
-  import Particles from "svelte-particles";
-  import { loadFull } from "tsparticles";
-  import { onMount } from "svelte";
-
 </script>
 
-
-
 <div class="h-full w-full bg-mainRed overflow-hidden relative">
-
   <section
     class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit my-40 md:my-0 relative px-5 lg:px-40"
   >
@@ -38,14 +29,28 @@
       >
         Charge less, Party more
       </p>
-      <a
-        href="/dashboard"
-        class="bg-gray-200 hover:bg-white p-2 transition rounded-full group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
-        >Start Hosting
-        <IconArrowRight
-          class="w-6 h-6 inline-block group-hover:translate-x-1 transition"
-        />
-      </a>
+      <div class="flex flex-row gap-3 items-center">
+        <div>
+          <a
+            href="/dashboard"
+            class="bg-emerald-200 border border-emerald-500 hover:bg-white p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
+            >Find Parties
+            <!-- <IconArrowRight
+              class="w-6 h-6 inline-block group-hover:translate-x-1 transition"
+            /> -->
+          </a>
+        </div>
+        <div>
+          <a
+            href="/dashboard"
+            class="bg-orange-200 border border-orange-500 hover:bg-white p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
+            >Start Hosting
+            <!-- <IconArrowRight
+              class="w-6 h-6 inline-block group-hover:translate-x-1 transition"
+            /> -->
+          </a>
+        </div>
+      </div>
     </div>
     <div class="rounded md:w-full md:h-full ] h-fit col-span-1">
       <img
@@ -55,7 +60,7 @@
       />
     </div>
   </section>
-  
+
   <!-- <section class="h-48 bg-matteBlack/50 rounded" /> -->
   <!-- <section
     class="w-full min-h-[fit] h-[70vh] md:h-[50vh] grid grid-cols-1 md:grid-cols-2 md:gap-20 px-5 lg:px-40 sm:my-28 md:my-20"
