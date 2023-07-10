@@ -242,7 +242,7 @@
     {/if}
   </nav>
 
-  <div class="h-full w-full relative overflow-scroll z-0">
+  <div class="h-full min-h-[100vh] w-full relative overflow-scroll z-0">
     <slot />
   </div>
 </div>

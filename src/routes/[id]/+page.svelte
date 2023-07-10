@@ -30,6 +30,17 @@
   import { writable, derived, get } from "svelte/store";
   import { clickOutside } from "$lib/clickOutSide";
   import OgImage2 from "../../assets/images/OgImage2.png";
+  import Particles from "svelte-particles";
+  import { loadFull } from "tsparticles";
+  import FireWorks from "../../assets/particles/particles.json";
+
+  let onParticlesLoaded = (event: any) => {
+    const particlesContainer = event.detail.particles;
+  };
+
+  let particlesInit = async (engine: any) => {
+    await loadFull(engine);
+  };
 
   // The current date/time as a store
   const now = writable(DateTime.now());
@@ -73,7 +84,6 @@
 
     // getHostStripeAccountId();
   });
-
 
   $: if (
     phoneNumber &&
@@ -229,6 +239,14 @@
     }
   }
 </script>
+
+<!-- <Particles
+  id="tsparticles"
+  options={FireWorks}
+  on:particlesLoaded={onParticlesLoaded}
+  {particlesInit}
+  class="absolute z-0"
+/> -->
 
 {#if message}
   <div
