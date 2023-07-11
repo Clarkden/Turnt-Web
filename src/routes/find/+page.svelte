@@ -23,10 +23,11 @@
   let findNearbyParties: boolean = false;
   let selectedView: string = "thisMonth";
   let userLocation: string = "";
-  let loadingParties: boolean = true;
-  let loadingLocation: boolean = false;
   let loadingLocationError: string = "";
   let nearbyDistance: number = 0;
+
+  let loading: "loading" | "loaded" | "error" = "loading";
+  let loadingLocation: "loading" | "loaded" | "error" = "loading";
 
   let parties: any = [];
 
@@ -49,13 +50,13 @@
       ...doc.data(),
     }));
 
+    loading = "loaded";
+
     if (parties.length < 1) {
-      loadingParties = false;
       return;
     }
 
     thisMonthsParties = parties;
-    loadingParties = false;
   };
 
   $: if (thisMonthsParties.length > 0) {
@@ -193,17 +194,17 @@
     getThisMonthsParties();
   });
 </script>
+
 <Particles
-    id="tsparticles"
-    options={FireWorks}
-    on:particlesLoaded={onParticlesLoaded}
-    {particlesInit}
-    class="absolute z-0"
-  />
+  id="tsparticles"
+  options={FireWorks}
+  on:particlesLoaded={onParticlesLoaded}
+  {particlesInit}
+  class="absolute z-0"
+/>
 <div
   class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-50"
 >
-  
   <div class="flex flex-row gap-4 z-20">
     <div
       class="flex flex-row gap-1 items-center border rounded px-4 py-2 bg-white"
@@ -232,14 +233,14 @@
         if (userLocation !== "") {
           getNearbyParties();
         } else {
-          loadingLocation = true;
+          loadingLocation = "loading";
           navigator.geolocation.getCurrentPosition(
             (position) => {
               userLocation = `(${position.coords.latitude}, ${position.coords.longitude})`;
-              loadingLocation = false;
+              loadingLocation = "loaded";
             },
             (error) => {
-              loadingLocation = false;
+              loadingLocation = "error";
               switch (error.code) {
                 case error.PERMISSION_DENIED:
                   loadingLocationError =
@@ -277,7 +278,7 @@
   </div>
 </div>
 
-{#if !loadingParties}
+{#if loading === "loaded"}
   {#if parties.length > 0}
     <div
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto z-50"
@@ -343,13 +344,24 @@
       {/each}
     </div>
   {:else}
-    <div class="flex flex-col items-center justify-center h-[100vh] text-white z-50">
+    <div
+      class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+    >
       <div class="text-2xl font-bold">No parties found</div>
       <div class="text-xl">Try a different option</div>
     </div>
   {/if}
-{:else}
-  <div class="flex flex-col items-center justify-center h-[100vh] text-white z-50">
+{:else if loading === "loading"}
+  <div
+    class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+  >
     <div class="text-2xl font-bold">Loading...</div>
+  </div>
+{:else if loading === "error"}
+  <div
+    class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+  >
+    <div class="text-2xl font-bold">Error</div>
+    <div class="text-xl">There was an error fetching parties</div>
   </div>
 {/if}

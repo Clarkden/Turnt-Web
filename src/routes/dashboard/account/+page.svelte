@@ -10,6 +10,7 @@
 
   let stripeAccount: any = null;
   let loading: boolean = true;
+  let stripeAccountStatus: "active" | "inactive" = "inactive";
 
   const createAccountLink = async () => {
     const storedStripeAccount = await getDoc(
@@ -59,8 +60,12 @@
       let returnedStripeAccount: any = await axios.get(
         `/api/checkStripeAccount?id=${stripeAccountId.data().stripeAccountId}`
       );
-      if (returnedStripeAccount) stripeAccount = returnedStripeAccount.data;
-      else stripeAccount = null;
+      if (returnedStripeAccount) {
+        stripeAccount = returnedStripeAccount.data;
+        stripeAccountStatus = stripeAccount.details_submitted
+          ? "active"
+          : "inactive";
+      } else stripeAccount = null;
     } catch (error) {
       console.log(error);
     } finally {
@@ -94,7 +99,7 @@
 
 <div class="w-full h-full rounded p-5 overflow-scroll">
   {#if !loading}
-    {#if !stripeAccount || !stripeAccount.details_submitted}
+    {#if stripeAccountStatus === "inactive"}
       <button
         class="bg-stripe/25 hover:bg-stripe/50 p-3 px-4 rounded flex items-center text-white text-lg"
         on:click={() => {
