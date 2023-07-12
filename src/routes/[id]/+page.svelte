@@ -428,28 +428,28 @@
           class="w-64 h-36 rounded-full bg-gradient-to-br from-green-300 to-purple-300 absolute blur-2xl -top-10 -right-10"
         /> -->
 
-        <h2 class="text-2xl font-bold mb-1 flex flex-row gap-2">
+        <h2 class="text-3xl font-bold mb-4 flex flex-row gap-2">
           {party.name}
         </h2>
         {#if party?.ageLimit > 1}
-          <h3 class="text-lg items-center mb-2">
+          <h3 class="text-lg items-center mb-1  ">
             Age : {party.ageLimit}+
           </h3>
         {/if}
-        <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+        <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
           <IconCalendar />
           {DateTime.fromISO(party.date).toLocaleString()}
         </h3>
-        <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+        <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
           <IconClock />
           {party.startTime} - {party.endTime}
         </h3>
-        <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+        <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
           <IconLocation />
           {party.privateAddress ? "Private Address" : party.address}
         </h3>
         {#if party.attendies > 20}
-          <h3 class="flex flex-row gap-2 text-lg items-center mb-2">
+          <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
             <IconUser />
             {party.attendies} Attendees
           </h3>
