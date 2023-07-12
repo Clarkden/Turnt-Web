@@ -417,7 +417,7 @@
       </div>
     </div>
     <div
-      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded"
+      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md"
     >
       <div
         class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
@@ -471,7 +471,7 @@
             >
               <div class="flex flex-col flex-grow pr-4">
                 <div class="flex flex-row gap-2 mb-2 items-baseline">
-                  <h1 class="font-semibold text-2xl">{ticket.name}</h1>
+                  <h1 class="font-bold text-2xl">{ticket.name}</h1>
                   {#if ticket.gender}
                     <h2 class="font-medium text-red-500 mt-1">
                       {ticket.gender} Only
@@ -479,8 +479,8 @@
                   {/if}
                 </div>
                 <div class="mt-2">
-                  <p class="font-bold text-lg">
-                    Price: ${formatPrice(ticket.price)}
+                  <p class="font-semibold text-lg text-green-400">
+                    ${formatPrice(ticket.price)}
                   </p>
                   {#if ticket.quantityLimit}
                     <p class="mt-2">{ticket.quantity} Left!</p>
@@ -503,7 +503,7 @@
                           selectedTicket = ticket;
                           phonenumberModal = true;
                         }}
-                        class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
+                        class="py-2 px-4 bg-mainRed hover:bg-red-400 text-white rounded-md"
                       >
                         Buy
                       </button>
@@ -575,7 +575,7 @@
                         selectedTicket = ticket;
                         phonenumberModal = true;
                       }}
-                      class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
+                      class="py-2 px-4 bg-mainRed hover:bg-red-400 text-white rounded-md"
                     >
                       Buy
                     </button>
