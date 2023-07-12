@@ -33,6 +33,7 @@
   import Particles from "svelte-particles";
   import { loadFull } from "tsparticles";
   import FireWorks from "../../assets/particles/particles.json";
+  import Footer from "../../components/Footer.svelte";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -404,26 +405,32 @@
 
 {#if party}
   <div
-    class="w-full h-fit min-h-screen overflow-scroll md:h-full flex flex-col md:flex-row md:p-10 pb-20"
+    class="w-full h-fit min-h-screen md:h-full flex flex-col md:flex-row md:p-10 pb-20 bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5"
   >
-    <div class="w-full h-fit md:min-w-[50%] md:h-[80vh] p-5 md:sticky md:top-0">
-      <div class="w-full h-full bg-white rounded-md drop-shadow-md">
+    <div class="w-full h-fit md:min-w-[45%] md:w-[45%]">
+      <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
         <img
           src={party.flyerPath}
           alt=""
-          class="w-full h-full object-cover rounded-md"
+          class="w-full object-cover md:object-contain rounded-md"
         />
       </div>
     </div>
     <div
-      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit"
+      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded"
     >
-      <div class="flex flex-col gap-2">
-        <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
-          Party Info
-        </h1>
+      <div
+        class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+      >
+        <h1 class="text-3xl font-bold mb-3">Party Info</h1>
 
-        <h2 class="text-2xl font-bold mb-1">{party.name}</h2>
+        <!-- <div
+          class="w-64 h-36 rounded-full bg-gradient-to-br from-green-300 to-purple-300 absolute blur-2xl -top-10 -right-10"
+        /> -->
+
+        <h2 class="text-2xl font-bold mb-1 flex flex-row gap-2">
+          {party.name}
+        </h2>
         {#if party?.ageLimit > 1}
           <h3 class="text-lg items-center mb-2">
             Age : {party.ageLimit}+
@@ -449,18 +456,14 @@
         {/if}
       </div>
 
-      <div class="flex flex-col gap-2">
-        <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
-          Overview
-        </h1>
+      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+        <h1 class="text-3xl font-bold mb-3">Overview</h1>
         <p class="text-lg">{@html party.description}</p>
       </div>
 
       {#if party.tickets && party.paidParty && !party.externalEvent}
-        <div class="flex flex-col gap-2">
-          <h1 class="text-3xl font-bold mb-3 border-b border-mainRed pb-2">
-            Tickets
-          </h1>
+        <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+          <h1 class="text-3xl font-bold mb-3">Tickets</h1>
 
           {#each JSON.parse(party.tickets) as ticket}
             <div
@@ -633,3 +636,4 @@
     </div>
   </div>
 {/if}
+<Footer />

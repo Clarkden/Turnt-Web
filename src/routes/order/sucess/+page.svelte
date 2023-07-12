@@ -60,10 +60,10 @@
 </script>
 
 <div
-  class="container h-screen w-full flex flex-col items-center justify-center bg-matteBlack"
+  class="container h-screen min-w-full flex flex-col items-center justify-center bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl"
 >
   <div
-    class="w-[90%] md:w-[400px] border-2 border-mainRed bg-matteBlack flex flex-col p-6 rounded-lg shadow-lg h-fit"
+    class="w-[90%] md:w-[400px] bg-neutral-900 flex flex-col p-6 rounded-lg shadow-lg h-fit"
   >
     <h1 class="text-3xl text-mainRed font-extrabold mt-4 tracking-tight">
       Have a great time!
