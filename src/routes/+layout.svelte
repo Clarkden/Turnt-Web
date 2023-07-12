@@ -159,14 +159,14 @@
       >
       <ul class="flex flex-row gap-4">
         <li>
-          <a href="/find" class="font-light hover:text-matteBlack"
+          <a href="/find" class="font-medium hover:text-matteBlack"
             >Find Parties</a
           >
         </li>
 
         {#if $user}
           <li>
-            <a href="/dashboard" class="font-light hover:text-matteBlack"
+            <a href="/dashboard" class="font-medium hover:text-matteBlack"
               >Dashboard</a
             >
           </li>
@@ -174,14 +174,14 @@
             on:click={() => {
               handleLogout();
             }}
-            class="font-light hover:text-matteBlack">Logout</button
+            class="font-medium hover:text-matteBlack">Logout</button
           >
         {:else}
           <li>
-            <a href="/login" class="font-light hover:text-matteBlack">Login</a>
+            <a href="/login" class="font-medium hover:text-matteBlack">Login</a>
           </li>
           <li>
-            <a href="/register" class="font-light hover:text-matteBlack"
+            <a href="/register" class="font-medium hover:text-matteBlack"
               >Register</a
             >
           </li>
@@ -217,36 +217,36 @@
 
       {#if showMobileNav}
         <div
-          class={`flex flex-col gap-4 absolute bg-violet-100  w-full top-[63px] p-3  z-50`}
+          class={`flex flex-col gap-4 absolute bg-neutral-100  w-full top-[63px] p-3  z-50`}
           in:slide
           out:slide
         >
           <ul class="flex flex-col gap-4" >
             <li>
-              <a href="/find" class="font-light text-black hover:text-gray-500"
+              <a href="/find" class="font-medium text-black hover:text-gray-500"
                 >Find Parties</a
               >
             </li>
 
             {#if $user}
               <li>
-                <a href="/dashboard" class="font-light text-black hover:text-gray-500"
+                <a href="/dashboard" class="font-medium text-black hover:text-gray-500"
                   >Dashboard</a
                 >
               </li>
               <button
                 on:click={() => handleLogout()}
-                class="font-light hover:text-gray-500 text-black text-start"
+                class="font-medium hover:text-gray-500 text-black text-start"
                 >Logout</button
               >
             {:else}
               <li>
-                <a href="/login" class="font-light text-black hover:text-gray-500"
+                <a href="/login" class="font-medium text-black hover:text-gray-500"
                   >Login</a
                 >
               </li>
               <li>
-                <a href="/register" class="font-light text-black hover:text-gray-500"
+                <a href="/register" class="font-medium text-black hover:text-gray-500"
                   >Register</a
                 >
               </li>

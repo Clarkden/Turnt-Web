@@ -405,7 +405,7 @@
 
 {#if party}
   <div
-    class="w-full h-fit min-h-screen md:h-full flex flex-col md:flex-row md:p-10 pb-20 bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5"
+    class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
   >
     <div class="w-full h-fit md:min-w-[45%] md:w-[45%]">
       <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
@@ -417,7 +417,7 @@
       </div>
     </div>
     <div
-      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md"
+      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
     >
       <div
         class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
@@ -432,7 +432,7 @@
           {party.name}
         </h2>
         {#if party?.ageLimit > 1}
-          <h3 class="text-lg items-center mb-1  ">
+          <h3 class="text-lg items-center mb-1">
             Age : {party.ageLimit}+
           </h3>
         {/if}
