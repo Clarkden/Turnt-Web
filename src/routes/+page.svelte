@@ -6,7 +6,7 @@
 
 <div class="h-full w-full bg-mainRed overflow-hidden relative">
   <section
-    class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit my-40 md:my-0 relative px-5 lg:px-40"
+    class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit mt-20 mb-40 md:my-0 md:mt-0 md:mb-0 relative px-5 lg:px-40"
   >
     <div
       class="w-full h-full flex flex-col items-center justify-center md:justify-center md:text-left md:items-start col-span-1"
@@ -57,7 +57,7 @@
       <img
         src={MainDash}
         alt="hero"
-        class="object-contain md:object-cover md:object-left md:absolute md:w-[auto] md:max-h-[80vh] md:h-full md:top-1/4 md:-translate-y-1/4 w-full h-[auto] rounded-sm md:rounded-lg border border-gray-400 shadow-md shadow-white animate-in fade-in duration-700"
+        class="object-contain md:object-cover md:object-left md:absolute md:w-[auto] md:max-h-[80vh] md:h-full md:top-1/4 md:-translate-y-1/4 w-full h-[auto] rounded-lg md:rounded-lg border-2 border-white animate-in fade-in duration-700"
       />
     </div>
   </section>
