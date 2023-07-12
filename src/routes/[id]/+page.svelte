@@ -422,7 +422,7 @@
       <div
         class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
       >
-        <h1 class="text-3xl font-bold mb-3">Party Info</h1>
+        <!-- <h1 class="text-3xl font-bold mb-3">Party Info</h1> -->
 
         <!-- <div
           class="w-64 h-36 rounded-full bg-gradient-to-br from-green-300 to-purple-300 absolute blur-2xl -top-10 -right-10"
