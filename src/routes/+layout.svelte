@@ -158,11 +158,13 @@
         >Turnt</a
       >
       <ul class="flex flex-row gap-4">
-        <li>
-          <a href="/find" class="font-medium hover:text-matteBlack"
-            >Find Parties</a
-          >
-        </li>
+        {#if !$page.route.id?.includes("/find")}
+          <li>
+            <a href="/find" class="font-medium hover:text-matteBlack"
+              >Find Parties</a
+            >
+          </li>
+        {/if}
 
         {#if $user}
           <li>
@@ -178,13 +180,15 @@
           >
         {:else}
           <li>
-            <a href="/login" class="font-medium hover:text-matteBlack">Login</a>
+            <a href="/login" class="font-medium hover:text-matteBlack"
+              >Host a party</a
+            >
           </li>
-          <li>
+          <!-- <li>
             <a href="/register" class="font-medium hover:text-matteBlack"
               >Register</a
             >
-          </li>
+          </li> -->
         {/if}
       </ul>
     </nav>
@@ -221,7 +225,7 @@
           in:slide
           out:slide
         >
-          <ul class="flex flex-col gap-4" >
+          <ul class="flex flex-col gap-4">
             <li>
               <a href="/find" class="font-medium text-black hover:text-gray-500"
                 >Find Parties</a
@@ -230,7 +234,9 @@
 
             {#if $user}
               <li>
-                <a href="/dashboard" class="font-medium text-black hover:text-gray-500"
+                <a
+                  href="/dashboard"
+                  class="font-medium text-black hover:text-gray-500"
                   >Dashboard</a
                 >
               </li>
@@ -241,13 +247,15 @@
               >
             {:else}
               <li>
-                <a href="/login" class="font-medium text-black hover:text-gray-500"
-                  >Login</a
+                <a
+                  href="/login"
+                  class="font-medium text-black hover:text-gray-500">Login</a
                 >
               </li>
               <li>
-                <a href="/register" class="font-medium text-black hover:text-gray-500"
-                  >Register</a
+                <a
+                  href="/register"
+                  class="font-medium text-black hover:text-gray-500">Register</a
                 >
               </li>
             {/if}

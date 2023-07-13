@@ -34,7 +34,7 @@
         <div>
           <a
             href="/find"
-            class="bg-emerald-200 border border-emerald-500 hover:bg-white p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
+            class="bg-emerald-200 border border-emerald-500 hover:bg-emerald-400 p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
             >Find Parties
             <!-- <IconArrowRight
               class="w-6 h-6 inline-block group-hover:translate-x-1 transition"
@@ -44,7 +44,7 @@
         <div>
           <a
             href="/dashboard"
-            class="bg-orange-200 border border-orange-500 hover:bg-white p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
+            class="bg-orange-200 border border-orange-500 hover:bg-orange-400 p-2 transition rounded-md group duration-300 ease-in-out flex items-center justify-center text-sm font-semibold"
             >Start Hosting
             <!-- <IconArrowRight
               class="w-6 h-6 inline-block group-hover:translate-x-1 transition"
@@ -57,7 +57,7 @@
       <img
         src={MainDash}
         alt="hero"
-        class="object-contain md:object-cover md:object-left md:absolute md:w-[auto] md:max-h-[80vh] md:h-full md:top-1/4 md:-translate-y-1/4 w-full h-[auto] rounded-lg md:rounded-lg border-2 border-white animate-in fade-in duration-700"
+        class="object-contain md:object-cover md:object-left md:absolute md:w-[auto] md:max-h-[80vh] md:h-full md:top-1/4 md:-translate-y-1/4 w-full h-[auto] rounded-lg md:rounded-lg border-2 border-white "
       />
     </div>
   </section>
