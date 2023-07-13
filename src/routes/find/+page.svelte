@@ -208,12 +208,12 @@
 >
   <div class="flex flex-row gap-4 z-20">
     <div
-      class="flex flex-row gap-1 items-center border rounded px-4 py-2 bg-white"
+      class="flex flex-row gap-1 items-center rounded px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white group"
     >
       <p class="m-0">When:</p>
       <select
         bind:value={selectedView}
-        class="border-none cursor-pointer outline-none bg-white"
+        class="border-none cursor-pointer outline-none bg-neutral-900 group-hover:bg-neutral-800 text-white"
       >
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
@@ -267,7 +267,7 @@
           );
         }
       }}
-      class="px-4 py-2 text-black border rounded cursor-pointer outline-none bg-white"
+      class="px-4 py-2 text-white rounded cursor-pointer outline-none bg-neutral-900 hover:bg-neutral-800"
     >
       <option value={0} selected>Anywhere</option>
       <option value={5}>5 miles</option>
@@ -287,7 +287,7 @@
       {#each parties as party (party.id)}
         <a
           href={`/${party.id}`}
-          class="rounded overflow-hidden shadow-lg bg-white flex flex-col justify-between relative h-[500px] group"
+          class="rounded overflow-hidden drop-shadow-xl bg-neutral-900 flex flex-col justify-between relative h-[500px] group"
         >
           <img
             class="w-full h-full object-cover absolute z-20"
@@ -295,7 +295,7 @@
             alt="Party flyer"
           />
           <div
-            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-black group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out z-40"
+            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-neutral-900 group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out z-40"
           >
             <div class="px-6 py-4">
               <div class="flex flex-row justify-between items-center">
@@ -309,8 +309,8 @@
             </div>
             <div class="px-6 pt-4 pb-2">
               <span
-                class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                >When:
+                class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                >
                 {#if DateTime.fromISO(party.date).hasSame(DateTime.local(), "day")}
                   Today
                 {:else if DateTime.local()
@@ -324,18 +324,18 @@
                 {/if}</span
               >
               <span
-                class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                >Time: {party.startTime} - {party.endTime}</span
+                class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                >{party.startTime} - {party.endTime}</span
               >
               {#if party.ageLimit > 0}
                 <span
-                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                  >Age Limit: {party.ageLimit}+</span
+                  class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >{party.ageLimit}+</span
                 >
               {/if}
               {#if party.externalEvent}
                 <span
-                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
                   >Not hosted on turnt</span
                 >
               {/if}

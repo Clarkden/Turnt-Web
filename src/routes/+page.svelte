@@ -4,7 +4,7 @@
   import Footer from "../components/Footer.svelte";
 </script>
 
-<div class="h-full w-full bg-mainRed overflow-hidden relative">
+<div class="h-full w-full bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl overflow-hidden relative">
   <section
     class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit mt-20 mb-40 md:my-0 md:mt-0 md:mb-0 relative px-5 lg:px-40"
   >
@@ -17,7 +17,7 @@
         The Better Party Platform
       </h1>
       <div
-        class="bg-gradient-to-r from-green-300 via-purple-300 to-blue-300 bg-clip-text drop-shadow-glow-gradient leading-releaxed w-fit h-fit"
+        class="bg-gradient-to-r from-green-300 to-yellow-300 bg-clip-text drop-shadow-glow-gradient leading-releaxed w-fit h-fit"
       >
         <h1
           class="font-bold text-3xl sm:text-4xl md:text-5xl text-transparent md:text-left"
