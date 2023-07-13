@@ -36,6 +36,7 @@
 		"@googlemaps/js-api-loader": "^1.16.2",
 		"@melt-ui/svelte": "^0.19.1",
 		"@tabler/icons-svelte": "^2.22.0",
+		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/typography": "^0.5.9",
 		"axios": "^1.4.0",
 		"cookie": "^0.5.0",

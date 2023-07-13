@@ -403,15 +403,15 @@
   </div>
 {/if}
 
-{#if party}
+{#if party.id}
   <div
     class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
   >
-    <div class="w-full h-fit md:min-w-[45%] md:w-[45%]">
+    <div class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900">
       <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
         <img
           src={party.flyerPath}
-          alt=""
+          alt="Party Flyer"
           class="w-full object-cover md:object-contain rounded-md"
         />
       </div>
@@ -635,8 +635,47 @@
       {/if}
     </div>
   </div>
+{:else}
+  <div
+    class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
+  >
+    <div class="w-full h-fit md:min-w-[45%] md:w-[45%]">
+      <div class="w-full h-[80vh] md:h-[100vh] bg-gray-400 rounded-md">
+        <div class="w-full h-full bg-neutral-900 animate-pulse rounded-md" />
+      </div>
+    </div>
 
-  {/if}
+    <div
+      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+    >
+      <div
+        class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+      >
+        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-4" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+      </div>
 
+      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded" />
+      </div>
+
+      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
+        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-4" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-4" />
+        <div class="h-8 bg-neutral-600 animate-pulse rounded" />
+      </div>
+
+      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
+        <div class="h-6 bg-neutral-600 animate-pulse rounded" />
+      </div>
+    </div>
+  </div>
+{/if}
 
 <Footer />
