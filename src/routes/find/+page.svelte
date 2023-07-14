@@ -218,7 +218,6 @@
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
         <option value="today">Today</option>
-        <!-- <option value="nearby">Nearby</option> -->
       </select>
     </div>
   </div>
