@@ -27,7 +27,7 @@
   let nearbyDistance: number = 0;
 
   let loading: "loading" | "loaded" | "error" = "loading";
-  let loadingLocation: "loading" | "loaded" | "error" = "loading";
+  // let loadingLocation: "loading" | "loaded" | "error" = "loading";
 
   let parties: any = [];
 
@@ -218,7 +218,7 @@
         <option value="thisMonth">This Month</option>
         <option value="thisWeek">This Week</option>
         <option value="today">Today</option>
-        <option value="nearby">Nearby</option>
+        <!-- <option value="nearby">Nearby</option> -->
       </select>
     </div>
   </div>
