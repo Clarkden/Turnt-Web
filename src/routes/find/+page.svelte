@@ -7,6 +7,7 @@
   import Particles from "svelte-particles";
   import { loadFull } from "tsparticles";
   import FireWorks from "../../assets/particles/particles.json";
+  import { fly } from "svelte/transition";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -27,7 +28,7 @@
   let nearbyDistance: number = 0;
 
   let loading: "loading" | "loaded" | "error" = "loading";
-  // let loadingLocation: "loading" | "loaded" | "error" = "loading";
+  let loadingLocation: "loading" | "loaded" | "error" = "loading";
 
   let parties: any = [];
 
@@ -195,174 +196,228 @@
   });
 </script>
 
-<div class="flex flex-col w-full h-full min-h-screen bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl">
-<Particles
-  id="tsparticles"
-  options={FireWorks}
-  on:particlesLoaded={onParticlesLoaded}
-  {particlesInit}
-  class="absolute z-0"
-/>
-<div
-  class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-50 "
->
-  <div class="flex flex-row gap-4 z-20">
-    <div
-      class="flex flex-row gap-1 items-center rounded px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white group"
-    >
-      <p class="m-0">When:</p>
-      <select
-        bind:value={selectedView}
-        class="border-none cursor-pointer outline-none bg-neutral-900 group-hover:bg-neutral-800 text-white"
+{#if loadingLocationError}
+  <div
+    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
+    in:fly={{ y: 100, duration: 200 }}
+    out:fly={{ y: 100, duration: 200 }}
+  >
+    <div class="flex items-center space-x-3">
+      <div class="text-mainRed">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </div>
+      <div class="flex-1 text-mainRed">
+        <p class="font-semibold">{@html loadingLocationError}</p>
+      </div>
+      <button
+        class="text-gray-400 hover:text-gray-600 transition"
+        on:click={() => {
+          loadingLocationError = "";
+        }}
       >
-        <option value="thisMonth">This Month</option>
-        <option value="thisWeek">This Week</option>
-        <option value="today">Today</option>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+{/if}
+
+<div
+  class="flex flex-col w-full h-full min-h-screen bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl"
+>
+  <Particles
+    id="tsparticles"
+    options={FireWorks}
+    on:particlesLoaded={onParticlesLoaded}
+    {particlesInit}
+    class="absolute z-0"
+  />
+  <div
+    class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-50"
+  >
+    <div class="flex flex-row gap-4 z-20">
+      <div
+        class="flex flex-row gap-1 items-center rounded px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white group"
+      >
+        <p class="m-0">When:</p>
+        <select
+          bind:value={selectedView}
+          class="border-none cursor-pointer outline-none bg-neutral-900 group-hover:bg-neutral-800 text-white"
+        >
+          <option value="thisMonth">This Month</option>
+          <option value="thisWeek">This Week</option>
+          <option value="today">Today</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex flex-row gap-4 z-20">
+      <select
+        bind:value={nearbyDistance}
+        on:change={() => {
+          if (nearbyDistance === 0) {
+            findNearbyParties = false;
+            return;
+          }
+          findNearbyParties = true;
+          if (userLocation !== "") {
+            getNearbyParties();
+          } else {
+            loadingLocation = "loading";
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                userLocation = `(${position.coords.latitude}, ${position.coords.longitude})`;
+                loadingLocation = "loaded";
+              },
+              (error) => {
+                loadingLocation = "error";
+                switch (error.code) {
+                  case error.PERMISSION_DENIED:
+                    loadingLocationError =
+                      "User denied the request for Geolocation.";
+                    break;
+                  case error.POSITION_UNAVAILABLE:
+                    loadingLocationError =
+                      "Location information is unavailable.";
+                    break;
+                  case error.TIMEOUT:
+                    loadingLocationError =
+                      "The request to get user location timed out.";
+                    break;
+                  default:
+                    loadingLocationError = "An unknown error occurred.";
+                    break;
+                }
+                findNearbyParties = false;
+              },
+              {
+                timeout: 5000,
+                maximumAge: 100000,
+              }
+            );
+          }
+        }}
+        class="px-4 py-2 text-white rounded cursor-pointer outline-none bg-neutral-900 hover:bg-neutral-800"
+      >
+        <option value={0} selected>Anywhere</option>
+        <option value={5}>5 miles</option>
+        <option value={10}>10 miles</option>
+        <option value={20}>20 miles</option>
+        <option value={50}>50 miles</option>
+        <option value={100}>100 miles</option>
       </select>
     </div>
   </div>
-  <div class="flex flex-row gap-4 z-20">
-    <select
-      bind:value={nearbyDistance}
-      on:change={() => {
-        if (nearbyDistance === 0) {
-          findNearbyParties = false;
-          return;
-        }
-        findNearbyParties = true;
-        if (userLocation !== "") {
-          getNearbyParties();
-        } else {
-          loadingLocation = "loading";
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              userLocation = `(${position.coords.latitude}, ${position.coords.longitude})`;
-              loadingLocation = "loaded";
-            },
-            (error) => {
-              loadingLocation = "error";
-              switch (error.code) {
-                case error.PERMISSION_DENIED:
-                  loadingLocationError =
-                    "User denied the request for Geolocation.";
-                  break;
-                case error.POSITION_UNAVAILABLE:
-                  loadingLocationError = "Location information is unavailable.";
-                  break;
-                case error.TIMEOUT:
-                  loadingLocationError =
-                    "The request to get user location timed out.";
-                  break;
-                default:
-                  loadingLocationError = "An unknown error occurred.";
-                  break;
-              }
-              findNearbyParties = false;
-            },
-            {
-              timeout: 5000,
-              maximumAge: 1000000,
-            }
-          );
-        }
-      }}
-      class="px-4 py-2 text-white rounded cursor-pointer outline-none bg-neutral-900 hover:bg-neutral-800"
-    >
-      <option value={0} selected>Anywhere</option>
-      <option value={5}>5 miles</option>
-      <option value={10}>10 miles</option>
-      <option value={20}>20 miles</option>
-      <option value={50}>50 miles</option>
-      <option value={100}>100 miles</option>
-    </select>
-  </div>
-</div>
 
-{#if loading === "loaded"}
-  {#if parties.length > 0}
-    <div
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto z-50"
-    >
-      {#each parties as party (party.id)}
-        <a
-          href={`/${party.id}`}
-          class="rounded overflow-hidden drop-shadow-xl bg-neutral-900 flex flex-col justify-between relative h-[500px] group"
-        >
-          <img
-            class="w-full h-full object-cover absolute z-20"
-            src={party.flyerPath}
-            alt="Party flyer"
-          />
-          <div
-            class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-neutral-900 group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out z-40"
+  {#if loading === "loaded"}
+    {#if parties.length > 0}
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto z-50"
+      >
+        {#each parties as party (party.id)}
+          <a
+            href={`/${party.id}`}
+            class="rounded overflow-hidden drop-shadow-xl bg-neutral-900 flex flex-col justify-between relative h-[500px] group"
           >
-            <div class="px-6 py-4">
-              <div class="flex flex-row justify-between items-center">
-                <div class="font-bold text-xl mb-2">{party.name}</div>
-              </div>
-              <!-- <p
+            <img
+              class="w-full h-full object-cover absolute z-20"
+              src={party.flyerPath}
+              alt="Party flyer"
+            />
+            <div
+              class=" h-full absolute w-full flex flex-col justify-end bg-gradient-to-b from-transparent to-neutral-900 group-hover:bg-gradient-to-b group-hover:from-transparent group-hover:to-mainRed text-white transition-color duration-500 ease-in-out z-40"
+            >
+              <div class="px-6 py-4">
+                <div class="flex flex-row justify-between items-center">
+                  <div class="font-bold text-xl mb-2">{party.name}</div>
+                </div>
+                <!-- <p
                 class="text-gray-300 text-base overflow-ellipsis overflow-hidden mt-3"
               >
                 {party.description}
               </p> -->
-            </div>
-            <div class="px-6 pt-4 pb-2">
-              <span
-                class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                >
-                {#if DateTime.fromISO(party.date).hasSame(DateTime.local(), "day")}
-                  Today
-                {:else if DateTime.local()
-                  .plus({ days: 1 })
-                  .hasSame(DateTime.fromISO(party.date), "day")}
-                  Tomorrow
-                {:else}
-                  {DateTime.fromISO(party.date).toLocaleString(
-                    DateTime.DATE_FULL
-                  )}
-                {/if}</span
-              >
-              <span
-                class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                >{party.startTime} - {party.endTime}</span
-              >
-              {#if party.ageLimit > 0}
+              </div>
+              <div class="px-6 pt-4 pb-2">
                 <span
                   class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                  >{party.ageLimit}+</span
                 >
-              {/if}
-              {#if party.externalEvent}
+                  {#if DateTime.fromISO(party.date).hasSame(DateTime.local(), "day")}
+                    Today
+                  {:else if DateTime.local()
+                    .plus({ days: 1 })
+                    .hasSame(DateTime.fromISO(party.date), "day")}
+                    Tomorrow
+                  {:else}
+                    {DateTime.fromISO(party.date).toLocaleString(
+                      DateTime.DATE_FULL
+                    )}
+                  {/if}</span
+                >
                 <span
                   class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                  >Not hosted on turnt</span
+                  >{party.startTime} - {party.endTime}</span
                 >
-              {/if}
+                {#if party.ageLimit > 0}
+                  <span
+                    class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                    >{party.ageLimit}+</span
+                  >
+                {/if}
+                {#if party.externalEvent}
+                  <span
+                    class="inline-block bg-gray-50 rounded-md px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                    >Not hosted on turnt</span
+                  >
+                {/if}
+              </div>
             </div>
-          </div>
-        </a>
-      {/each}
-    </div>
-  {:else}
+          </a>
+        {/each}
+      </div>
+    {:else}
+      <div
+        class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+      >
+        <div class="text-2xl font-bold">No parties found</div>
+        <div class="text-xl">Try a different option</div>
+      </div>
+    {/if}
+  {:else if loading === "loading"}
     <div
       class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
     >
-      <div class="text-2xl font-bold">No parties found</div>
-      <div class="text-xl">Try a different option</div>
+      <div class="text-2xl font-bold">Loading...</div>
+    </div>
+  {:else if loading === "error"}
+    <div
+      class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+    >
+      <div class="text-2xl font-bold">Error</div>
+      <div class="text-xl">There was an error fetching parties</div>
     </div>
   {/if}
-{:else if loading === "loading"}
-  <div
-    class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
-  >
-    <div class="text-2xl font-bold">Loading...</div>
-  </div>
-{:else if loading === "error"}
-  <div
-    class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
-  >
-    <div class="text-2xl font-bold">Error</div>
-    <div class="text-xl">There was an error fetching parties</div>
-  </div>
-{/if}
 </div>

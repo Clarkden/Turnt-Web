@@ -28,8 +28,7 @@
   let stripe: any = null;
   let totalRevenue: number = 0;
   let totalAttendees: number = 0;
-  let loadingParties: boolean = true;
-  let loadingAnalytics: boolean = true;
+  let loading: "loading" | "loaded" | "error" = "loading";
   let stripeAccountBalanceAvailable: any = null;
   let stripeAccountBalancePending: any = null;
   let recentTransactions: any = [];
@@ -118,31 +117,29 @@
   $: if (usersParties.length > 0) splitParties();
 
   onMount(async () => {
-    getDocs(
-      query(
-        collection(db, "parties"),
-        where("hostAccountId", "==", $page.data.uid)
-      )
-    )
-      .then((snapshot) => {
-        const parties: any = [];
-        snapshot.forEach((doc) => {
-          parties.push({ id: doc.id, ...doc.data() });
-        });
-        usersParties = parties;
-        // console.log(usersParties);
-        loadingParties = false;
-      })
-      .then(() => {
-        getStripeAccountId().then(() => {
-          getRecentTransactions().then(() => {
-            getHostData().then(() => {
-              retrieveConnectAccountBalance();
-            });
-          });
-        });
-        loadingAnalytics = false;
+    try {
+      const snapshot = await getDocs(
+        query(
+          collection(db, "parties"),
+          where("hostAccountId", "==", $page.data.uid)
+        )
+      );
+      const parties: any = [];
+      snapshot.forEach((doc) => {
+        parties.push({ id: doc.id, ...doc.data() });
       });
+      usersParties = parties;
+
+      await getStripeAccountId();
+      await getRecentTransactions();
+      await getHostData();
+      await retrieveConnectAccountBalance();
+
+      loading = "loaded";
+    } catch (err) {
+      console.log(err);
+      loading = "error";
+    }
   });
 
   const getHostData = async () => {
@@ -162,7 +159,8 @@
       </h1>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">
-        {#if loadingAnalytics}
+        {#if loading == "loading"}
+          <!-- Loading state UI for each of the three columns -->
           <div
             class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
           >
@@ -193,7 +191,36 @@
               >
             </h1>
           </div>
-        {:else if !stripeAccountId}
+        {:else if loading == "error"}
+          <!-- Error state UI for each of the three columns -->
+          <div
+            class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
+          >
+            <h1>
+              <span class="font-medium text-sm uppercase text-gray-500"
+                >Error occurred...</span
+              >
+            </h1>
+          </div>
+          <div
+            class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
+          >
+            <h1>
+              <span class="font-medium text-sm uppercase text-gray-500"
+                >Error occurred...</span
+              >
+            </h1>
+          </div>
+          <div
+            class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
+          >
+            <h1>
+              <span class="font-medium text-sm uppercase text-gray-500"
+                >Error occurred...</span
+              >
+            </h1>
+          </div>
+        {:else if !stripeAccountId && loading == "loaded"}
           <a href="/dashboard/account" class="w-full col-span-full">
             <div
               class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
@@ -206,7 +233,7 @@
               </h1>
             </div>
           </a>
-        {:else}
+        {:else if loading == "loaded"}
           <div
             class="flex flex-col border-[1px] h-fit w-full col-span-1 p-2 border-black rounded-md bg-white text-center"
           >
@@ -258,7 +285,7 @@
       </dialog>
     </div>
 
-    {#if usersParties.length > 0}
+    {#if usersParties.length > 0 && loading == "loaded"}
       <h1 class="font-bold text-2xl sm:text-3xl lg:text-4xl text-white mb-4">
         Your Next Party
       </h1>
@@ -277,6 +304,18 @@
           </a>
         </div>
       </div>
+    {:else if loading == "loading"}
+      <div
+        class="bg-white w-full h-fit p-5 rounded-md flex flex-col items-start justify-start"
+      >
+        <h1 class="font-semibold text-lg">Loading...</h1>
+      </div>
+    {:else if loading == "error"}
+      <div
+        class="bg-white w-full h-fit p-5 rounded-md flex flex-col items-start justify-start"
+      >
+        <h1 class="font-semibold text-lg">Error occurred...</h1>
+      </div>
     {:else}
       <div
         class="bg-white w-full h-fit p-5 rounded-md flex flex-col items-start justify-start"
@@ -290,44 +329,6 @@
   </div>
 
   <div class="flex flex-col h-fit max-h-[86vh] overflow-scroll">
-    <h1 class="text-2xl sm:text-3xl lg:text-4xl text-white font-bold mb-2">
-      Activity
-    </h1>
-    <div
-      class="bg-white border-[2px] border-black rounded-md flex flex-col gap-2 flex-1 p-4 overflow-scroll h-fit"
-    >
-      {#if recentTransactions.length > 0}
-        {#each recentTransactions as transaction (transaction.id)}
-          <div
-            class="flex flex-col sm:flex-row bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
-          >
-            <div class="flex flex-col">
-              <h1 class="text-lg font-semibold text-gray-800">
-                {transaction.amount > 0 ? "Ticket Purchase" : "Refund"}
-              </h1>
-
-              <p class="text-sm text-gray-500">
-                {DateTime.fromSeconds(transaction.created).toLocaleString(
-                  DateTime.DATETIME_MED
-                )}
-              </p>
-            </div>
-            <p class="text-green-600">
-              ${(transaction.amount / 100).toFixed(2)}
-            </p>
-          </div>
-        {/each}
-      {:else}
-        <div
-          class="flex flex-col bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
-        >
-          <div class="flex flex-col">
-            <h1 class="text-base font-semibold text-gray-800">
-              Recent activity will show up here
-            </h1>
-          </div>
-        </div>
-      {/if}
-    </div>
+    <!-- This section also needs to account for loading and error states -->
   </div>
 </section>
