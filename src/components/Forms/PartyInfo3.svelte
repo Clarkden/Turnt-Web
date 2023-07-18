@@ -8,7 +8,11 @@
   import { onMount } from "svelte";
   import { clickOutside } from "../../lib/clickOutSide";
   import { DateTime } from "luxon";
-  import { fly } from "svelte/transition";
+  import { fly, slide } from "svelte/transition";
+  // import { createAccordion } from "@melt-ui/svelte";
+
+  // const { content, item, trigger, root } = createAccordion();
+
   const dispatch = createEventDispatcher();
 
   let tickets: Ticket[] = [];
@@ -20,7 +24,7 @@
   let ticketQuantity: number = 0;
   let ticketSaleStart: string = "";
   let ticketSaleEnd: string = "";
-  let ticketPrice: number = 0;
+  let ticketPrice: number;
   let ticketQuantityLimit: boolean = false;
 
   let selectedTimeStart: string;
@@ -191,7 +195,7 @@
             name="ticketName"
             type="text"
             bind:value={ticketName}
-            class="border-[1px] rounded-md border-black w-full p-1 text-black"
+            class=" rounded-md border-black w-full p-1 text-black bg-white outline-none"
           />
         </div>
 
@@ -204,7 +208,7 @@
             min="1"
             step="any"
             bind:value={ticketPrice}
-            class="border-[1px] rounded-md border-black w-full p-1 text-black"
+            class=" rounded-md border-black w-full p-1 text-black bg-white outline-none"
           />
         </div>
       </div>
@@ -213,24 +217,31 @@
         on:click={() => {
           showAdvancedOptions = !showAdvancedOptions;
         }}
-        class="flex flex-row items-center gap-2 transition"
+        class="flex flex-row items-center gap-2 transition bg-gradient-to-r from-mainRed to-pink-500 w-fit px-4 py-2 rounded-md text-white mb-3 mt-2"
         type="button"
       >
         Advanced Options
         <IconCaretDown
           size={20}
           stroke={1}
-          class={`${showAdvancedOptions ? "transform -rotate-180" : ""}`}
+          fill={"white"}
+          class={`${
+            showAdvancedOptions ? "transform -rotate-180" : ""
+          } transition`}
         />
       </button>
       {#if showAdvancedOptions}
-        <div class="w-full h-fit p-1 flex flex-col gap-2">
+        <div
+          class="w-full h-fit p-2 flex flex-col gap-2 bg-neutral-700 rounded-md pb-4 mb-2"
+          in:slide
+          out:slide
+        >
           <label for="ticketGender">Gender</label>
 
           <select
             id="ticketGender"
             name="ticketGender"
-            class="border-[1px] rounded-md border-black p-1 text-black"
+            class=" rounded-md p-1 text-black bg-white outline-none"
             on:change={(e) => {
               ticketGender = e.target.value;
             }}
@@ -250,7 +261,7 @@
                   class={`w-14 h-8  rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
                     ticketQuantityLimit
                       ? "justify-end bg-green-400"
-                      : "justify-start bg-gray-400"
+                      : "justify-start bg-neutral-200"
                   }`}
                 >
                   <div class="w-6 h-6 rounded-full bg-white" />
@@ -265,7 +276,7 @@
                 name="ticketQuantity"
                 type="number"
                 bind:value={ticketQuantity}
-                class="border-[1px] rounded-md border-black p-1 text-black"
+                class=" rounded-md border-black p-1 text-black bg-white outline-none"
               />
             </div>
           </div>
@@ -277,7 +288,7 @@
                 name="ticketSaleStart"
                 type="date"
                 bind:value={ticketSaleStart}
-                class="border-[1px] rounded-md border-black p-1 text-black"
+                class=" rounded-md border-black p-1 text-black"
               />
             </div>
             <div class="flex flex-col gap-1 w-full">
@@ -285,7 +296,7 @@
               <div class="relative">
                 <div
                   id="timeStart"
-                  class="border-[1px] border-black p-1 rounded-md w-full cursor-pointer bg-white flex flex-row items-center justify-between text-black"
+                  class=" border-black p-1 rounded-md w-full cursor-pointer bg-white flex flex-row items-center justify-between text-black"
                   on:mouseup={() =>
                     (showTimeStartDropdown = !showTimeStartDropdown)}
                   use:clickOutside
@@ -325,7 +336,7 @@
                 name="ticketSaleEnd"
                 type="date"
                 bind:value={ticketSaleEnd}
-                class="border-[1px] rounded-md border-black p-1 text-black"
+                class=" rounded-md border-black p-1 text-black"
               />
             </div>
             <div class="flex flex-col gap-1 w-full">
@@ -333,7 +344,7 @@
               <div class="relative">
                 <div
                   id="timeEnd"
-                  class="border-[1px] border-black p-1 rounded-md w-full cursor-pointer bg-white flex flex-row items-center justify-between text-black"
+                  class=" border-black p-1 rounded-md w-full cursor-pointer bg-white flex flex-row items-center justify-between text-black"
                   on:mouseup={() =>
                     (showTimeEndDropdown = !showTimeEndDropdown)}
                   use:clickOutside
@@ -542,7 +553,7 @@
   {:else}
     <button
       type="submit"
-      class="bg-black/50 border-[1px] border-black text-white p-2 rounded-md w-full"
+      class="bg-black/50 border-black text-white p-2 rounded-md w-full"
       disabled
     >
       Next

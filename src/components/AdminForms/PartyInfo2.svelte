@@ -6,6 +6,7 @@
   import { clickOutside } from "$lib/clickOutSide";
   import { DateTime } from "luxon";
   import { fly } from "svelte/transition";
+  import axios from "axios";
 
   const dispatch = createEventDispatcher();
 
@@ -25,8 +26,10 @@
   let showTimeEndDropdown = false;
   let validEndTime: boolean = false;
   let externalEventLink: string = "";
+  let scrapeUrl: string = "";
 
   let error: string = "";
+  let scrapingPageState: "idle" | "loading" | "error" = "idle";
 
   export let data: any;
 
@@ -50,7 +53,6 @@
   };
 
   const completion = () => {
-    
     if (
       !name ||
       !address ||
@@ -78,7 +80,7 @@
       hostName,
       privateAddress,
       ageLimit,
-      externalEventLink
+      externalEventLink,
     });
   };
 
@@ -89,6 +91,50 @@
     } else if (dropdown === "end") {
       selectedTimeEnd = time;
       showTimeEndDropdown = false;
+    }
+  };
+
+  const scrapePage = async () => {
+    scrapingPageState = "loading";
+    try {
+      const data = await axios.post("/api/scrapePage", {
+        url: scrapeUrl,
+      });
+
+      if (!data.data) return;
+
+      name = data.data.title;
+      description =
+        data.data.shortDescription + "\n" + data.data.longDescription;
+      hostName = data.data.host;
+
+      document.getElementById("autocomplete").value = data.data.location;
+
+      date = DateTime.fromFormat(data.data.date, "EEE MMM dd, h:mm a").toFormat(
+        "yyyy-MM-dd"
+      );
+
+      selectedTimeStart = DateTime.fromFormat(
+        data.data.date,
+        "EEE MMM dd, h:mm a"
+      ).toFormat("h:mm a");
+      selectedTimeEnd = "2:00 AM";
+
+      externalEventLink = scrapeUrl;
+
+      //       {
+      //   title: 'USC Mansion Rave',
+      //   host: 'elevate',
+      //   image: 'https://images.posh.vip/images/5c8f4ef4-c05b-4c73-8770-e8de3770eb1e.jpg',
+      //   shortDescription: 'First & only house USC mansion of the summer. Join us for a night of dancing with beautiful people & music 🥂 Students & Non-Students welcome. ',
+      //   longDescription: 'availible tonight only.\nthis tier will sell out tonight, and raise to $25.',
+      //   date: 'Sat Jul 22, 10:00 PM',
+      //   location: '1182 1/2 W 37th Pl, Los Angeles, CA 90007, USA'
+      // }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      scrapingPageState = "idle";
     }
   };
 
@@ -154,9 +200,7 @@
   });
 </script>
 
-<h1 class="font-bold text-3xl text-white mb-4">
-  Now let's get some basic details
-</h1>
+<h1 class="font-bold text-3xl text-white mb-4">Party Info</h1>
 {#if error}
   <div
     class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
@@ -207,6 +251,25 @@
     </div>
   </div>
 {/if}
+<div class="flex flex-row">
+  <input
+    type="text"
+    placeholder="Link to external event"
+    class="p-2 rounded-md bg-matteBlack text-white outline-none w-full"
+    name="scrapeUrl"
+    id="scrapeUrl"
+    bind:value={scrapeUrl}
+  />
+
+  <button
+    class={`bg-white text-black rounded-md p-2 ml-2 ${
+      scrapingPageState === "loading" ? "opacity-50" : ""
+    }}`}
+    on:click={() => (scrapingPageState === "loading" ? null : scrapePage())}
+    >{scrapingPageState === "idle" ? "Load" : "Loading..."}</button
+  >
+</div>
+<div class="w-full h-1 bg-neutral-700 my-5" />
 <form
   on:submit|preventDefault={() => completion()}
   class="flex flex-col gap-2 pb-20"
