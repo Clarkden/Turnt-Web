@@ -1,12 +1,22 @@
-import axios from "axios";
 import puppeteer from "puppeteer";
+import { ENVIRONMENT } from "$env/static/private";
+import chromium from "chrome-aws-lambda";
 
 export async function POST(event: any) {
   const body = await event.request.json();
   try {
-    const browser = await puppeteer.launch({
-      headless: "new",
-    });
+    let browser;
+    if (ENVIRONMENT === "development") {
+      browser = await puppeteer.launch({
+        headless: "new",
+        args: ["--no-sandbox"],
+      });
+    } else {
+      browser = await chromium.puppeteer.launch({
+        args: chromium.args,
+        headless: true,
+      });
+    }
     const page = await browser.newPage();
     await page.goto(body.url);
     await page.waitForNetworkIdle();
@@ -37,10 +47,9 @@ export async function POST(event: any) {
         shortDescription,
         longDescription,
         date,
-        location
+        location,
       };
     });
-
 
     await browser.close();
 
