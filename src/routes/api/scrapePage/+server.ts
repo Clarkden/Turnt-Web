@@ -1,27 +1,19 @@
-import puppeteer from "puppeteer";
-import { ENVIRONMENT } from "$env/static/private";
-import chromium from "chrome-aws-lambda";
+import puppeteer from "puppeteer-core";
+import { BROWSERLESS_KEY } from "$env/static/private";
+// import { ENVIRONMENT } from "$env/static/private";
 
 export async function POST(event: any) {
   const body = await event.request.json();
   try {
-    let browser;
-    if (ENVIRONMENT === "development") {
-      browser = await puppeteer.launch({
-        headless: "new",
-        args: ["--no-sandbox"],
-      });
-    } else {
-      browser = await chromium.puppeteer.launch({
-        args: chromium.args,
-        headless: true,
-      });
-    }
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
+    });
+
     const page = await browser.newPage();
     await page.goto(body.url);
     await page.waitForNetworkIdle();
 
-    // Force 
+    // Force
 
     const data = await page.evaluate(() => {
       const title = document.querySelector(".EventPage-name")?.textContent;
