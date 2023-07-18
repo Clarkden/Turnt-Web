@@ -28,17 +28,15 @@
   const dispatch = createEventDispatcher();
 
   let currentStepIndex = 0;
-  let totalSteps = 4;
   let response: any = {};
-  let test: string = "test";
 
   let fileInput: HTMLInputElement;
   let file: File | null = null;
   let fileName: string = "";
   let error: string = "";
-  let stripeCheck: boolean = false;
-  let stripeCheckValid: boolean = false;
   let creatingParty: boolean = false;
+  let flyerLink: string = "";
+  let now = new Date();
 
   const handleFileChange = (e: any) => {
     file = e.target.files[0];
@@ -53,28 +51,22 @@
     if (!file) return;
 
     try {
-      const now = new Date();
-
-      const findDuplicateAddressOnDate = await getDocs(
-        query(
-          collection(db, "parties"),
-          where("address", "==", response.address),
-          where("date", "==", response.date)
-        )
-      );
-
-      if (findDuplicateAddressOnDate.docs.length > 0) {
-        alert(
-          "You cannot have two parties at the same address on the same day."
-        );
+      if (!flyerLink && !file) {
+        error = "Please add a flyer or a link to a flyer";
         return;
       }
 
-      const storageRef = ref(storage, `images/${now.getTime()}`);
+      let path;
 
-      let path = await uploadBytes(storageRef, file).then(async (snapshot) => {
-        return await getDownloadURL(snapshot.ref);
-      });
+      if (file) {
+        const storageRef = ref(storage, `images/${now.getTime()}`);
+
+        path = await uploadBytes(storageRef, file).then(async (snapshot) => {
+          return await getDownloadURL(snapshot.ref);
+        });
+      } else {
+        path = flyerLink;
+      }
 
       response = {
         ...response,
@@ -108,25 +100,6 @@
       creatingParty = false;
       completion();
     }
-  };
-
-  const checkStripeAccount = async () => {
-    const stripeId = await getDoc(doc(db, "stripe-accounts", $page.data.uid));
-
-    if (stripeId.exists()) {
-      let returnedStripeAccount: any = await axios.get(
-        `/api/checkStripeAccount?id=${stripeId.data().stripeAccountId}`
-      );
-
-      if (
-        returnedStripeAccount.data.details_submitted &&
-        returnedStripeAccount.data.charges_enabled
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    } else return false;
   };
 </script>
 
@@ -203,6 +176,15 @@
   <h1 class="font-bold text-3xl text-white mb-1">Host</h1>
   <h1 class="text-lg text-neutral-100 mb-4">Add a party flyer</h1>
 
+  <input
+    type="text"
+    placeholder="Link to picture"
+    class="p-2 rounded-md bg-matteBlack text-white outline-none w-full"
+    name="scrapeUrl"
+    id="scrapeUrl"
+    bind:value={flyerLink}
+  />
+
   <div class="relative inline-block">
     <div
       class="w-full h-[300px] border-[1px] flex flex-col items-center justify-center cursor-pointer rounded-md group p-4"
@@ -231,7 +213,7 @@
     <!-- <p class="mt-2">{fileName}</p> -->
   </div>
 
-  {#if file}
+  {#if file || flyerLink}
     {#if !creatingParty}
       <button
         on:click={() => {
