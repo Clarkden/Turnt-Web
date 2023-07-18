@@ -21,6 +21,8 @@ export async function POST(event: any) {
     await page.goto(body.url);
     await page.waitForNetworkIdle();
 
+    // Force 
+
     const data = await page.evaluate(() => {
       const title = document.querySelector(".EventPage-name")?.textContent;
       const host = document.querySelector(".EventPage-groupName")?.textContent;
