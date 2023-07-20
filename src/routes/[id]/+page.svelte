@@ -444,7 +444,7 @@
     >
       <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
         <img
-          src={party.flyerPath}
+          src={data.flyerPath}
           alt="Party Flyer"
           class="w-full object-cover md:object-contain rounded-md"
         />
@@ -673,9 +673,15 @@
   <div
     class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
   >
-    <div class="w-full h-fit md:min-w-[45%] md:w-[45%]">
-      <div class="w-full h-[80vh] md:h-[100vh] bg-gray-400 rounded-md">
-        <div class="w-full h-full bg-neutral-900 animate-pulse rounded-md" />
+    <div
+      class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
+    >
+      <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
+        <img
+          src={data.flyerPath}
+          alt="Party Flyer"
+          class="w-full object-cover md:object-contain rounded-md"
+        />
       </div>
     </div>
 
