@@ -196,6 +196,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>Find Parties</title>
+</svelte:head>
+
 {#if loadingLocationError}
   <div
     class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white"
