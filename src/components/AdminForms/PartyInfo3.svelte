@@ -1,7 +1,7 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { IconCalendar, IconQuestionMark } from "@tabler/icons-svelte";
 
-  import { Ticket } from "../../lib/types";
+  import type { Ticket } from "../../lib/types";
   import { IconCirclePlus } from "@tabler/icons-svelte";
   import { IconCaretDown } from "@tabler/icons-svelte";
   import { createEventDispatcher } from "svelte";
@@ -49,6 +49,10 @@
     if (ticketPrice < 1) {
       error = "Ticket price must be greater than 0";
       return;
+    }
+
+    let newTicket: Ticket = {
+
     }
 
     tickets = [
@@ -522,4 +526,4 @@
       Next
     </button>
   {/if}
-</div>
+</div> -->
