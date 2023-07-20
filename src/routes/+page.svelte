@@ -2,9 +2,58 @@
   import { IconArrowRight, IconBrandDiscord } from "@tabler/icons-svelte";
   import MainDash from "../assets/images/MainDash.png";
   import Footer from "../components/Footer.svelte";
+  import OgImage from "../assets/images/OgImage.png";
 </script>
 
-<div class="h-full w-full bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl overflow-hidden relative">
+<svelte:head>
+  <title>Turnt - The Better Party Platform</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
+  />
+  <meta
+    name="keywords"
+    content="party, parties, Turnt, Turntapp, Turntparty, Turnt party, social, events, gatherings, fun"
+  />
+  <meta name="author" content="Turnt" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="turnt.party" />
+  <!-- Replace with your website URL -->
+  <meta property="og:title" content="Turnt - The Better Party Platform" />
+  <meta
+    property="og:description"
+    content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
+  />
+  <meta property="og:image" content={OgImage} />
+  <!-- Replace with your image URL -->
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="turnt.party" />
+  <!-- Replace with your website URL -->
+  <meta property="twitter:title" content="Turnt - The Better Party Platform" />
+  <meta
+    property="twitter:description"
+    content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
+  />
+  <meta property="twitter:image" content={OgImage} />
+  <!-- Replace with your image URL -->
+</svelte:head>
+
+<div
+  class="h-full w-full bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl overflow-hidden relative"
+>
   <section
     class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit mt-20 mb-40 md:my-0 md:mt-0 md:mb-0 relative px-5 lg:px-40"
   >
@@ -57,7 +106,7 @@
       <img
         src={MainDash}
         alt="hero"
-        class="object-contain md:object-cover md:object-left md:absolute md:w-[auto] md:max-h-[80vh] md:h-full md:top-1/4 md:-translate-y-1/4 w-full h-[auto] rounded-lg md:rounded-lg border-2 border-white "
+        class="object-contain md:object-cover md:object-left md:absolute md:w-[auto] md:max-h-[80vh] md:h-full md:top-1/4 md:-translate-y-1/4 w-full h-[auto] rounded-lg md:rounded-lg border-2 border-white"
       />
     </div>
   </section>

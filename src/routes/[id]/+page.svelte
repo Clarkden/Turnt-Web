@@ -23,17 +23,16 @@
     IconLocation,
     IconUser,
   } from "@tabler/icons-svelte";
-  // import { authStore } from "../../stores/authStore";
   import axios from "axios";
   import { goto } from "$app/navigation";
   import { fly } from "svelte/transition";
   import { writable, derived, get } from "svelte/store";
   import { clickOutside } from "$lib/clickOutSide";
-  import OgImage2 from "../../assets/images/OgImage2.png";
   import Particles from "svelte-particles";
   import { loadFull } from "tsparticles";
   import FireWorks from "../../assets/particles/particles.json";
   import Footer from "../../components/Footer.svelte";
+  import type { PageData } from "./$types";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -239,6 +238,8 @@
       message = "Your ticket purchase has been canceled.";
     }
   }
+
+  export let data: any;
 </script>
 
 <!-- <Particles
@@ -248,6 +249,37 @@
   {particlesInit}
   class="absolute z-0"
 /> -->
+
+<svelte:head>
+  <title>{data.name}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={data.description} />
+  <meta
+    name="keywords"
+    content="party, parties, Turnt, Turntapp, Turntparty, Turnt party, social, events, gatherings, fun"
+  />
+  <meta name="author" content="Turnt" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={`turnt.party/${data.id}`} />
+  <meta property="og:title" content={data.name} />
+  <meta property="og:description" content={data.description} />
+  <meta property="og:image" content={data.flyerPath} />
+
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content={`turnt.party/${data.id}`} />
+  <meta property="twitter:title" content={data.name} />
+  <meta property="twitter:description" content={data.description} />
+  <meta property="twitter:image" content={data.flyerPath} />
+</svelte:head>
 
 {#if message}
   <div
@@ -407,7 +439,9 @@
   <div
     class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
   >
-    <div class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden">
+    <div
+      class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
+    >
       <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
         <img
           src={party.flyerPath}

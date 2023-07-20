@@ -16,7 +16,6 @@
   import { fade, slide } from "svelte/transition";
   import { logout, user } from "$lib/stores/auth";
   import { navigating } from "$app/stores";
-  import OgImage from "../assets/images/OgImage.png";
   // import whiteIcon
 
   let showMobileNav: boolean = false;
@@ -93,51 +92,7 @@
   // });
 </script>
 
-<svelte:head>
-  <title>Turnt - The Better Party Platform</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
-  />
-  <meta
-    name="keywords"
-    content="party, parties, Turnt, Turntapp, Turntparty, Turnt party, social, events, gatherings, fun"
-  />
-  <meta name="author" content="Turnt" />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="turnt.party" />
-  <!-- Replace with your website URL -->
-  <meta property="og:title" content="Turnt - The Better Party Platform" />
-  <meta
-    property="og:description"
-    content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
-  />
-  <meta property="og:image" content={OgImage} />
-  <!-- Replace with your image URL -->
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="turnt.party" />
-  <!-- Replace with your website URL -->
-  <meta property="twitter:title" content="Turnt - The Better Party Platform" />
-  <meta
-    property="twitter:description"
-    content="Turnt is the better party platform. Discover parties, connect with others, and get Turnt like never before!"
-  />
-  <meta property="twitter:image" content={OgImage} />
-  <!-- Replace with your image URL -->
-</svelte:head>
 
 <svelte:window bind:scrollY />
 
