@@ -72,7 +72,6 @@
           });
         }
 
-        // if(JSON.ap(partyCancelResponse).message === "Party deleted successfully")
       } catch (error) {
         console.log(error);
       } finally {
@@ -206,100 +205,101 @@
   });
 </script>
 
-{#if message}
-  <div
-    class="fixed bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white z-50"
-  >
-    <div class="flex items-center space-x-3">
-      <div class="text-green-600">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-      <div class="flex-1 text-green-600">
-        <p class="font-semibold">{message}</p>
-      </div>
-      <button
-        class="text-gray-400 hover:text-gray-600 transition"
-        on:click={() => {
-          message = "";
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-    </div>
-  </div>
-{/if}
-
-{#if editPartyModal}
-  <div
-    class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center pt-16 md:p-none"
-    in:fly
-    out:fly
-  >
-    <div
-      class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-mainRed rounded-md shadow-lg z-50 overflow-scroll"
-    >
-      <div class="p-5 h-full">
-        <EditParty
-          {party}
-          on:save={() => {
-            editPartyModal = false;
-          }}
-        />
-      </div>
-    </div>
-  </div>
-{/if}
-{#if editTicketsModal}
-  <div
-    class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center pt-16 md:p-none"
-    in:fly
-    out:fly
-  >
-    <div
-      class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-mainRed rounded-md shadow-lg z-50 overflow-scroll"
-    >
-      <div class="p-5 h-full">
-        <EditTickets
-          {party}
-          on:save={() => {
-            editTicketsModal = false;
-          }}
-        />
-      </div>
-    </div>
-  </div>
-{/if}
 <div
   class="
-  p-4 md:p-10
+  p-4 md:p-10 relative min-h-screen overflow-y-scroll
 "
 >
+  {#if message}
+    <div
+      class="absolute bottom-0 w-full px-4 py-6 md:w-auto md:px-6 md:rounded md:shadow-lg md:bottom-3 md:right-3 bg-white z-10"
+    >
+      <div class="flex items-center space-x-3">
+        <div class="text-green-600">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <div class="flex-1 text-green-600">
+          <p class="font-semibold">{message}</p>
+        </div>
+        <button
+          class="text-gray-400 hover:text-gray-600 transition"
+          on:click={() => {
+            message = "";
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  {/if}
+
+  {#if editPartyModal}
+    <div
+    class="absolute inset-0 z-10 overflow-auto bg-black/50 flex items-center justify-center p-3 md:p-16"
+      in:fly
+      out:fly
+    >
+      <div
+        class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-mainRed rounded-md shadow-lg z-50 overflow-scroll"
+      >
+        <div class="p-5 h-full">
+          <EditParty
+            {party}
+            on:save={() => {
+              editPartyModal = false;
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  {/if}
+  {#if editTicketsModal}
+    <div
+      class="absolute inset-0 z-10 overflow-auto bg-black/50 flex items-center justify-center p-3 md:p-16"
+      in:fly
+      out:fly
+    >
+      <div
+        class="h-[80vh] max-h-[80vh] w-[95vw] md:w-[90vw] m-auto bg-mainRed rounded-md shadow-lg z-50 overflow-scroll"
+      >
+        <div class="p-5 h-full">
+          <EditTickets
+            {party}
+            on:save={() => {
+              editTicketsModal = false;
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  {/if}
+
   {#if cancelPartyModal && $page.data.uid === party.hostAccountId}
     <div
       class="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center p-3 md:p-none"
@@ -502,7 +502,7 @@
         <h1 class="text-white text-2xl font-extrabold mb-4">Ticket Sales</h1>
         <div class="flex flex-col gap-2">
           {#if party.tickets}
-            <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-2">
               {#each JSON.parse(party.tickets) as ticket (ticket.id)}
                 <div
                   class="flex flex-col border-[1px] h-fit col-span-1 p-2 px-4 border-black rounded-md bg-white text-center w-full"

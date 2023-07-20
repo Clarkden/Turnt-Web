@@ -254,7 +254,7 @@
 <div class="flex flex-row">
   <input
     type="text"
-    placeholder="Link to external event"
+    placeholder="Import event data from posh"
     class="p-2 rounded-md bg-matteBlack text-white outline-none w-full"
     name="scrapeUrl"
     id="scrapeUrl"
@@ -266,7 +266,7 @@
       scrapingPageState === "loading" ? "opacity-50" : ""
     }}`}
     on:click={() => (scrapingPageState === "loading" ? null : scrapePage())}
-    >{scrapingPageState === "idle" ? "Load" : "Loading..."}</button
+    >{scrapingPageState === "idle" ? "Import" : "Loading..."}</button
   >
 </div>
 <div class="w-full h-1 bg-neutral-700 my-5" />

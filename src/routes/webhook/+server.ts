@@ -25,7 +25,7 @@ import {
 } from "firebase/firestore";
 import twilio from "twilio";
 
-const client = twilio(PRIVATE_TWILIO_ACCOUNT_SID, PRIVATE_TWILIO_AUTH_TOKEN);
+// const client = twilio(PRIVATE_TWILIO_ACCOUNT_SID, PRIVATE_TWILIO_AUTH_TOKEN);
 
 const endpointSecret = PRIVATE_ENDPOINT_SECRET;
 
@@ -123,26 +123,26 @@ export async function POST({ request }: RequestEvent) {
           ticketInfo: paymentIntentSucceeded.metadata.ticketInfo,
         });
 
-
-        client.messages
-          .create({
-            // body: `Your link to your ticket is below 🎉:\n${
-            //   ENVIRONMENT === "development"
-            //     ? `http://localhost:4242/qrCode/${paymentIntentSucceeded.id}`
-            //     : `https://turnt.party/qrCode/${paymentIntentSucceeded.id}`
-            // }`,
-            body: `Turnt - Here is your ticket Qr Code: www.turnt.party/qrCode/${paymentIntentSucceeded.id}`,
-            from: "+18185930804",
-            to: `${paymentIntentSucceeded.metadata.purchaserPhoneNumber}`,
-          })
-          .then((message: any) => console.log(message.sid));
+        // client.messages
+        //   .create({
+        //     // body: `Your link to your ticket is below 🎉:\n${
+        //     //   ENVIRONMENT === "development"
+        //     //     ? `http://localhost:4242/qrCode/${paymentIntentSucceeded.id}`
+        //     //     : `https://turnt.party/qrCode/${paymentIntentSucceeded.id}`
+        //     // }`,
+        //     body: `Turnt - Here is your ticket Qr Code: www.turnt.party/qrCode/${paymentIntentSucceeded.id}`,
+        //     from: "+18185930804",
+        //     to: `${paymentIntentSucceeded.metadata.purchaserPhoneNumber}`,
+        //   })
+        //   .then((message: any) => console.log(message.sid));
       } catch (err) {
         console.log(err);
+
       }
       break;
     // ... handle other event types
     default:
-    //   console.log(`Unhandled event type ${event.type}`);
+      console.log(`Unhandled event type ${event.type}`);
   }
 
   // Return a 200 response to acknowledge receipt of the event

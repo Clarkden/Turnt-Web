@@ -40,7 +40,7 @@
     class="  p-5 py-10 hidden md:flex flex-col gap-4 text-white border-r-[1px] border-neutral-500 md:w-[275px] md:h-screen md:sticky md:top-0 md:left-0"
   >
     <div
-      class="flex flex-row gap-2 pb-4 border-b-[1px] border-neutral-500 mb-10 items-center"
+      class="flex flex-row gap-2 mb-10 items-center"
     >
       <!-- <img src={redIcon} alt="Turnt Logo" class="w-12 h-[auto]" /> -->
       <a class="font-extrabold text-3xl text-[#F94144]" href="/">Turnt</a>

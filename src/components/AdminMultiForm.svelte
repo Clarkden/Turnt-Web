@@ -1,6 +1,6 @@
 <script lang="ts">
   import { IconArrowLeft, IconCirclePlus } from "@tabler/icons-svelte";
-  import PartyInfo2 from "./AdminForms/PartyInfo2.svelte";
+  import PartyInfo2 from "./AdminForms/PartyInfo.svelte";
   import PartyInfo3 from "./AdminForms/PartyInfo3.svelte";
   import { createEventDispatcher } from "svelte";
   import {
@@ -58,15 +58,15 @@
 
       let path;
 
-      if (file) {
-        const storageRef = ref(storage, `images/${now.getTime()}`);
+      // if (file) {
+      const storageRef = ref(storage, `images/${now.getTime()}`);
 
-        path = await uploadBytes(storageRef, file).then(async (snapshot) => {
-          return await getDownloadURL(snapshot.ref);
-        });
-      } else {
-        path = flyerLink;
-      }
+      path = await uploadBytes(storageRef, file).then(async (snapshot) => {
+        return await getDownloadURL(snapshot.ref);
+      });
+      // } else {
+      //   path = flyerLink;
+      // }
 
       response = {
         ...response,
@@ -176,14 +176,14 @@
   <h1 class="font-bold text-3xl text-white mb-1">Host</h1>
   <h1 class="text-lg text-neutral-100 mb-4">Add a party flyer</h1>
 
-  <input
+  <!-- <input
     type="text"
     placeholder="Link to picture"
     class="p-2 rounded-md bg-matteBlack text-white outline-none w-full"
     name="scrapeUrl"
     id="scrapeUrl"
     bind:value={flyerLink}
-  />
+  /> -->
 
   <div class="relative inline-block">
     <div

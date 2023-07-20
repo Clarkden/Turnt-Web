@@ -202,7 +202,7 @@
         <a
           href="/"
           class="h-full flex flex-col items-center justify-center font-extrabold text-2xl"
-          >turnt.party</a
+          >Turnt</a
         >
 
         <button

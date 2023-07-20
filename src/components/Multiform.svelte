@@ -1,8 +1,8 @@
 <script lang="ts">
   import { IconArrowLeft, IconCirclePlus } from "@tabler/icons-svelte";
-  import PartyInfo1 from "./Forms/PartyInfo1.svelte";
-  import PartyInfo2 from "./Forms/PartyInfo2.svelte";
-  import PartyInfo3 from "./Forms/PartyInfo3.svelte";
+  import PartyInfo1 from "./Forms/PartyType.svelte";
+  import PartyInfo2 from "./Forms/PartyInfo.svelte";
+  import PartyInfo3 from "./Forms/PartyTickets.svelte";
   import { createEventDispatcher } from "svelte";
   import {
     doc,

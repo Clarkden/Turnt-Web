@@ -56,8 +56,6 @@
 };
 
 
-  // $: if (usersParties.length > 0) splitParties();
-
   onMount(() => {
   const unsubscribe = onSnapshot(
     query(

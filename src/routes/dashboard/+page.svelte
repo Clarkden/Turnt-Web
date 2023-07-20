@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { auth, db } from "$lib/firebase";
+  import { db } from "$lib/firebase";
   import {
     setDoc,
     doc,
@@ -11,23 +11,15 @@
     collection,
     where,
   } from "firebase/firestore";
-  import { get } from "svelte/store";
   import { DateTime } from "luxon";
   import PartyComponent from "../../components/PartyComponent.svelte";
   import { IconEye } from "@tabler/icons-svelte";
   import axios from "axios";
-  import { user } from "$lib/stores/auth";
   import { page } from "$app/stores";
-  // import { loadStripe } from "@stripe/stripe-js";
-  // import { PUBLIC_STRIPE_KEY } from "$env/static/public";
-  // import { Elements } from "svelte-stripe";
-  // const stripe = require("stripe")(PUBLIC_STRIPE_KEY);
 
   let usersParties: any = [];
   let upComingAndFutureParties: any = [];
-  let stripe: any = null;
-  let totalRevenue: number = 0;
-  let totalAttendees: number = 0;
+  let totalAttendees = 0;
   let loading: "loading" | "loaded" | "error" = "loading";
   let stripeAccountBalanceAvailable: any = null;
   let stripeAccountBalancePending: any = null;
@@ -56,21 +48,20 @@
     upComingAndFutureParties = upComingAndFutureParties.slice(0, 1);
   };
 
+  // Retrive balance of users account
   const retrieveConnectAccountBalance = async () => {
     if (!stripeAccountId) return;
 
     try {
-      await axios
-        .get(`/api/retrieveConnectAccountBalance?id=${stripeAccountId}`)
-        .then((res) => {
-          stripeAccountBalanceAvailable = res.data.available[0].amount / 100;
-          stripeAccountBalancePending = res.data.pending[0].amount / 100;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      const response = await axios.get(
+        `/api/retrieveConnectAccountBalance?id=${stripeAccountId}`
+      );
+
+      stripeAccountBalanceAvailable = response.data.available[0].amount / 100;
+      stripeAccountBalancePending = response.data.pending[0].amount / 100;
     } catch (err) {
       console.log(err);
+      loading = "error";
     }
   };
 
@@ -88,6 +79,7 @@
           stripeAccountId = checkStripeAccount.data.id;
       } catch (err) {
         console.log(err);
+        loading = "error";
       }
 
       return (stripeAccountId = hostStripe.data().stripeAccountId);
@@ -111,10 +103,11 @@
       }
     } catch (err) {
       console.log(err);
+      loading = "error";
     }
   };
 
-  $: if (usersParties.length > 0) splitParties();
+  // $: if (usersParties.length > 0) splitParties();
 
   onMount(async () => {
     try {
@@ -129,6 +122,7 @@
         parties.push({ id: doc.id, ...doc.data() });
       });
       usersParties = parties;
+      splitParties();
 
       await getStripeAccountId();
       await getRecentTransactions();
@@ -330,5 +324,64 @@
 
   <div class="flex flex-col h-fit max-h-[86vh] overflow-scroll">
     <!-- This section also needs to account for loading and error states -->
+    <h1 class="text-2xl sm:text-3xl lg:text-4xl text-white font-bold mb-2">
+      Recent Activity
+    </h1>
+    <div
+      class="bg-white border-[2px] border-black rounded-md flex flex-col gap-2 flex-1 p-4 overflow-scroll h-fit"
+    >
+      {#if loading === "loading"}
+        <div class="flex flex-col gap-2">
+          <div
+            class="flex flex-col sm:flex-row bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
+          >
+            <div class="flex flex-col">
+              <h1 class="text-lg font-semibold text-gray-800">Loading...</h1>
+            </div>
+          </div>
+        </div>
+      {:else if loading === "error"}
+        <div class="flex flex-col gap-2">
+          <div
+            class="flex flex-col sm:flex-row bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
+          >
+            <div class="flex flex-col">
+              <h1 class="text-lg font-semibold text-gray-800">Could not load recent transactions...</h1>
+            </div>
+          </div>
+        </div>
+      {:else if recentTransactions.length > 0}
+        {#each recentTransactions as transaction (transaction.id)}
+          <div
+            class="flex flex-col sm:flex-row bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
+          >
+            <div class="flex flex-col">
+              <h1 class="text-lg font-semibold text-gray-800">
+                {transaction.amount > 0 ? "Ticket Purchase" : "Refund"}
+              </h1>
+
+              <p class="text-sm text-gray-500">
+                {DateTime.fromSeconds(transaction.created).toLocaleString(
+                  DateTime.DATETIME_MED
+                )}
+              </p>
+            </div>
+            <p class="text-green-600">
+              ${(transaction.amount / 100).toFixed(2)}
+            </p>
+          </div>
+        {/each}
+      {:else}
+        <div
+          class="flex flex-col bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
+        >
+          <div class="flex flex-col">
+            <h1 class="text-base font-semibold text-gray-800">
+              Recent activity will show up here
+            </h1>
+          </div>
+        </div>
+      {/if}
+    </div>
   </div>
 </section>

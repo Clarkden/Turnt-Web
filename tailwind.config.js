@@ -2,7 +2,6 @@
 export default {
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
-    
     extend: {
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
@@ -10,7 +9,12 @@ export default {
       colors: {
         mainRed: "#F94144",
         matteBlack: "#28282B",
-        stripe: "#6772e5"
+        stripe: "#6772e5",
+        text: "#fdfcfc",
+        background: "#060505",
+        primary: "#F94144",
+        secondary: "#1c1717",
+        accent: "#73738c",
       },
       dropShadow: {
         glow: [
@@ -22,5 +26,8 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require('@tailwindcss/aspect-ratio')],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/aspect-ratio"),
+  ],
 };
