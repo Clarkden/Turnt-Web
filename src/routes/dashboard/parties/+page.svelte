@@ -13,65 +13,74 @@
   } from "firebase/firestore";
   import { fade, fly, slide } from "svelte/transition";
 
-  import { Party, Ticket } from "$lib/types";
   import Multiform from "../../../components/Multiform.svelte";
-  import { IconDots } from "@tabler/icons-svelte";
   import { DateTime } from "luxon";
   import PartyComponent from "../../../components/PartyComponent.svelte";
   import { onMount } from "svelte";
   import { page } from "$app/stores";
+  import type { Party } from "$lib/types";
+  import { IconCaretDown } from "@tabler/icons-svelte";
 
-  let usersParties: any[] = [];
+  let usersParties: Party[] = [];
   let showPartyForm: boolean = false;
 
-  let pastParties: any[] = [];
-  let upcomingParties: any[] = [];
-  let todayParties: any[] = [];
-
-  let selectedParty: any = null;
+  let pastParties: Party[] = [];
+  let upcomingParties: Party[] = [];
+  let todayParties: Party[] = [];
+  let showPastParties: boolean = false;
 
   const splitParties = () => {
     const now = DateTime.now();
     usersParties.forEach((party) => {
-        const partyDate = DateTime.fromISO(party.date).set({
-            hour: DateTime.fromFormat(party.endTime, "h:mm a").hour,
-            minute: DateTime.fromFormat(party.endTime, "h:mm a").minute,
-        });
+      const partyDate = DateTime.fromISO(party.date).set({
+        hour: DateTime.fromFormat(party.endTime, "h:mm a").hour,
+        minute: DateTime.fromFormat(party.endTime, "h:mm a").minute,
+      });
 
-        // Check for duplicates
-        const isDuplicateInPastParties = pastParties.some(p => p.id === party.id);
-        const isDuplicateInUpcomingParties = upcomingParties.some(p => p.id === party.id);
-        const isDuplicateInTodayParties = todayParties.some(p => p.id === party.id);
+      // Check for duplicates
+      const isDuplicateInPastParties = pastParties.some(
+        (p) => p.id === party.id
+      );
+      const isDuplicateInUpcomingParties = upcomingParties.some(
+        (p) => p.id === party.id
+      );
+      const isDuplicateInTodayParties = todayParties.some(
+        (p) => p.id === party.id
+      );
 
-        if (partyDate < now && !isDuplicateInPastParties) {
-            pastParties = [...pastParties, party];
-        }
-        else if (partyDate > now && !isDuplicateInUpcomingParties) {
-            upcomingParties = [...upcomingParties, party];
-        }
-        else if (!isDuplicateInTodayParties) {
-            todayParties = [...todayParties, party];
-        }
+      if (partyDate < now && !isDuplicateInPastParties) {
+        pastParties = [...pastParties, party];
+      } else if (partyDate > now && !isDuplicateInUpcomingParties) {
+        upcomingParties = [...upcomingParties, party];
+      } else if (!isDuplicateInTodayParties) {
+        todayParties = [...todayParties, party];
+      }
     });
-};
+  };
 
+  const fetchParties = async () => {
+    try {
+      const q = query(
+        collection(db, "parties"),
+        where("hostAccountId", "==", $page.data.uid)
+      );
 
-  onMount(() => {
-  const unsubscribe = onSnapshot(
-    query(
-      collection(db, "parties"),
-      where("hostAccountId", "==", $page.data.uid)
-    ),
-    (snapshot) => {
+      const snapshot = await getDocs(q);
       let parties: any = [];
       snapshot.forEach((doc) => {
         parties = [...parties, { id: doc.id, ...doc.data() }];
       });
+
       usersParties = parties;
       splitParties();
+    } catch (error) {
+      console.error("Error fetching parties:", error);
     }
-  );
-});
+  };
+
+  onMount(async () => {
+    fetchParties();
+  });
 </script>
 
 <div class="w-full h-full overflow-scroll p-4 md:p-10">
@@ -92,6 +101,7 @@
             }}
             on:completion={() => {
               showPartyForm = false;
+              fetchParties();
             }}
           />
         </div>
@@ -112,8 +122,12 @@
     {#if usersParties.length > 0}
       {#if todayParties.length > 0}
         <div>
-          <h1 class="text-2xl font-bold text-neutral-200 mb-2">Today's Parties</h1>
-          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 md:gap-10">
+          <h1 class="text-2xl font-bold text-neutral-200 mb-2">
+            Today's Parties
+          </h1>
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 py-4 md:mx-auto z-50"
+          >
             {#each todayParties as todayParty (todayParty.id)}
               <PartyComponent party={todayParty} />
             {/each}
@@ -125,7 +139,9 @@
           <h1 class="text-2xl font-bold text-neutral-200 mb-2">
             Your Upcoming Parties
           </h1>
-          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 md:gap-10">
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 py-4 md:mx-auto z-50"
+          >
             {#each upcomingParties as upComingParty (upComingParty.id)}
               <PartyComponent party={upComingParty} />
             {/each}
@@ -134,12 +150,31 @@
       {/if}
       {#if pastParties.length > 0}
         <div>
-          <h1 class="text-2xl font-bold text-neutral-200 mb-2">Past Parties</h1>
-          <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
-            {#each pastParties as pastParty (pastParty.id)}
-              <PartyComponent party={pastParty} />
-            {/each}
-          </div>
+          <button
+            on:click={() => {
+              showPastParties = !showPastParties;
+            }}
+            class={`text-2xl font-bold  mb-2 rounded-md ${
+              showPastParties
+                ? "text-neutral-100"
+                : "text-neutral-400 hover:text-neutral-300"
+            }`}
+            >{showPastParties
+              ? "Hide Past Parties"
+              : "Show Past Parties"}
+              
+                <IconCaretDown class="inline-block w-6 h-6"/>
+              </button
+          >
+          {#if showPastParties}
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 py-4 md:mx-auto z-50"
+            >
+              {#each pastParties as pastParty (pastParty.id)}
+                <PartyComponent party={pastParty} />
+              {/each}
+            </div>
+          {/if}
         </div>
       {/if}
     {/if}

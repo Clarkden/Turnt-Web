@@ -21,9 +21,10 @@
   import EditTickets from "../../../../../components/EditTickets.svelte";
   import { logEvent } from "firebase/analytics";
   import { browser } from "$app/environment";
+  import type { Party } from "$lib/types";
 
   let party: any = null;
-  let partyId: any = $page.params.id;
+  let partyId: Party["id"] = $page.params.id;
   let revenue: number = 0;
   let guestList: any = null;
   let payments: any = null;
@@ -71,7 +72,6 @@
             stripeAccountId: stripeAccountId,
           });
         }
-
       } catch (error) {
         console.log(error);
       } finally {
@@ -107,12 +107,12 @@
   // };
 
   const viewGuestList = async () => {
-    if (party.paidParty) return;
+    if (party?.paidParty) return;
 
     // Query for the guestList document
     const guestListQuery = query(
       collection(db, "guest-lists"),
-      where("partyId", "==", party.id)
+      where("partyId", "==", party?.id)
     );
     const guestListSnapShot = await getDocs(guestListQuery);
 
@@ -261,7 +261,7 @@
 
   {#if editPartyModal}
     <div
-    class="absolute inset-0 z-10 overflow-auto bg-black/50 flex items-center justify-center p-3 md:p-16"
+      class="absolute inset-0 z-10 overflow-auto bg-black/50 flex items-center justify-center p-3 md:p-16"
       in:fly
       out:fly
     >

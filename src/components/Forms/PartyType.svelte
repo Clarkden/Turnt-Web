@@ -4,6 +4,7 @@
   const dispatch = createEventDispatcher();
 
   let paidParty: boolean = true;
+  let selectedType: boolean = false;
 
   const completion = () => {
     dispatch("completion", {
@@ -28,9 +29,10 @@
 <div
   on:mouseup={() => {
     paidParty = true;
+    selectedType = true;
     completion();
   }}
-  class="w-full drop-shadow-md h-[10vh] rounded-md flex flex-col items-center justify-center mt-5 bg-matteBlack cursor-pointer hover:border transition-all text-white"
+  class={`w-full drop-shadow-md h-[10vh] rounded-md flex flex-col items-center justify-center mt-5 bg-matteBlack cursor-pointer hover:border transition-all text-white ${selectedType && "pointer-events-none"}`}
 >
   <h1 class="font-semibold text-lg">Paid Event</h1>
   <p class="text-neutral-400">Sell Tickets</p>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { doc, setDoc, updateDoc } from "firebase/firestore";
-  import PartyEditInfo2 from "./EditForms/EditTickets.svelte";
-  import PartyEditInfo3 from "./EditForms/EditParty.svelte";
+  import PartyEditInfo2 from "./EditForms/EditParty.svelte";
+  import PartyEditInfo3 from "./EditForms/EditTickets.svelte";
   import { db } from "$lib/firebase";
   import { createEventDispatcher } from "svelte";
 

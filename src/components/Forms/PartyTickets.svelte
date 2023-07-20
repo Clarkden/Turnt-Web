@@ -1,7 +1,7 @@
 <script lang="ts">
   import { IconCalendar, IconQuestionMark } from "@tabler/icons-svelte";
 
-  import { Ticket } from "../../lib/types";
+  import type { Ticket } from "../../lib/types";
   import { IconCirclePlus } from "@tabler/icons-svelte";
   import { IconCaretDown } from "@tabler/icons-svelte";
   import { createEventDispatcher } from "svelte";
@@ -19,16 +19,16 @@
   let creatingTicket = false;
   let showAdvancedOptions: boolean = false;
 
-  let ticketName: string = "";
-  let ticketGender: string = "";
-  let ticketQuantity: number = 0;
-  let ticketSaleStart: string = "";
-  let ticketSaleEnd: string = "";
-  let ticketPrice: number;
-  let ticketQuantityLimit: boolean = false;
+  let ticketName: Ticket["name"] = "";
+  let ticketGender: Ticket["gender"] = "";
+  let ticketQuantity: Ticket["quantity"] = 0;
+  let ticketQuantityLimit: Ticket["quantityLimit"] = false;
+  let ticketSaleStart: Ticket["saleStartDate"] = "";
+  let ticketSaleEnd: Ticket["saleEndDate"] = "";
+  let ticketPrice: Ticket["price"] = 0;
 
-  let selectedTimeStart: string;
-  let selectedTimeEnd: string;
+  let selectedTimeStart: Ticket["saleStartTime"];
+  let selectedTimeEnd: Ticket["saleEndTime"];
   let timeOptions: string[] = [];
   let showTimeStartDropdown = false;
   let showTimeEndDropdown = false;
@@ -56,21 +56,20 @@
       return;
     }
 
-    tickets = [
-      ...tickets,
-      new Ticket(
-        tickets.length + 1,
-        ticketName,
-        ticketGender,
-        ticketQuantity,
-        ticketQuantityLimit,
-        ticketSaleStart,
-        ticketSaleEnd,
-        selectedTimeStart,
-        selectedTimeEnd,
-        ticketPrice
-      ),
-    ];
+    let newTicket: Ticket = {
+      id: tickets.length + 1,
+      name: ticketName,
+      gender: ticketGender,
+      quantity: ticketQuantity,
+      quantityLimit: ticketQuantityLimit,
+      saleStartDate: ticketSaleStart,
+      saleEndDate: ticketSaleEnd,
+      saleStartTime: selectedTimeStart,
+      saleEndTime: selectedTimeEnd,
+      price: ticketPrice,
+    };
+
+    tickets = [...tickets, newTicket];
     creatingTicket = false;
     ticketName = "";
     ticketGender = "";
@@ -82,6 +81,31 @@
     selectedTimeEnd = "";
     ticketPrice = 0;
     showAdvancedOptions = false;
+  };
+
+  const setTicketInfomration = (ticket: Ticket) => {
+    // Set creating ticket values to that of the ticket being edited
+
+    ticketName = ticket.name;
+    ticketGender = ticket.gender;
+    ticketQuantity = ticket.quantity;
+    ticketQuantityLimit = ticket.quantityLimit;
+    ticketSaleStart = ticket.saleStartDate;
+    ticketSaleEnd = ticket.saleEndDate;
+    selectedTimeStart = ticket.saleStartTime;
+    selectedTimeEnd = ticket.saleEndTime;
+    ticketPrice = ticket.price;
+
+    // set creating ticket to true so that the form will be shown
+    creatingTicket = true;
+
+    // check if advanced options are being used and if they are show them
+    if (ticketSaleStart || ticketSaleEnd || ticketQuantityLimit) {
+      showAdvancedOptions = true;
+    }
+
+    // remove the ticket from the tickets array
+    tickets = tickets.filter((t) => t.id !== ticket.id);
   };
 
   const completion = () => {
@@ -379,13 +403,6 @@
         </div>
       {/if}
       <div class="flex flex-row gap-4">
-        <button
-          class="w-full p-1 bg-red-500 text-white rounded-md"
-          type="button"
-          on:click={() => {
-            creatingTicket = false;
-          }}>Cancel</button
-        >
         {#if !ticketName || (ticketSaleStart && !ticketSaleEnd) || (ticketSaleEnd && !ticketSaleStart)}
           <button
             class="w-full p-1 bg-green-500/25 border border-green-500 text-white rounded-md"
@@ -531,12 +548,20 @@
         {#if ticket.quantityLimit}
           <p>Quantity: {ticket.quantity}</p>
         {/if}
-        <button
-          class="bg-mainRed rounded px-4 py-2 mt-4 w-fit"
-          on:click={() => {
-            tickets = tickets.filter((t) => t.id !== ticket.id);
-          }}>Remove Ticket</button
-        >
+        <div class="flex flex-row gap-2">
+          <button
+            class="bg-mainRed rounded px-4 py-2 mt-4 w-fit"
+            on:click={() => {
+              tickets = tickets.filter((t) => t.id !== ticket.id);
+            }}>Remove Ticket</button
+          >
+          <button
+            class="bg-yellow-500 rounded px-4 py-2 mt-4 w-fit"
+            on:click={() => {
+              setTicketInfomration(ticket);
+            }}>Edit Ticket</button
+          >
+        </div>
       </div>
     {/each}
   </div>

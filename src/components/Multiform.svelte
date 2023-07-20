@@ -56,20 +56,20 @@
     try {
       const now = new Date();
 
-      const findDuplicateAddressOnDate = await getDocs(
-        query(
-          collection(db, "parties"),
-          where("address", "==", response.address),
-          where("date", "==", response.date)
-        )
-      );
+      // const findDuplicateAddressOnDate = await getDocs(
+      //   query(
+      //     collection(db, "parties"),
+      //     where("address", "==", response.address),
+      //     where("date", "==", response.date)
+      //   )
+      // );
 
-      if (findDuplicateAddressOnDate.docs.length > 0) {
-        alert(
-          "You cannot have two parties at the same address on the same day."
-        );
-        return;
-      }
+      // if (findDuplicateAddressOnDate.docs.length > 0) {
+      //   alert(
+      //     "You cannot have two parties at the same address on the same day."
+      //   );
+      //   return;
+      // }
 
       const storageRef = ref(storage, `images/${now.getTime()}`);
 
@@ -389,9 +389,10 @@
     <!-- <p class="mt-2">{fileName}</p> -->
   </div>
 
-  {#if file}
+  {#if file && !creatingParty}
     <button
       on:click={() => {
+        creatingParty = true;
         createParty();
       }}
       class="bg-black text-white rounded-md p-2 w-full my-4"

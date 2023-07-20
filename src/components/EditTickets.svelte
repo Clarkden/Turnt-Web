@@ -1,6 +1,6 @@
 <script lang="ts">
   import { doc, setDoc, updateDoc } from "firebase/firestore";
-  import PartyEditInfo3 from "./EditForms/EditParty.svelte";
+  import PartyEditInfo3 from "./EditForms/EditTickets.svelte";
   import { db } from "$lib/firebase";
   import { createEventDispatcher } from "svelte";
   import { stringify } from "postcss";
@@ -14,8 +14,8 @@
 
     if(!e.detail) return;
 
-    const savedParty = await updateDoc(doc(db, "parties", localParty.id), {
-      tickets: JSON.stringify(e.detail),
+    const savedTickets = await updateDoc(doc(db, "parties", localParty.id), {
+      tickets: JSON.stringify(e.detail.tickets),
     });
 
     dispatch("save");

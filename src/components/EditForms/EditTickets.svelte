@@ -1,84 +1,92 @@
 <script lang="ts">
+  import { IconCalendar, IconQuestionMark } from "@tabler/icons-svelte";
+
+  import type { Ticket } from "../../lib/types";
+  import { IconCirclePlus } from "@tabler/icons-svelte";
+  import { IconCaretDown } from "@tabler/icons-svelte";
   import { createEventDispatcher } from "svelte";
   import { onMount } from "svelte";
-  import { Loader } from "@googlemaps/js-api-loader";
-  import { IconCaretDown, IconQuestionMark } from "@tabler/icons-svelte";
-  import { clickOutside } from "$lib/clickOutSide";
+  import { clickOutside } from "../../lib/clickOutSide";
   import { DateTime } from "luxon";
   import { fly } from "svelte/transition";
-
   const dispatch = createEventDispatcher();
 
-  let name: string = "";
-  let autocomplete: google.maps.places.Autocomplete;
-  let address: any;
-  let latAndLong: any;
-  let privateAddress: boolean = false;
-  let description: string = "";
-  let date: string;
-  let hostName: StaticRange;
-  let ageLimit: number = 0;
-  let selectedTimeStart: string;
-  let selectedTimeEnd: string;
+  let tickets: Ticket[] = [];
+  let creatingTicket = false;
+  let showAdvancedOptions: boolean = false;
+
+  let ticketName: Ticket["name"] = "";
+  let ticketGender: Ticket["gender"] = "";
+  let ticketQuantity: Ticket["quantity"] = 0;
+  let ticketQuantityLimit: Ticket["quantityLimit"] = false;
+  let ticketSaleStart: Ticket["saleStartDate"] = "";
+  let ticketSaleEnd: Ticket["saleEndDate"] = "";
+  let ticketPrice: Ticket["price"] = 0;
+
+  let selectedTimeStart: Ticket["saleStartTime"];
+  let selectedTimeEnd: Ticket["saleEndTime"];
   let timeOptions: string[] = [];
   let showTimeStartDropdown = false;
   let showTimeEndDropdown = false;
-  let validEndTime: boolean = false;
-
   let error: string = "";
 
   export let data: any;
 
-  $: if (selectedTimeStart && selectedTimeEnd) {
-    validEndTime = isEndTimeAfterStartTime(selectedTimeStart, selectedTimeEnd);
+  const genders = ["Guys", "Girls"];
+
+  $: if (ticketGender === "None") {
+    ticketGender = "";
   }
 
-  function isEndTimeAfterStartTime(startTime: any, endTime: any) {
-    // Parse the times using Luxon's DateTime
-    // let start = DateTime.fromFormat(startTime, "h:mm a");
-    // let end = DateTime.fromFormat(endTime, "h:mm a");
+  const saveTicket = () => {
+    if (ticketSaleStart && !selectedTimeStart) {
+      selectedTimeStart = "12:00 AM";
+    }
 
-    // // Check if the end time is after the start time
-    // return end > start;
-    return true;
-  }
+    if (ticketSaleEnd && !selectedTimeEnd) {
+      selectedTimeEnd = "12:00 AM";
+    }
 
-  const options = {
-    componentRestrictions: { country: "us" },
-    strictBounds: false,
-  };
-
-  const completion = () => {
-    if (DateTime.fromISO(date) < DateTime.now()) {
-      error = "Date must be in the future";
-      return;
-    } else if (
-      !name ||
-      !address ||
-      !selectedTimeStart ||
-      !selectedTimeEnd ||
-      !date ||
-      !hostName ||
-      !description
-    ) {
-      error = "Please fill out all fields";
-      return;
-    } else if (!validEndTime) {
-      error = "End time must be after start time";
+    if (ticketPrice < 1) {
+      error = "Ticket price must be greater than 0";
       return;
     }
 
+    if (ticketQuantityLimit && ticketQuantity! < 1) {
+      error = "Ticket quantity must be greater than 0";
+      return;
+    }
+    let newTicket: Ticket = {
+      id: tickets.length + 1,
+      name: ticketName,
+      gender: ticketGender,
+      quantity: ticketQuantity,
+      quantityLimit: ticketQuantityLimit,
+      saleStartDate: ticketSaleStart,
+      saleEndDate: ticketSaleEnd,
+      saleStartTime: selectedTimeStart,
+      saleEndTime: selectedTimeEnd,
+      price: ticketPrice,
+    };
+
+    tickets = [...tickets, newTicket];
+
+    creatingTicket = false;
+    ticketName = "";
+    ticketGender = "";
+    ticketQuantity = 0;
+    ticketQuantityLimit = false;
+    ticketSaleStart = "";
+    ticketSaleEnd = "";
+    selectedTimeStart = "";
+    selectedTimeEnd = "";
+    ticketPrice = 0;
+    showAdvancedOptions = false;
+  };
+
+  const completion = () => {
     dispatch("completion", {
-      name,
-      date,
-      startTime: selectedTimeStart,
-      endTime: selectedTimeEnd,
-      address,
-      latAndLong,
-      description,
-      hostName,
-      privateAddress,
-      ageLimit,
+      tickets,
     });
   };
 
@@ -90,6 +98,31 @@
       selectedTimeEnd = time;
       showTimeEndDropdown = false;
     }
+  };
+
+  const setTicketInfomration = (ticket: Ticket) => {
+    // Set creating ticket values to that of the ticket being edited
+
+    ticketName = ticket.name;
+    ticketGender = ticket.gender;
+    ticketQuantity = ticket.quantity;
+    ticketQuantityLimit = ticket.quantityLimit;
+    ticketSaleStart = ticket.saleStartDate;
+    ticketSaleEnd = ticket.saleEndDate;
+    selectedTimeStart = ticket.saleStartTime;
+    selectedTimeEnd = ticket.saleEndTime;
+    ticketPrice = ticket.price;
+
+    // set creating ticket to true so that the form will be shown
+    creatingTicket = true;
+
+    // check if advanced options are being used and if they are show them
+    if (ticketSaleStart || ticketSaleEnd || ticketQuantityLimit) {
+      showAdvancedOptions = true;
+    }
+
+    // remove the ticket from the tickets array
+    tickets = tickets.filter((t) => t.id !== ticket.id);
   };
 
   onMount(() => {
@@ -113,43 +146,8 @@
       }
     }
 
-    const loader = new Loader({
-      apiKey: "AIzaSyCUQ24URm-IQ3QKw9WtDc5L36irv31FMpg",
-      version: "weekly",
-      libraries: ["places"],
-    });
-
-    loader.loadCallback((e) => {
-      if (e) {
-        console.log(e);
-      } else {
-        autocomplete = new google.maps.places.Autocomplete(
-          document.getElementById("autocomplete") as HTMLInputElement,
-          options
-        );
-
-        autocomplete.addListener("place_changed", onPlaceChanged);
-      }
-    });
-
-    function onPlaceChanged() {
-      latAndLong = autocomplete.getPlace().geometry?.location.toString();
-      address = autocomplete.getPlace();
-      address = address.formatted_address;
-    }
-
-    if (data) {
-      if (data.name) name = data.name;
-      if (data.hostName) hostName = data.hostName;
-      if (data.description) description = data.description;
-      if (data.date) date = data.date;
-      if (data.startTime) selectedTimeStart = data.startTime;
-      if (data.endTime) selectedTimeEnd = data.endTime;
-      if (data.address) {
-        address = data.address;
-        document.getElementById("autocomplete").value = address;
-      }
-      privateAddress = data.privateAddress;
+    if (data.tickets) {
+      tickets = JSON.parse(data.tickets);
     }
   });
 </script>
@@ -204,188 +202,392 @@
     </div>
   </div>
 {/if}
-<form
-  on:submit|preventDefault={() => completion()}
-  class="flex flex-col gap-2 pb-20"
->
-  <div class="w-full flex flex-col sm:flex-row gap-4">
-    <div class="flex flex-col gap-2 w-full">
-      <label for="name" class="text-white">Party Name</label>
-      <input
-        type="text"
-        name="name"
-        id="name"
-        placeholder="Ex. Epic Backyard Rager"
-        class="p-2 rounded-md bg-matteBlack text-white outline-none"
-        bind:value={name}
-      />
-    </div>
-    <div class="flex flex-col gap-2 w-full">
-      <label for="name" class="text-white">Party Host</label>
-      <input
-        type="text"
-        name="host"
-        id="host"
-        placeholder="Host"
-        class="p-2 rounded-md bg-matteBlack text-white outline-none"
-        bind:value={hostName}
-      />
-    </div>
-  </div>
-  <label for="description" class="text-white">Party Description</label>
-  <textarea
-    name="description"
-    id="description"
-    class="rounded-md p-2 bg-matteBlack text-white outline-none resize-none"
-    bind:value={description}
-    placeholder="Party Description"
-  />
-  <div class="w-full flex flex-col sm:flex-row gap-4">
-    <div class="flex flex-col gap-1 w-full">
-      <label for="autocomplete" class="text-white">Party Location</label>
-      <input
-        type="text"
-        name="autocomplete"
-        id="autocomplete"
-        autocomplete="off"
-        class="p-2 rounded-md bg-matteBlack text-white outline-none"
-      />
-    </div>
-    <div class="flex flex-col min-w-fit gap-2">
-      <label for="private" class="text-white">Private Address?</label>
-      <div class="flex flex-row gap-1">
-        <div
-          on:mousedown={() => (privateAddress = !privateAddress)}
-          class={`w-14 h-8  rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
-            privateAddress
-              ? "justify-end bg-green-400"
-              : "justify-start bg-matteBlack"
-          }`}
-        >
-          <div class="w-6 h-6 rounded-full bg-white" />
+<div class="w-full h-fit text-white">
+  {#if creatingTicket}
+    <form
+      on:submit|preventDefault={() => {
+        saveTicket();
+      }}
+      class="flex flex-col gap-2 bg-matteBlack p-4 rounded-md w-full"
+    >
+      <div class="flex flex-row w-full gap-4">
+        <div class="flex flex-col w-full">
+          <label for="ticketName">Ticket Name</label>
+          <input
+            id="ticketName"
+            name="ticketName"
+            type="text"
+            bind:value={ticketName}
+            class="border-[1px] rounded-md border-black w-full p-1 text-black"
+          />
+        </div>
+
+        <div class="flex flex-col w-full">
+          <label for="ticketPrice">Ticket Price</label>
+          <input
+            id="ticketPrice"
+            name="ticketPrice"
+            type="number"
+            min="1"
+            step="any"
+            bind:value={ticketPrice}
+            class="border-[1px] rounded-md border-black w-full p-1 text-black"
+          />
         </div>
       </div>
-    </div>
-    <div class="flex flex-col min-w-fit gap-2">
-      <label for="private" class="text-white">Age Limit?</label>
-      <div class="flex flex-row gap-1">
-        <select
-          name="ageLimit"
-          id="ageLimit"
-          class="p-2 rounded-md bg-matteBlack text-white outline-none"
-          bind:value={ageLimit}
-        >
-          <option value="0">No Limit</option>
-          <option value="18">18+</option>
-          <option value="21">21+</option>
-        </select>
-      </div>
-    </div>
-  </div>
 
-  <div class="flex flex-col sm:flex-row gap-2 w-full mb-4">
-    <div class="flex flex-col gap-2 w-full">
-      <label for="date" class="text-white">Date</label>
+      <button
+        on:click={() => {
+          showAdvancedOptions = !showAdvancedOptions;
+        }}
+        class="flex flex-row items-center gap-2 transition"
+        type="button"
+      >
+        Advanced Options
+        <IconCaretDown
+          size={20}
+          stroke={1}
+          class={`${showAdvancedOptions ? "transform -rotate-180" : ""}`}
+        />
+      </button>
+      {#if showAdvancedOptions}
+        <div class="w-full h-fit p-1 flex flex-col gap-2">
+          <label for="ticketGender">Gender</label>
 
-      <input
-        id="date"
-        name="date"
-        type="date"
-        class="p-2 rounded-md bg-matteBlack text-white outline-none"
-        bind:value={date}
-      />
-    </div>
-    <div class="flex flex-col gap-2 w-full">
-      <label for="timeStart" class="text-white">Start Time</label>
-      <div class="relative">
-        <div
-          id="timeStart"
-          class=" p-2 rounded-md w-full cursor-pointer bg-matteBlack text-white flex flex-row items-center justify-between"
-          on:mouseup={() => (showTimeStartDropdown = !showTimeStartDropdown)}
-          use:clickOutside
-          on:click_outside={() => {
-            showTimeStartDropdown = false;
-          }}
-        >
-          {#if !selectedTimeStart}
-            Select a time
-          {:else}
-            {selectedTimeStart}
-          {/if}
-          <IconCaretDown size={20} stroke={1} />
-        </div>
-        {#if showTimeStartDropdown}
-          <div
-            class="absolute w-full bg-matteBlack border rounded-md z-10 max-h-[200px] overflow-scroll"
+          <select
+            id="ticketGender"
+            name="ticketGender"
+            class="border-[1px] rounded-md border-black p-1 text-black"
+            on:change={(e) => {
+              ticketGender = e.target.value;
+            }}
           >
-            {#each timeOptions as time (time)}
-              <div
-                class="p-1 text-white hover:bg-gray-600 cursor-pointer"
-                on:mouseup={() => selectTime("start", time)}
-              >
-                {time}
-              </div>
+            <option selected={true}>Select Gender (Optional)</option>
+            {#each genders as gender (gender)}
+              <option>{gender}</option>
             {/each}
+          </select>
+          <div class="flex flex-row gap-2">
+            <div class="flex flex-col min-w-fit gap-2">
+              <label for="private" class="text-white">Limit Quantity?</label>
+              <div class="flex flex-row gap-1">
+                <div
+                  on:mousedown={() =>
+                    (ticketQuantityLimit = !ticketQuantityLimit)}
+                  class={`w-14 h-8  rounded-full flex flex-row overflow-hidden items-center p-1 transition-all cursor-pointer ${
+                    ticketQuantityLimit
+                      ? "justify-end bg-green-400"
+                      : "justify-start bg-gray-400"
+                  }`}
+                >
+                  <div class="w-6 h-6 rounded-full bg-white" />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <label for="ticketQuantity">Quantity</label>
+              <input
+                id="ticketQuantity"
+                name="ticketQuantity"
+                type="number"
+                bind:value={ticketQuantity}
+                class="border-[1px] rounded-md border-black p-1 text-black"
+              />
+            </div>
           </div>
+          <div class="flex flex-row justify-between items-center gap-2">
+            <div class="flex flex-col gap-1 w-full">
+              <label for="ticketSaleStart">Sale Start</label>
+              <input
+                id="ticketSaleStart"
+                name="ticketSaleStart"
+                type="date"
+                bind:value={ticketSaleStart}
+                class="border-[1px] rounded-md border-black p-1 text-black"
+              />
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+              <label for="timeStart" class="text-white">Start Time</label>
+              <div class="relative">
+                <div
+                  id="timeStart"
+                  class="border-[1px] border-black p-1 rounded-md w-full cursor-pointer bg-white flex flex-row items-center justify-between text-black"
+                  on:mouseup={() =>
+                    (showTimeStartDropdown = !showTimeStartDropdown)}
+                  use:clickOutside
+                  on:click_outside={() => {
+                    showTimeStartDropdown = false;
+                  }}
+                >
+                  {#if !selectedTimeStart}
+                    Select a time
+                  {:else}
+                    {selectedTimeStart}
+                  {/if}
+                  <IconCaretDown size={20} stroke={1} />
+                </div>
+                {#if showTimeStartDropdown}
+                  <div
+                    class="absolute w-full bg-matteBlack border border-gray-300 rounded-md z-10 max-h-[200px] overflow-scroll"
+                  >
+                    {#each timeOptions as time (time)}
+                      <div
+                        class="p-1 hover:bg-gray-200 hover:text-black cursor-pointer"
+                        on:mouseup={() => selectTime("start", time)}
+                      >
+                        {time}
+                      </div>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-row gap-4 justify-between items-center w-full">
+            <div class="flex flex-col gap-1 w-full">
+              <label for="ticketSaleEnd">Sale End</label>
+              <input
+                id="ticketSaleEnd"
+                name="ticketSaleEnd"
+                type="date"
+                bind:value={ticketSaleEnd}
+                class="border-[1px] rounded-md border-black p-1 text-black"
+              />
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+              <label for="timeEnd" class="text-white">End Time</label>
+              <div class="relative">
+                <div
+                  id="timeEnd"
+                  class="border-[1px] border-black p-1 rounded-md w-full cursor-pointer bg-white flex flex-row items-center justify-between text-black"
+                  on:mouseup={() =>
+                    (showTimeEndDropdown = !showTimeEndDropdown)}
+                  use:clickOutside
+                  on:click_outside={() => {
+                    showTimeEndDropdown = false;
+                  }}
+                >
+                  {#if !selectedTimeEnd}
+                    Select a time
+                  {:else}
+                    {selectedTimeEnd}
+                  {/if}
+                  <IconCaretDown size={20} stroke={1} />
+                </div>
+                {#if showTimeEndDropdown}
+                  <div
+                    class="absolute w-full bg-matteBlack border border-gray-300 rounded-md z-10 max-h-[200px] overflow-scroll"
+                  >
+                    {#each timeOptions as time (time)}
+                      <div
+                        class="p-1 hover:bg-gray-200 hover:text-black cursor-pointer"
+                        on:mouseup={() => selectTime("end", time)}
+                      >
+                        {time}
+                      </div>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          </div>
+        </div>
+      {/if}
+      <div class="flex flex-row gap-4">
+        
+        {#if !ticketName || (ticketSaleStart && !ticketSaleEnd) || (ticketSaleEnd && !ticketSaleStart)}
+          <button
+            class="w-full p-1 bg-green-500/25 border border-green-500 text-white rounded-md"
+            disabled>Save</button
+          >
+        {:else}
+          <button class="w-full p-1 bg-green-500 text-white rounded-md"
+            >Save</button
+          >
         {/if}
       </div>
-    </div>
-    <div class="flex flex-col gap-2 w-full">
-      <label for="timeEnd" class="text-white">End Time</label>
-      <div class="relative">
-        <div
-          id="timeEnd"
-          class="p-2 rounded-md w-full cursor-pointer bg-matteBlack text-white flex flex-row items-center justify-between"
-          on:mouseup={() => (showTimeEndDropdown = !showTimeEndDropdown)}
-          use:clickOutside
-          on:click_outside={() => {
-            showTimeEndDropdown = false;
-          }}
-        >
-          {#if !selectedTimeEnd}
-            Select a time
-          {:else}
-            {selectedTimeEnd}
-          {/if}
-          <IconCaretDown size={20} stroke={1} />
-        </div>
-        {#if showTimeEndDropdown}
-          <div
-            class="absolute w-full bg-matteBlack border rounded-md z-10 max-h-[200px] overflow-scroll"
-          >
-            {#each timeOptions as time (time)}
-              <div
-                class="p-1 text-white hover:bg-gray-600 cursor-pointer"
-                on:mouseup={() => selectTime("end", time)}
-              >
-                {time}
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    </div>
-  </div>
-
-  <div class="flex flex-row gap-2 mt-4">
+    </form>
+  {:else}
     <button
-      on:click={() => dispatch("cancel")}
-      type="button"
+      class="bg-green-500 text-white rounded-md p-3 w-full flex flex-row gap-2 items-center justify-center mt-4"
+      on:click={() => {
+        creatingTicket = true;
+        // tickets = [...tickets, new Ticket(tickets.length + 1)];
+      }}
+    >
+      New Ticket
+
+      <IconCirclePlus size={28} stroke={1} /></button
+    >
+  {/if}
+  <div class="flex flex-col gap-3 my-4">
+    {#each tickets as ticket (ticket.id)}
+      <div class="bg-matteBlack p-4 rounded-md flex flex-col">
+        <h1 class="text-lg font-bold">{ticket.name}</h1>
+        {#if ticket.price}
+          <div class="flex flex-col md:flex-row md:gap-5">
+            <p>
+              Ticket Price: <span class="text-green-400"
+                >${ticket.price.toFixed(2)}</span
+              >
+            </p>
+            <p class="flex flex-row gap-3 items-center">
+              You Profit: <span class="text-green-400"
+                >${(ticket.price - ticket.price * 0.07).toFixed(2)}</span
+              >
+            </p>
+            <div class="flex flex-row">
+              <div
+                tabindex="0"
+                role="link"
+                aria-label="tooltip 1"
+                class="focus:outline-none focus:ring-gray-300 rounded-full focus:ring-offset-2 focus:ring-2 focus:bg-gray-200 relative md:mt-0 group"
+              >
+                <div class=" cursor-pointer">
+                  <svg
+                    aria-haspopup="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="icon icon-tabler icon-tabler-info-circle"
+                    width="25"
+                    height="25"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="#A0AEC0"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <circle cx="12" cy="12" r="9" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                    <polyline points="11 12 12 12 12 16 13 16" />
+                  </svg>
+                </div>
+                <div
+                  id="tooltip1"
+                  role="tooltip"
+                  class="z-20 -mt-16 w-64 absolute group-hover:inline-block hidden transition duration-150 ease-in-out left-0 ml-8 shadow-lg bg-white p-4 rounded"
+                >
+                  <svg
+                    class="absolute left-0 -ml-2 bottom-0 top-0 h-full"
+                    width="9px"
+                    height="16px"
+                    viewBox="0 0 9 16"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                  >
+                    <g
+                      id="Page-1"
+                      stroke="none"
+                      stroke-width="1"
+                      fill="none"
+                      fill-rule="evenodd"
+                    >
+                      <g
+                        id="Tooltips-"
+                        transform="translate(-874.000000, -1029.000000)"
+                        fill="#FFFFFF"
+                      >
+                        <g
+                          id="Group-3-Copy-16"
+                          transform="translate(850.000000, 975.000000)"
+                        >
+                          <g
+                            id="Group-2"
+                            transform="translate(24.000000, 0.000000)"
+                          >
+                            <polygon
+                              id="Triangle"
+                              transform="translate(4.500000, 62.000000) rotate(-90.000000) translate(-4.500000, -62.000000) "
+                              points="4.5 57.5 12.5 66.5 -3.5 66.5"
+                            />
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </svg>
+                  <p class="text-sm font-bold text-gray-800 pb-1">
+                    Application Fee
+                  </p>
+                  <p class="text-xs leading-4 text-gray-600 pb-3">
+                    We take a 7% application fee to keep our platform running.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
+        {#if ticket.gender}
+          <p>{ticket.gender}</p>
+        {/if}
+        {#if ticket.saleStartDate}
+          <div class="flex flex-col gap-3 my-3 text-gray-200">
+            <div class="flex flex-col w-full h-full">
+              <p class="underline">Sale Start</p>
+              <p class="flex flex-row gap-1">
+                <IconCalendar />
+                {DateTime.fromISO(ticket.saleStartDate).toLocaleString()} - {ticket.saleStartTime}
+              </p>
+            </div>
+            <div class="flex flex-col w-full h-full">
+              <p class="underline">Sale End</p>
+              <p class="flex flex-row gap-1">
+                <IconCalendar />
+                {ticket.saleEndDate} - {ticket.saleEndTime}
+              </p>
+            </div>
+          </div>
+        {/if}
+        {#if ticket.quantityLimit}
+          <p>Quantity: {ticket.quantity}</p>
+        {/if}
+        <div class="flex flex-row gap-2">
+          <button
+            class="bg-mainRed rounded px-4 py-2 mt-4 w-fit"
+            on:click={() => {
+              tickets = tickets.filter((t) => t.id !== ticket.id);
+            }}>Remove Ticket</button
+          >
+          <button
+            class="bg-yellow-500 rounded px-4 py-2 mt-4 w-fit"
+            on:click={() => {
+              setTicketInfomration(ticket);
+            }}>Edit Ticket</button
+          >
+        </div>
+      </div>
+    {/each}
+  </div>
+  <div class="flex flex-row gap-2">
+    <button
+      on:click={() => {
+        dispatch("cancel");
+      }}
+      type="submit"
       class="bg-black text-white p-2 rounded-md w-full"
     >
       Cancel
     </button>
-    {#if !name || !date || !selectedTimeStart || !selectedTimeEnd || !address}
+    {#if tickets.length > 0}
       <button
-        class="bg-black text-white p-2 rounded-md w-full border-[1px] bg-black/25 border-black"
-        disabled
+        on:click={() => {
+          completion();
+        }}
+        type="submit"
+        class="bg-black text-white p-2 rounded-md w-full"
       >
         Save
       </button>
     {:else}
-      <button type="submit" class="bg-black text-white p-2 rounded-md w-full">
+      <button
+        type="submit"
+        class="bg-black/50 border-[1px] border-black text-white p-2 rounded-md w-full"
+        disabled
+      >
         Save
       </button>
     {/if}
   </div>
-</form>
+</div>
