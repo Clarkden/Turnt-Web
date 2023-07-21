@@ -15,7 +15,7 @@
     query,
     where,
   } from "firebase/firestore";
-  import { db, storage } from "$lib/firebase";
+  import { auth, db, storage } from "$lib/firebase";
   import type { Party } from "$lib/types";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import axios from "axios";
@@ -24,6 +24,7 @@
   import { analytics } from "$lib/firebase";
   import { logEvent } from "firebase/analytics";
   import { browser } from "$app/environment";
+  import { getIdToken } from "firebase/auth";
   // import {v4 as uuid} from "uuid";
 
   const dispatch = createEventDispatcher();
@@ -139,7 +140,12 @@
 
     if (stripeId.exists()) {
       let returnedStripeAccount: any = await axios.get(
-        `/api/checkStripeAccount?id=${stripeId.data().stripeAccountId}`
+        `/api/checkStripeAccount?id=${stripeId.data().stripeAccountId}`, 
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
       );
 
       if (

@@ -11,8 +11,9 @@
   } from "firebase/firestore";
   import { onMount } from "svelte";
   import { QRCodeImage } from "svelte-qrcode-image";
-  import { db } from "$lib/firebase";
+  import { auth, db } from "$lib/firebase";
   import { goto } from "$app/navigation";
+  import { getIdToken } from "firebase/auth";
 
   let sessionId: any = $page.url.searchParams.get("session_id");
   let paymentIntentId: any;
@@ -22,12 +23,22 @@
   const checkId = async () => {
     try {
       const checkOutResponse = await axios.get(
-        `/api/checkCheckoutId?id=${sessionId}`
+        `/api/checkCheckoutId?id=${sessionId}`,
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
       );
       paymentIntentId = checkOutResponse.data.payment_intent;
 
       const paymentIntent = await axios.get(
-        `/api/checkPaymentIntent?id=${paymentIntentId}`
+        `/api/checkPaymentIntent?id=${paymentIntentId}`,
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
       );
 
       if (paymentIntent) {
@@ -55,7 +66,6 @@
   onMount(() => {
     checkId();
     getPartyLocation();
-
   });
 </script>
 

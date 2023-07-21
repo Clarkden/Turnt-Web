@@ -4,19 +4,30 @@ import axios from "axios";
 import { PRIVATE_STRIPE_KEY } from "$env/static/private";
 import { ENVIRONMENT } from "$env/static/private";
 import Stripe from "stripe";
+import { getAuth } from "firebase-admin/auth";
 const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
   apiVersion: "2022-11-15",
 });
 
 export async function POST({ request }: any) {
-  const body = await request.json();
-
   try {
-    const transactions = await stripe.balanceTransactions.list({
-      limit: 10,
-    }, {
+    const body = await request.json();
+    const veryfyIdToken = await getAuth().verifyIdToken(
+      request.headers.get("Authorization")!.split(" ")[1]
+    );
+
+    if (!veryfyIdToken) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    const transactions = await stripe.balanceTransactions.list(
+      {
+        limit: 10,
+      },
+      {
         stripeAccount: body.stripeAccountId,
-    });
+      }
+    );
 
     return new Response(JSON.stringify(transactions));
   } catch (err) {

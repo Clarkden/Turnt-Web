@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { analytics, db } from "$lib/firebase";
+  import { analytics, auth, db } from "$lib/firebase";
   import {
     getDoc,
     doc,
@@ -22,6 +22,7 @@
   import { logEvent } from "firebase/analytics";
   import { browser } from "$app/environment";
   import type { Party } from "$lib/types";
+  import { getIdToken } from "firebase/auth";
 
   let party: any = null;
   let partyId: Party["id"] = $page.params.id;
@@ -61,6 +62,11 @@
           partyId: party.id,
           stripeAeccountId: stripeAccountId,
           hostAccountId: party.hostAccountId,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
         });
 
         cancelPartyModal = false;

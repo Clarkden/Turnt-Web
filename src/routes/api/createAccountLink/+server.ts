@@ -11,6 +11,14 @@ const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
 
 export async function POST(event: any) {
   try {
+
+  const veryfyIdToken = await getAuth().verifyIdToken(
+    event.request.headers.get("Authorization")!.split(" ")[1]
+  );
+
+  if (!veryfyIdToken) {
+    return new Response("Unauthorized", { status: 401 });
+  }
     const body = await event.request.json();
 
     // getAuth()

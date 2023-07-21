@@ -25,15 +25,22 @@ const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
 });
 
 import twilio from "twilio";
+import { getAuth } from "firebase-admin/auth";
 
 const client = twilio(PRIVATE_TWILIO_ACCOUNT_SID, PRIVATE_TWILIO_AUTH_TOKEN);
 
 export async function POST({ request }: any) {
-  const body = await request.json();
-
-  console.log(body);
-
   try {
+    const body = await request.json();
+
+    const veryfyIdToken = await getAuth().verifyIdToken(
+      request.headers.get("Authorization")!.split(" ")[1]
+    );
+
+    if (!veryfyIdToken) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const party = await getDoc(doc(db, "parties", body.partyId));
 
     if (party.exists() && party.data().paidParty) {

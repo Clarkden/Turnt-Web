@@ -7,6 +7,9 @@
   import { DateTime } from "luxon";
   import { fly } from "svelte/transition";
   import axios from "axios";
+  import { page } from "$app/stores";
+  import { getIdToken } from "firebase/auth";
+  import { auth } from "$lib/firebase";
 
   const dispatch = createEventDispatcher();
 
@@ -97,9 +100,17 @@
   const scrapePage = async () => {
     scrapingPageState = "loading";
     try {
-      const data = await axios.post("/api/scrapePage", {
-        url: scrapeUrl,
-      });
+      const data = await axios.post(
+        "/api/scrapePage",
+        {
+          url: scrapeUrl,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
+      );
 
       if (!data.data) return;
 

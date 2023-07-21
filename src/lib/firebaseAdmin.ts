@@ -6,8 +6,6 @@ import {
   FIREBASE_ADMIN_CLIENT_EMAIL,
 } from "$env/static/private";
 import { PUBLIC_FIREBASE_PROJECT_ID } from "$env/static/public";
-import { credential } from "firebase-admin";
-// import serviceAccount from "../../lit-party-platform-firebase-adminsdk-b9jfm-6d612e962c.json"
 
 async function makeApp() {
   const apps = getApps();

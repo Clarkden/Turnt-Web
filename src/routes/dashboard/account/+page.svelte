@@ -2,11 +2,12 @@
   // import { authStore } from "../../../../stores/authStore";
   import axios from "axios";
   import { doc, getDoc, collection, setDoc } from "firebase/firestore";
-  import { db } from "$lib/firebase";
+  import { auth, db } from "$lib/firebase";
   import { goto } from "$app/navigation";
   import stripeIcon from "../../../assets/images/stripe-icon.svg";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
+  import { getIdToken } from "firebase/auth";
 
   let stripeAccount: any = null;
   let loading: boolean = true;
@@ -21,6 +22,11 @@
       try {
         let accountLink: any = await axios.post("/api/createAccountLink", {
           id: stripeAccount.id,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
         });
         window.location.href = accountLink.data.url;
       } catch (error) {
@@ -29,7 +35,12 @@
     } else {
       try {
         let newStripeAccount: any = await axios.post(
-          "/api/createStripeAccount"
+          "/api/createStripeAccount",
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
         );
 
         await setDoc(doc(db, "stripe-accounts", $page.data.uid), {
@@ -38,6 +49,11 @@
 
         let accountLink: any = await axios.post("/api/createAccountLink", {
           id: newStripeAccount.data.id,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
         });
         window.location.href = accountLink.data.url;
       } catch (error) {
@@ -58,7 +74,12 @@
 
     try {
       let returnedStripeAccount: any = await axios.get(
-        `/api/checkStripeAccount?id=${stripeAccountId.data().stripeAccountId}`
+        `/api/checkStripeAccount?id=${stripeAccountId.data().stripeAccountId}`,
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
       );
       if (returnedStripeAccount) {
         stripeAccount = returnedStripeAccount.data;
@@ -77,7 +98,12 @@
     loading = true;
     try {
       let loginLink = await axios.get(
-        `/api/createStripeLoginLink?id=${stripeAccount.id}`
+        `/api/createStripeLoginLink?id=${stripeAccount.id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
       );
 
       goto(loginLink.data.url);

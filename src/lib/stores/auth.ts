@@ -73,6 +73,7 @@ export async function loginWithGoogle(): Promise<boolean> {
 
 if (browser) {
   onIdTokenChanged(auth, async (newUser: any) => {
+
     const tokenCurrentlySet =
       cookie.parse(document.cookie)["token"] !== undefined;
     const token = newUser ? await newUser?.getIdToken() : undefined;

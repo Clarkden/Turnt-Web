@@ -1,10 +1,18 @@
 import puppeteer from "puppeteer-core";
 import { BROWSERLESS_KEY } from "$env/static/private";
-// import { ENVIRONMENT } from "$env/static/private";
+import { getAuth } from "firebase-admin/auth";
 
 export async function POST(event: any) {
-  const body = await event.request.json();
   try {
+    const body = await event.request.json();
+    const veryfyIdToken = await getAuth().verifyIdToken(
+      event.request.headers.get("Authorization")!.split(" ")[1]
+    );
+
+    if (!veryfyIdToken) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const browser = await puppeteer.connect({
       browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
     });
@@ -12,8 +20,6 @@ export async function POST(event: any) {
     const page = await browser.newPage();
     await page.goto(body.url);
     await page.waitForNetworkIdle();
-
-    // Force
 
     const data = await page.evaluate(() => {
       const title = document.querySelector(".EventPage-name")?.textContent;

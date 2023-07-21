@@ -4,34 +4,43 @@ import axios from "axios";
 import { PRIVATE_STRIPE_KEY } from "$env/static/private";
 import { ENVIRONMENT } from "$env/static/private";
 import Stripe from "stripe";
+import { getAuth } from "firebase-admin/auth";
 const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
   apiVersion: "2022-11-15",
 });
 
 export async function POST({ request, url }: any) {
-  const body = await request.json();
-
-  const convertToStripePrice = (price: number) => {
-    return price * 100;
-  };
-
-  // const applicationFee = () => {
-  //   let fee = Math.ceil(
-  //     convertToStripePrice(parseFloat(body.ticket.price) * 0.05) +
-  //       Math.ceil(convertToStripePrice(parseFloat(body.ticket.price) * 0.029)) +
-  //       30
-  //   );
-  //   if (fee < 50) {
-  //     fee = 50;
-  //   }
-  //   return fee;
-  // };
-
-  const calculateTicketPrice = () => {
-    return convertToStripePrice(parseFloat(body.ticket.price));
-  };
-
   try {
+    const body = await request.json();
+
+    const veryfyIdToken = await getAuth().verifyIdToken(
+      request.headers.get("Authorization")!.split(" ")[1]
+    );
+
+    if (!veryfyIdToken) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    const convertToStripePrice = (price: number) => {
+      return price * 100;
+    };
+
+    // const applicationFee = () => {
+    //   let fee = Math.ceil(
+    //     convertToStripePrice(parseFloat(body.ticket.price) * 0.05) +
+    //       Math.ceil(convertToStripePrice(parseFloat(body.ticket.price) * 0.029)) +
+    //       30
+    //   );
+    //   if (fee < 50) {
+    //     fee = 50;
+    //   }
+    //   return fee;
+    // };
+
+    const calculateTicketPrice = () => {
+      return convertToStripePrice(parseFloat(body.ticket.price));
+    };
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [

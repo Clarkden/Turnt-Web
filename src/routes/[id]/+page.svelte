@@ -33,6 +33,7 @@
   import FireWorks from "../../assets/particles/particles.json";
   import Footer from "../../components/Footer.svelte";
   import type { PageData } from "./$types";
+  import { getIdToken } from "firebase/auth";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -182,7 +183,12 @@
         ticket: selectedTicket,
         stripeAccountId: await getHostStripeAccountId(),
         purchaserPhoneNumber: countryCode + phoneNumber,
-      });
+      },
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        });
       goto(checkoutSession.data.url);
     } catch (error) {
       console.log(error);

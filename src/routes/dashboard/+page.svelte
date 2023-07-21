@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { db } from "$lib/firebase";
+  import { auth, db } from "$lib/firebase";
   import {
     setDoc,
     doc,
@@ -16,6 +16,7 @@
   import { IconEye } from "@tabler/icons-svelte";
   import axios from "axios";
   import { page } from "$app/stores";
+  import { getIdToken } from "firebase/auth";
 
   let usersParties: any = [];
   let upComingAndFutureParties: any = [];
@@ -54,7 +55,12 @@
 
     try {
       const response = await axios.get(
-        `/api/retrieveConnectAccountBalance?id=${stripeAccountId}`
+        `/api/retrieveConnectAccountBalance?id=${stripeAccountId}`,
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
       );
 
       stripeAccountBalanceAvailable = response.data.available[0].amount / 100;
@@ -70,7 +76,12 @@
     if (hostStripe.exists()) {
       try {
         const checkStripeAccount = await axios.get(
-          `/api/checkStripeAccount?id=${hostStripe.data().stripeAccountId}`
+          `/api/checkStripeAccount?id=${hostStripe.data().stripeAccountId}`,
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
         );
         if (
           checkStripeAccount.data.details_submitted &&
@@ -93,7 +104,12 @@
           "/api/getRecentTransactions",
           {
             stripeAccountId: stripeAccountId,
-          }
+          },
+        {
+          headers: {
+            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+          },
+        }
         );
 
         if (accountTransactions.data.data.length > 0) {

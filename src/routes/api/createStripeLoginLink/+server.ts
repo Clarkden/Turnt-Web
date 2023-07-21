@@ -4,14 +4,23 @@ import axios from "axios";
 import { PRIVATE_STRIPE_KEY } from "$env/static/private";
 import { ENVIRONMENT } from "$env/static/private";
 import Stripe from "stripe";
+import { getAuth } from "firebase-admin/auth";
 const stripe = new Stripe(PRIVATE_STRIPE_KEY, {
   apiVersion: "2022-11-15",
 });
 
-export async function GET({ url }: any) {
+export async function GET({request, url }: any) {
+  try {
   const id = url.searchParams.get("id");
 
-  try {
+  const veryfyIdToken = await getAuth().verifyIdToken(
+    request.headers.get("Authorization")!.split(" ")[1]
+  );
+
+  if (!veryfyIdToken) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
     const loginLink = await stripe.accounts.createLoginLink(id);
 
     return new Response(JSON.stringify(loginLink));
