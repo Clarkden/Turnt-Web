@@ -13,7 +13,7 @@
 
   const getPoshParties = async () => {
     try {
-      const res = await axios.get("https://turnt-server.fly.dev/");
+      const res = await axios.get("https://turnt-server.fly.dev/getPosh");
       partiesToImport = res.data;
       console.log(partiesToImport);
     } catch (err) {
