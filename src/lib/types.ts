@@ -18,13 +18,13 @@ export interface Party {
   description: string;
   date: string;
   location: string;
-  longAndLat: string;
+  longAndLat?: string;
   startTime: string;
   endTime: string;
   paidParty: boolean;
-  tickets: Ticket[];
+  tickets?: Ticket[];
   hostName: string;
-  hostAccountId: string;
+  hostAccountId?: string;
   createdAt: string;
   flyerPath: string;
   privateAddress?: boolean;
