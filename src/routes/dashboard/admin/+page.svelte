@@ -13,9 +13,10 @@
 
   const getPoshParties = async () => {
     try {
-      const res = await axios.get("https://turnt-server.fly.dev/getPosh");
+      const res = await axios.get("/api/importPosh")
+      console.log(res)
       partiesToImport = res.data;
-      console.log(partiesToImport);
+      // console.log(partiesToImport);
     } catch (err) {
       console.log(err);
     }
