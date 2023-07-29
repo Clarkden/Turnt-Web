@@ -14,7 +14,7 @@
   const getPoshParties = async () => {
     try {
       const res = await axios.get("/api/importPosh")
-      console.log(res)
+      // console.log(res)
       partiesToImport = res.data;
       // console.log(partiesToImport);
     } catch (err) {
@@ -44,7 +44,7 @@
 
     try {
       const docRef = await addDoc(collection(db, "parties"), newParty);
-      console.log("Document written with ID: ", docRef.id);
+      // console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
