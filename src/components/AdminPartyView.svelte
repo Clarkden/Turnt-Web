@@ -24,6 +24,12 @@
     querySnapshot.forEach((doc) => {
       parties = [...parties, { ...doc.data(), id: doc.id }];
     });
+    parties.sort((a: any, b: any) => {
+      return (
+        DateTime.fromISO(b.date).toMillis() -
+        DateTime.fromISO(a.date).toMillis()
+      );
+    });
   };
 
   const deleteParty = async (id: string) => {
