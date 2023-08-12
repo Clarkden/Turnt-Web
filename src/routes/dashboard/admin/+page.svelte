@@ -30,7 +30,9 @@
       startTime: DateTime.fromISO(party.event.startUtc, {
         zone: party.event.timezone,
       }).toFormat("h:mm a"),
-      endTime: "02:00 AM",
+      endTime: DateTime.fromISO(party.event.endUtc, {
+        zone: party.event.timezone,
+      }).toFormat("h:mm a") || "2:00 AM",
       location: party.event.venue.address,
       description: party.event.description,
       hostName: party.group.name || "Posh Parties",

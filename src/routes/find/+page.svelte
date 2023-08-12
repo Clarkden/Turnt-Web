@@ -254,13 +254,13 @@
 <div
   class="flex flex-col w-full h-full min-h-screen bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl"
 >
-  <Particles
+  <!-- <Particles
     id="tsparticles"
     options={FireWorks}
     on:particlesLoaded={onParticlesLoaded}
     {particlesInit}
     class="absolute z-0"
-  />
+  /> -->
   <div
     class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-50"
   >
