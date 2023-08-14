@@ -179,17 +179,20 @@
     if (!phoneNumber) return;
 
     try {
-      let checkoutSession = await axios.post("/api/createCheckoutSession", {
-        party,
-        ticket: selectedTicket,
-        stripeAccountId: await getHostStripeAccountId(),
-        purchaserPhoneNumber: countryCode + phoneNumber,
-      },
+      let checkoutSession = await axios.post(
+        "/api/createCheckoutSession",
+        {
+          party,
+          ticket: selectedTicket,
+          stripeAccountId: await getHostStripeAccountId(),
+          purchaserPhoneNumber: countryCode + phoneNumber,
+        },
         {
           headers: {
             Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
           },
-        });
+        }
+      );
       goto(checkoutSession.data.url);
     } catch (error) {
       console.log(error);
@@ -442,96 +445,170 @@
   </div>
 {/if}
 
-<container class="flex flex-1 w-full flex-col">
+<container
+  class="flex flex-1 w-full flex-col bg-gradient-to-b from-mainRed to-purple-400"
+>
   <Navbar />
-{#if party.id}
-  <div
-    class="w-full flex-1 flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
-  >
+  {#if party.id}
     <div
-      class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
-    >
-      <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
-        <img
-          src={data.flyerPath}
-          alt="Party Flyer"
-          class="w-full object-cover md:object-contain rounded-md"
-        />
-      </div>
-    </div>
-    <div
-      class="w-full md:min-w-[50%] p-2 md:p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+      class="w-full flex-1 flex flex-col md:flex-row backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
     >
       <div
-        class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+        class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
       >
-        <!-- <h1 class="text-3xl font-bold mb-3">Party Info</h1> -->
+        <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
+          <img
+            src={data.flyerPath}
+            alt="Party Flyer"
+            class="w-full object-cover md:object-contain rounded-md"
+          />
+        </div>
+      </div>
+      <div
+        class="w-full md:min-w-[50%] p-2 md:p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+      >
+        <div
+          class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+        >
+          <!-- <h1 class="text-3xl font-bold mb-3">Party Info</h1> -->
 
-        <!-- <div
+          <!-- <div
           class="w-64 h-36 rounded-full bg-gradient-to-br from-green-300 to-purple-300 absolute blur-2xl -top-10 -right-10"
         /> -->
 
-        <h2 class="text-3xl font-bold mb-4 flex flex-row gap-2">
-          {party.name}
-        </h2>
-        {#if party?.ageLimit > 1}
-          <h3 class="text-lg items-center mb-1">
-            Age : {party.ageLimit}+
-          </h3>
-        {/if}
-        <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
-          <IconCalendar />
-          {DateTime.fromISO(party.date).toLocaleString()}
-        </h3>
-        <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
-          <IconClock />
-          {party.startTime} - {party.endTime}
-        </h3>
-        <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
-          <IconLocation />
-          {party.privateAddress ? "Private Address" : party.address}
-        </h3>
-        {#if party.attendies > 20}
+          <h2 class="text-3xl font-bold mb-4 flex flex-row gap-2">
+            {party.name}
+          </h2>
+          {#if party?.ageLimit > 1}
+            <h3 class="text-lg items-center mb-1">
+              Age : {party.ageLimit}+
+            </h3>
+          {/if}
           <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
-            <IconUser />
-            {party.attendies} Attendees
+            <IconCalendar />
+            {DateTime.fromISO(party.date).toLocaleString()}
           </h3>
-        {/if}
-      </div>
+          <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
+            <IconClock />
+            {party.startTime} - {party.endTime}
+          </h3>
+          <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
+            <IconLocation />
+            {party.privateAddress ? "Private Address" : party.address}
+          </h3>
+          {#if party.attendies > 20}
+            <h3 class="flex flex-row gap-2 text-lg items-center mb-1">
+              <IconUser />
+              {party.attendies} Attendees
+            </h3>
+          {/if}
+        </div>
 
-      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
-        <h1 class="text-3xl font-bold mb-3">Overview</h1>
-        <p class="text-lg">{@html party.description}</p>
-      </div>
-
-      {#if party.tickets && party.paidParty && !party.externalEvent}
         <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
-          <h1 class="text-3xl font-bold mb-3">Tickets</h1>
+          <h1 class="text-3xl font-bold mb-3">Overview</h1>
+          <p class="text-lg">{@html party.description}</p>
+        </div>
 
-          {#each JSON.parse(party.tickets) as ticket}
-            <div
-              class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg"
-            >
-              <div class="flex flex-col flex-grow pr-4">
-                <div class="flex flex-row gap-2 mb-2 items-baseline">
-                  <h1 class="font-bold text-2xl">{ticket.name}</h1>
-                  {#if ticket.gender}
-                    <h2 class="font-medium text-red-500 mt-1">
-                      {ticket.gender} Only
-                    </h2>
-                  {/if}
+        {#if party.tickets && party.paidParty && !party.externalEvent}
+          <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+            <h1 class="text-3xl font-bold mb-3">Tickets</h1>
+
+            {#each JSON.parse(party.tickets) as ticket}
+              <div
+                class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg"
+              >
+                <div class="flex flex-col flex-grow pr-4">
+                  <div class="flex flex-row gap-2 mb-2 items-baseline">
+                    <h1 class="font-bold text-2xl">{ticket.name}</h1>
+                    {#if ticket.gender}
+                      <h2 class="font-medium text-red-500 mt-1">
+                        {ticket.gender} Only
+                      </h2>
+                    {/if}
+                  </div>
+                  <div class="mt-2">
+                    <p class="font-semibold text-lg text-green-400">
+                      ${formatPrice(ticket.price)}
+                    </p>
+                    {#if ticket.quantityLimit}
+                      <p class="mt-2">{ticket.quantity} Left!</p>
+                    {/if}
+                  </div>
                 </div>
-                <div class="mt-2">
-                  <p class="font-semibold text-lg text-green-400">
-                    ${formatPrice(ticket.price)}
-                  </p>
-                  {#if ticket.quantityLimit}
-                    <p class="mt-2">{ticket.quantity} Left!</p>
+                {#if ticket.saleStartDate}
+                  {#if isTicketSaleWindowOpen(ticket)}
+                    <div class="flex items-center">
+                      {#if ticket.quantityLimit && parseInt(ticket.quantity) <= 0}
+                        <button
+                          class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
+                          disabled
+                        >
+                          Sold Out
+                        </button>
+                      {:else}
+                        <button
+                          on:click={() => {
+                            selectedTicket = ticket;
+                            phonenumberModal = true;
+                          }}
+                          class="py-2 px-4 bg-mainRed hover:bg-red-400 text-white rounded-md"
+                        >
+                          Buy
+                        </button>
+                      {/if}
+                    </div>
+                  {:else}
+                    <div class="flex items-center">
+                      <button
+                        class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
+                        disabled
+                      >
+                        {#if isTicketSaleWindowOver(ticket)}
+                          Sale Over
+                        {:else}
+                          Sale Starts in {DateTime.fromISO(ticket.saleStartDate)
+                            .set({
+                              hour: DateTime.fromFormat(
+                                ticket.saleStartTime,
+                                "h:mm a"
+                              ).hour,
+                              minute: DateTime.fromFormat(
+                                ticket.saleStartTime,
+                                "h:mm a"
+                              ).minute,
+                            })
+                            .diff($now)
+                            .as("hours") >= 24
+                            ? DateTime.fromISO(ticket.saleStartDate)
+                                .set({
+                                  hour: DateTime.fromFormat(
+                                    ticket.saleStartTime,
+                                    "h:mm a"
+                                  ).hour,
+                                  minute: DateTime.fromFormat(
+                                    ticket.saleStartTime,
+                                    "h:mm a"
+                                  ).minute,
+                                })
+                                .toFormat("yyyy-MM-dd")
+                            : DateTime.fromISO(ticket.saleStartDate)
+                                .set({
+                                  hour: DateTime.fromFormat(
+                                    ticket.saleStartTime,
+                                    "h:mm a"
+                                  ).hour,
+                                  minute: DateTime.fromFormat(
+                                    ticket.saleStartTime,
+                                    "h:mm a"
+                                  ).minute,
+                                })
+                                .diffNow()
+                                .toFormat("hh:mm:ss")}
+                        {/if}
+                      </button>
+                    </div>
                   {/if}
-                </div>
-              </div>
-              {#if ticket.saleStartDate}
-                {#if isTicketSaleWindowOpen(ticket)}
+                {:else}
                   <div class="flex items-center">
                     {#if ticket.quantityLimit && parseInt(ticket.quantity) <= 0}
                       <button
@@ -552,180 +629,108 @@
                       </button>
                     {/if}
                   </div>
-                {:else}
-                  <div class="flex items-center">
-                    <button
-                      class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
-                      disabled
-                    >
-                      {#if isTicketSaleWindowOver(ticket)}
-                        Sale Over
-                      {:else}
-                        Sale Starts in {DateTime.fromISO(ticket.saleStartDate)
-                          .set({
-                            hour: DateTime.fromFormat(
-                              ticket.saleStartTime,
-                              "h:mm a"
-                            ).hour,
-                            minute: DateTime.fromFormat(
-                              ticket.saleStartTime,
-                              "h:mm a"
-                            ).minute,
-                          })
-                          .diff($now)
-                          .as("hours") >= 24
-                          ? DateTime.fromISO(ticket.saleStartDate)
-                              .set({
-                                hour: DateTime.fromFormat(
-                                  ticket.saleStartTime,
-                                  "h:mm a"
-                                ).hour,
-                                minute: DateTime.fromFormat(
-                                  ticket.saleStartTime,
-                                  "h:mm a"
-                                ).minute,
-                              })
-                              .toFormat("yyyy-MM-dd")
-                          : DateTime.fromISO(ticket.saleStartDate)
-                              .set({
-                                hour: DateTime.fromFormat(
-                                  ticket.saleStartTime,
-                                  "h:mm a"
-                                ).hour,
-                                minute: DateTime.fromFormat(
-                                  ticket.saleStartTime,
-                                  "h:mm a"
-                                ).minute,
-                              })
-                              .diffNow()
-                              .toFormat("hh:mm:ss")}
-                      {/if}
-                    </button>
-                  </div>
                 {/if}
-              {:else}
-                <div class="flex items-center">
-                  {#if ticket.quantityLimit && parseInt(ticket.quantity) <= 0}
-                    <button
-                      class="py-2 px-4 bg-red-500 text-white rounded-md opacity-50 cursor-not-allowed"
-                      disabled
-                    >
-                      Sold Out
-                    </button>
-                  {:else}
-                    <button
-                      on:click={() => {
-                        selectedTicket = ticket;
-                        phonenumberModal = true;
-                      }}
-                      class="py-2 px-4 bg-mainRed hover:bg-red-400 text-white rounded-md"
-                    >
-                      Buy
-                    </button>
-                  {/if}
-                </div>
-              {/if}
+              </div>
+            {/each}
+          </div>
+        {:else if party.externalEvent}
+          {#if party.externalEventLink}
+            <div>
+              <a href={party.externalEventLink} target="_blank">
+                <button
+                  class="py-2 px-4 bg-violet-500 hover:bg-violet-400 text-white rounded-md"
+                >
+                  Visit Party Page
+                </button>
+              </a>
             </div>
-          {/each}
-        </div>
-      {:else if party.externalEvent}
-        {#if party.externalEventLink}
-          <div>
-            <a href={party.externalEventLink} target="_blank">
+          {/if}
+        {:else}
+          <div
+            class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg flex-col gap-4"
+          >
+            <h1 class="font-semibold">Get on the guest list</h1>
+            <form
+              on:submit|preventDefault={() => addToGuestList()}
+              class="flex flex-col gap-2 mt-2"
+            >
+              <input
+                type="text"
+                placeholder="Full Name"
+                class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
+                bind:value={name}
+              />
+              <input
+                type="text"
+                placeholder="Instagram"
+                class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
+                bind:value={instagram}
+              />
+              <input
+                type="text"
+                placeholder="Phone Number"
+                class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
+                bind:value={guestListPhone}
+              />
               <button
-                class="py-2 px-4 bg-violet-500 hover:bg-violet-400 text-white rounded-md"
+                type="submit"
+                class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
               >
-                Visit Party Page
+                Submit
               </button>
-            </a>
+            </form>
           </div>
         {/if}
-      {:else}
-        <div
-          class="flex bg-matteBlack p-4 mb-4 border border-mainRed shadow-md rounded-lg flex-col gap-4"
-        >
-          <h1 class="font-semibold">Get on the guest list</h1>
-          <form
-            on:submit|preventDefault={() => addToGuestList()}
-            class="flex flex-col gap-2 mt-2"
-          >
-            <input
-              type="text"
-              placeholder="Full Name"
-              class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
-              bind:value={name}
-            />
-            <input
-              type="text"
-              placeholder="Instagram"
-              class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
-              bind:value={instagram}
-            />
-            <input
-              type="text"
-              placeholder="Phone Number"
-              class="py-2 px-4 bg-matteBlack border border-mainRed text-white rounded-md"
-              bind:value={guestListPhone}
-            />
-            <button
-              type="submit"
-              class="py-2 px-4 bg-mainRed hover:bg-red-500 text-white rounded-md"
-            >
-              Submit
-            </button>
-          </form>
-        </div>
-      {/if}
-    </div>
-  </div>
-{:else}
-  <div
-    class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
-  >
-    <div
-      class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
-    >
-      <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
-        <img
-          src={data.flyerPath}
-          alt="Party Flyer"
-          class="w-full object-cover md:object-contain rounded-md"
-        />
       </div>
     </div>
-
+  {:else}
     <div
-      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+      class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
     >
       <div
-        class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+        class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
       >
-        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-4" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+        <div class="w-full h-full md:h-fit bg-matteBlack rounded-md">
+          <img
+            src={data.flyerPath}
+            alt="Party Flyer"
+            class="w-full object-cover md:object-contain rounded-md"
+          />
+        </div>
       </div>
 
-      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
-        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded" />
-      </div>
+      <div
+        class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+      >
+        <div
+          class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+        >
+          <div class="h-10 bg-neutral-600 animate-pulse rounded mb-4" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded mb-1" />
+        </div>
 
-      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
-        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
-        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-4" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded mb-4" />
-        <div class="h-8 bg-neutral-600 animate-pulse rounded" />
-      </div>
+        <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+          <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded" />
+        </div>
 
-      <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
-        <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
-        <div class="h-6 bg-neutral-600 animate-pulse rounded" />
+        <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+          <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
+          <div class="h-10 bg-neutral-600 animate-pulse rounded mb-4" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded mb-4" />
+          <div class="h-8 bg-neutral-600 animate-pulse rounded" />
+        </div>
+
+        <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+          <div class="h-10 bg-neutral-600 animate-pulse rounded mb-3" />
+          <div class="h-6 bg-neutral-600 animate-pulse rounded" />
+        </div>
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
 
-<Footer />
+  <Footer />
 </container>
