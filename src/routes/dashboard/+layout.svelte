@@ -35,7 +35,7 @@
   $: ({ admin } = data);
 </script>
 
-<div class="flex flex-col md:flex-row h-full md:h-screen">
+<div class="flex flex-col md:flex-row flex-1">
   <nav
     class="  p-5 py-10 hidden md:flex flex-col gap-4 text-white border-r-[1px] border-neutral-500 md:w-[275px] md:h-screen md:sticky md:top-0 md:left-0"
   >

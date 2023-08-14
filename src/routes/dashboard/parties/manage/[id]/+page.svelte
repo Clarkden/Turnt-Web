@@ -213,7 +213,7 @@
 
 <div
   class="
-  p-4 md:p-10 relative min-h-screen overflow-y-scroll
+  p-4 md:p-10 relative flex-1 w-full overflow-y-scroll
 "
 >
   {#if message}
