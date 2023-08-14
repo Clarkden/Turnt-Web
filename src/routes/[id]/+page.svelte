@@ -460,7 +460,7 @@
       </div>
     </div>
     <div
-      class="w-full md:min-w-[50%] p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+      class="w-full md:min-w-[50%] p-2 md:p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
     >
       <div
         class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"

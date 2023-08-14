@@ -322,7 +322,7 @@
             );
           }
         }}
-        class=" text-black rounded cursor-pointer outline-none w-full md:w-[auto] group-hover:bg-gray-200"
+        class=" text-black rounded cursor-pointer outline-none w-full md:w-[auto] bg-white group-hover:bg-gray-200"
       >
         <option value={0} selected>Anywhere</option>
         <option value={5}>5 miles</option>
