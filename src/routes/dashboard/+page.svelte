@@ -77,11 +77,11 @@
       try {
         const checkStripeAccount = await axios.get(
           `/api/checkStripeAccount?id=${hostStripe.data().stripeAccountId}`,
-        {
-          headers: {
-            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
-          },
-        }
+          {
+            headers: {
+              Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+            },
+          }
         );
         if (
           checkStripeAccount.data.details_submitted &&
@@ -105,11 +105,11 @@
           {
             stripeAccountId: stripeAccountId,
           },
-        {
-          headers: {
-            Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
-          },
-        }
+          {
+            headers: {
+              Authorization: "Bearer " + (await getIdToken(auth?.currentUser!)),
+            },
+          }
         );
 
         if (accountTransactions.data.data.length > 0) {
@@ -160,9 +160,9 @@
 </script>
 
 <section
-  class="flex flex-col sm:flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-8 h-fit overflow-scroll p-2 px-4 md:p-10"
+  class="flex flex-col sm:flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-8 p-2 px-4 md:p-10 flex-1 w-full overflow-y-scroll"
 >
-  <div class="h-fit lg:h-full lg:overflow-y-auto">
+  <div class="h-fit">
     <div class="mb-5 md:mb-10">
       <h1 class="text-white text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
         Analytics
@@ -362,7 +362,9 @@
             class="flex flex-col sm:flex-row bg-gray-100 rounded-md border px-6 py-4 space-y-2 sm:space-y-0 sm:space-x-4 sm:items-baseline justify-between"
           >
             <div class="flex flex-col">
-              <h1 class="text-lg font-semibold text-gray-800">Could not load recent transactions...</h1>
+              <h1 class="text-lg font-semibold text-gray-800">
+                Could not load recent transactions...
+              </h1>
             </div>
           </div>
         </div>

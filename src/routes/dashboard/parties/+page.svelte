@@ -83,31 +83,32 @@
   });
 </script>
 
-<div class="w-full h-full overflow-scroll p-4 md:p-10">
-  {#if showPartyForm}
+{#if showPartyForm}
+  <div
+    class="absolute w-full h-full bg-black/50 flex flex-col items-center justify-center z-50"
+    transition:fade={{ duration: 500 }}
+  >
     <div
-      class="absolute w-full h-full bg-black/50 -m-2 -my-3 md:-m-10 flex flex-col items-center justify-center z-50"
-      transition:fade={{ duration: 500 }}
+      class="h-full w-full md:h-[90vh] md:w-[60vw] bg-mainRed md:rounded-md overflow-scroll"
+      in:fly={{ x: 500, duration: 500 }}
+      out:fly={{ x: 500, duration: 1000 }}
     >
-      <div
-        class="h-full w-full md:h-[90vh] md:w-[60vw] bg-mainRed md:rounded-md overflow-scroll"
-        in:fly={{ x: 500, duration: 500 }}
-        out:fly={{ x: 500, duration: 1000 }}
-      >
-        <div class="flex flex-col w-full h-full p-5">
-          <Multiform
-            on:cancel={() => {
-              showPartyForm = false;
-            }}
-            on:completion={() => {
-              showPartyForm = false;
-              fetchParties();
-            }}
-          />
-        </div>
+      <div class="flex flex-col w-full h-full p-5">
+        <Multiform
+          on:cancel={() => {
+            showPartyForm = false;
+          }}
+          on:completion={() => {
+            showPartyForm = false;
+            fetchParties();
+          }}
+        />
       </div>
     </div>
-  {/if}
+  </div>
+{/if}
+
+<div class="w-full flex-1 flex flex-col overflow-scroll p-4 md:p-10">
   <div class="flex flex-row gap-2">
     <button
       on:click={() => (showPartyForm = true)}
@@ -159,13 +160,10 @@
                 ? "text-neutral-100"
                 : "text-neutral-400 hover:text-neutral-300"
             }`}
-            >{showPastParties
-              ? "Hide Past Parties"
-              : "Show Past Parties"}
-              
-                <IconCaretDown class="inline-block w-6 h-6"/>
-              </button
-          >
+            >{showPastParties ? "Hide Past Parties" : "Show Past Parties"}
+
+            <IconCaretDown class="inline-block w-6 h-6" />
+          </button>
           {#if showPastParties}
             <div
               class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 py-4 md:mx-auto z-50"

@@ -39,9 +39,7 @@
   <nav
     class="  p-5 py-10 hidden md:flex flex-col gap-4 text-white border-r-[1px] border-neutral-500 md:w-[275px] md:h-screen md:sticky md:top-0 md:left-0"
   >
-    <div
-      class="flex flex-row gap-2 mb-10 items-center"
-    >
+    <div class="flex flex-row gap-2 mb-10 items-center">
       <!-- <img src={redIcon} alt="Turnt Logo" class="w-12 h-[auto]" /> -->
       <a class="font-extrabold text-3xl text-[#F94144]" href="/">Turnt</a>
     </div>
@@ -197,7 +195,9 @@
             <a
               href="/dashboard/admin"
               class={`flex flex-row items-center gap-2 text-lg hover:text-white  ${
-                $page.url.pathname === "/dashboard/admin" ? "" : "text-neutral-400"
+                $page.url.pathname === "/dashboard/admin"
+                  ? ""
+                  : "text-neutral-400"
               }`}
             >
               <IconUser size={24} stroke={2} />
@@ -242,7 +242,7 @@
     {/if}
   </nav>
 
-  <div class="h-full min-h-[100vh] w-full relative overflow-scroll z-0">
+  <div class="flex-1 flex flex-col w-full relative overflow-scroll z-0">
     <slot />
   </div>
 </div>

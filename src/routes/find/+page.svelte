@@ -8,6 +8,7 @@
   import { loadFull } from "tsparticles";
   import FireWorks from "../../assets/particles/particles.json";
   import { fly } from "svelte/transition";
+  import Navbar from "../../components/Navbar.svelte";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -252,26 +253,20 @@
 {/if}
 
 <div
-  class="flex flex-col w-full h-full min-h-screen bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl"
+  class="flex flex-col flex-1 bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl"
 >
-  <!-- <Particles
-    id="tsparticles"
-    options={FireWorks}
-    on:particlesLoaded={onParticlesLoaded}
-    {particlesInit}
-    class="absolute z-0"
-  /> -->
+  <Navbar />
   <div
-    class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-50"
+    class="flex flex-row gap-2 sm:gap-4 p-4 w-full justify-start md:w-[80%] md:mx-auto mt-5 md:mt-10 z-20"
   >
-    <div class="flex flex-row gap-4 z-20">
+    <div class="flex flex-row gap-4 z-10 w-full md:w-[auto]">
       <div
-        class="flex flex-row gap-1 items-center rounded px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white group"
+        class="flex flex-row gap-1 items-center rounded px-4 py-2 bg-white hover:bg-gray-200 text-black group w-full md:w-[auto]"
       >
         <p class="m-0">When:</p>
         <select
           bind:value={selectedView}
-          class="border-none cursor-pointer outline-none bg-neutral-900 group-hover:bg-neutral-800 text-white"
+          class="border-none cursor-pointer outline-none bg-white group-hover:bg-gray-200 text-black"
         >
           <option value="thisMonth">This Month</option>
           <option value="thisWeek">This Week</option>
@@ -279,7 +274,9 @@
         </select>
       </div>
     </div>
-    <div class="flex flex-row gap-4 z-20">
+    <div
+      class="flex flex-row gap-4 z-10 w-full md:w-[auto] px-4 py-2 bg-white rounded hover:bg-gray-200 group"
+    >
       <select
         bind:value={nearbyDistance}
         on:change={() => {
@@ -325,7 +322,7 @@
             );
           }
         }}
-        class="px-4 py-2 text-white rounded cursor-pointer outline-none bg-neutral-900 hover:bg-neutral-800"
+        class=" text-black rounded cursor-pointer outline-none w-full md:w-[auto] group-hover:bg-gray-200"
       >
         <option value={0} selected>Anywhere</option>
         <option value={5}>5 miles</option>
@@ -404,7 +401,7 @@
       </div>
     {:else}
       <div
-        class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+        class="flex flex-col items-center justify-center flex-1 w-full text-white z-50"
       >
         <div class="text-2xl font-bold">No parties found</div>
         <div class="text-xl">Try a different option</div>
@@ -412,13 +409,13 @@
     {/if}
   {:else if loading === "loading"}
     <div
-      class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+      class="flex flex-col items-center justify-center flex-1 w-full text-white z-50"
     >
       <div class="text-2xl font-bold">Loading...</div>
     </div>
   {:else if loading === "error"}
     <div
-      class="flex flex-col items-center justify-center h-[100vh] text-white z-50"
+      class="flex flex-col items-center justify-center flex-1 w-full text-white z-50"
     >
       <div class="text-2xl font-bold">Error</div>
       <div class="text-xl">There was an error fetching parties</div>

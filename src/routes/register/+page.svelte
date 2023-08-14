@@ -6,6 +6,7 @@
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import { user } from "$lib/stores/auth";
+  import Navbar from "../../components/Navbar.svelte";
 
   let email: string;
   let password: string;
@@ -20,26 +21,21 @@
 
     signup(email, password).then((success) => {
       if (success) {
-        window.location.href = "/dashboard";
+        window.location.replace("/dashboard");
       } else {
         error = "Invalid email or password";
       }
     });
   };
-
-  $: if (browser) {
-    if ($user) {
-      window.location.href = "/dashboard";
-    }
-  }
 </script>
 
 <svelte:head>
   <title>Register</title>
 </svelte:head>
-<section class="bg-mainRed">
+<section class="bg-mainRed flex-1 flex flex-col">
+  <Navbar />
   <div
-    class="flex flex-col items-center justify-center px-6 md:py-8 mx-auto h-screen lg:py-0"
+    class="flex flex-col items-center justify-center px-6 md:py-8 mx-auto lg:py-0 flex-1 w-full"
   >
     <!-- <a
       href="#"

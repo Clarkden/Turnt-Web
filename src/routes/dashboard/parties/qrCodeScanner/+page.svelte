@@ -145,7 +145,7 @@
   {/if}
 </main> -->
 
-<section class="p-4 flex flex-col gap-4 items-start">
+<section class="p-4 flex flex-col gap-4 items-start overflow-y-scroll">
   <button
     on:click={() => {
       goto("/dashboard/parties");

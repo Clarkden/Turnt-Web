@@ -6,6 +6,7 @@
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import { signInWithRedirect } from "firebase/auth";
+  import Navbar from "../../components/Navbar.svelte";
 
   let email: string;
   let password: string;
@@ -24,7 +25,7 @@
   const handleGoogleSubmit = async () => {
     loginWithGoogle().then((success) => {
       if (success) {
-        window.location.href = "/dashboard";
+        window.location.replace("/dashboard")
       } else {
         error = "Invalid email or password";
       }
@@ -43,9 +44,10 @@
   <title>Login</title>
 </svelte:head>
 
-<section class="bg-mainRed">
+<section class="bg-mainRed flex-1 flex flex-col">
+  <Navbar />
   <div
-    class="flex flex-col items-center justify-center px-6 md:py-8 mx-auto h-screen lg:py-0"
+    class="flex flex-col items-center justify-center px-6 md:py-8 mx-auto lg:py-0 flex-1 w-full"
   >
     <div
       class="w-full bg-matteBlack rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0"

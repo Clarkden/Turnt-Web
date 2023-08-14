@@ -34,6 +34,7 @@
   import Footer from "../../components/Footer.svelte";
   import type { PageData } from "./$types";
   import { getIdToken } from "firebase/auth";
+  import Navbar from "../../components/Navbar.svelte";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -441,9 +442,11 @@
   </div>
 {/if}
 
+<container class="flex flex-1 w-full flex-col">
+  <Navbar />
 {#if party.id}
   <div
-    class="w-full h-fit md:h-full flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
+    class="w-full flex-1 flex flex-col md:flex-row bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl gap-10 p-5 md:p-10 pb-20 md:pb-40"
   >
     <div
       class="w-full h-fit md:min-w-[45%] md:w-[45%] bg-neutral-900 rounded-md overflow-hidden"
@@ -725,3 +728,4 @@
 {/if}
 
 <Footer />
+</container>

@@ -3,6 +3,7 @@
   import MainDash from "../assets/images/MainDash.png";
   import Footer from "../components/Footer.svelte";
   import OgImage from "../assets/images/OgImage.png";
+  import Navbar from "../components/Navbar.svelte";
 </script>
 
 <svelte:head>
@@ -49,11 +50,18 @@
   />
   <meta property="twitter:image" content={OgImage} />
   <!-- Replace with your image URL -->
+
 </svelte:head>
 
 <div
-  class="h-full w-full bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl overflow-hidden relative"
+  class="bg-gradient-to-b from-mainRed to-purple-400 backdrop-blur-2xl relative flex-1 h-fit"
+  on:scroll={() => {
+    // scrollY.set(window.scrollY);
+    console.log(window.scrollY);
+  }}
 >
+  <Navbar />
+
   <section
     class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 md:h-[100vh] h-fit mt-20 mb-40 md:my-0 md:mt-0 md:mb-0 relative px-5 lg:px-40"
   >
