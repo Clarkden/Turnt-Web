@@ -465,10 +465,10 @@
         </div>
       </div>
       <div
-        class="w-full md:min-w-[50%] p-2 md:p-5 flex flex-col gap-4 bg-matteBlack text-white h-fit rounded-md md:sticky md:top-20"
+        class="w-full md:min-w-[50%] md:px-5 flex flex-col gap-4  text-white h-fit rounded-md md:sticky md:top-20"
       >
         <div
-          class="flex flex-col gap-2 bg-neutral-900 rounded-md p-3 relative overflow-hidden"
+          class="flex flex-col gap-2 bg-matteBlack rounded-md p-3 relative overflow-hidden"
         >
           <!-- <h1 class="text-3xl font-bold mb-3">Party Info</h1> -->
 
@@ -504,7 +504,7 @@
           {/if}
         </div>
 
-        <div class="flex flex-col gap-2 bg-neutral-900 p-3 rounded-md">
+        <div class="flex flex-col gap-2 bg-matteBlack p-3 rounded-md">
           <h1 class="text-3xl font-bold mb-3">Overview</h1>
           <p class="text-lg">{@html party.description}</p>
         </div>
@@ -638,7 +638,7 @@
             <div>
               <a href={party.externalEventLink} target="_blank">
                 <button
-                  class="py-2 px-4 bg-violet-500 hover:bg-violet-400 text-white rounded-md"
+                  class="py-2 px-4 bg-white text-black rounded-md"
                 >
                   Visit Party Page
                 </button>

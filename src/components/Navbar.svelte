@@ -79,7 +79,7 @@
   <div class="flex flex-row justify-between w-full px-4">
     <a
       href="/"
-      class="h-full flex flex-col items-center justify-center font-extrabold text-2xl"
+      class="h-full flex flex-col items-center justify-center font-extrabold text-2xl drop-shadow-md"
       >Turnt</a
     >
 
