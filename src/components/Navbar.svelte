@@ -131,7 +131,7 @@
           <li>
             <a
               href="/register"
-              class="font-medium text-black hover:text-gray-500">Register</a
+              class="font-medium text-white hover:text-gray-500">Register</a
             >
           </li>
         {/if}
