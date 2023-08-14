@@ -337,7 +337,7 @@
   {#if loading === "loaded"}
     {#if parties.length > 0}
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto z-50"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-x-10 md:gap-y-6 p-4 md:w-[80%] md:mx-auto z-20"
       >
         {#each parties as party (party.id)}
           <a
