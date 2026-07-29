@@ -14,6 +14,7 @@
   import { auth, db } from "$lib/firebase";
   import { goto } from "$app/navigation";
   import { getIdToken } from "firebase/auth";
+  import { capture } from "$lib/posthog";
 
   let sessionId: any = $page.url.searchParams.get("session_id");
   let paymentIntentId: any;
@@ -42,6 +43,11 @@
       );
 
       if (paymentIntent) {
+        capture("ticket_checkout_completed", {
+          party_id: paymentIntent.data?.metadata?.partyId,
+          payment_intent_id: paymentIntentId,
+        });
+
         const party = await getDoc(
           doc(db, "parties", paymentIntent.data.metadata.partyId)
         );
@@ -50,7 +56,14 @@
       } else {
         goto("/find");
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Confirming the completed purchase failed — previously invisible
+      // (console.log only), so a buyer who paid but hit an error here left no
+      // trace in analytics.
+      capture("ticket_confirmation_failed", {
+        session_id: sessionId,
+        error: error?.response?.data?.message || error?.message || String(error),
+      });
       console.log(error);
     }
   };

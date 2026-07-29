@@ -44,6 +44,7 @@
 		"firebase-admin": "^11.10.1",
 		"html5-qrcode": "^2.3.8",
 		"luxon": "^3.3.0",
+		"posthog-js": "^1.407.5",
 		"puppeteer-core": "^20.8.2",
 		"stripe": "^12.10.0",
 		"svelte-inview": "^4.0.0",

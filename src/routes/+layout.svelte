@@ -1,5 +1,11 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { scrollY } from "$lib/stores/scrollStore";
+  import { initPostHog } from "$lib/posthog";
+
+  onMount(() => {
+    initPostHog();
+  });
 </script>
 
 <body

@@ -35,6 +35,7 @@
   import type { PageData } from "./$types";
   import { getIdToken } from "firebase/auth";
   import Navbar from "../../components/Navbar.svelte";
+  import { capture } from "$lib/posthog";
 
   let onParticlesLoaded = (event: any) => {
     const particlesContainer = event.detail.particles;
@@ -65,6 +66,42 @@
   let instagram: string = "";
   let guestListPhone: string = "";
 
+  // --- Analytics: ticket/checkout funnel instrumentation ---
+  // Guards so events driven by reactive statements / the Firestore snapshot
+  // listener fire once per page load rather than on every re-render.
+  let eventPageViewedCaptured = false;
+  let soldOutTiersCaptured = false;
+
+  const ticketProps = (ticket: any) => ({
+    party_id: party?.id,
+    party_name: party?.name,
+    ticket_name: ticket?.name,
+    ticket_price: ticket?.price,
+    ticket_gender: ticket?.gender || null,
+  });
+
+  const isTicketSoldOut = (ticket: any) =>
+    Boolean(ticket?.quantityLimit) && parseInt(ticket?.quantity) <= 0;
+
+  const openPhoneGate = (ticket: any) => {
+    selectedTicket = ticket;
+    phonenumberModal = true;
+    // The phone-number gate is the sign-in step sprung on the buyer once they
+    // pick a tier — this is where drop-off is suspected.
+    capture("ticket_phone_gate_opened", ticketProps(ticket));
+  };
+
+  const closePhoneGate = () => {
+    // Fires only for explicit dismissals (X / backdrop). A successful checkout
+    // navigates away via goto() before this runs.
+    capture("ticket_phone_gate_dismissed", {
+      ...ticketProps(selectedTicket),
+      had_valid_phone: validPhoneNumber,
+    });
+    phonenumberModal = false;
+    selectedTicket = null;
+  };
+
   const getHostStripeAccountId = async () => {
     const hostStripe = await getDoc(
       doc(db, "stripe-accounts", party.hostAccountId)
@@ -81,6 +118,38 @@
         if (!doc.exists()) goto("/find");
 
         party = { id: doc.id, ...doc.data() };
+
+        if (!eventPageViewedCaptured && party.id) {
+          eventPageViewedCaptured = true;
+          capture("event_page_viewed", {
+            party_id: party.id,
+            party_name: party.name,
+            paid_party: Boolean(party.paidParty),
+            external_event: Boolean(party.externalEvent),
+          });
+        }
+
+        // Report which tiers render as sold out, so we can see how often a
+        // buyer lands on an unbuyable tier.
+        if (
+          !soldOutTiersCaptured &&
+          party.tickets &&
+          party.paidParty &&
+          !party.externalEvent
+        ) {
+          try {
+            const tiers = JSON.parse(party.tickets);
+            const soldOut = tiers.filter(isTicketSoldOut);
+            if (soldOut.length) {
+              soldOutTiersCaptured = true;
+              soldOut.forEach((ticket: any) =>
+                capture("ticket_tier_sold_out_shown", ticketProps(ticket))
+              );
+            }
+          } catch (error) {
+            console.warn("failed to parse tickets for analytics", error);
+          }
+        }
       }
     );
 
@@ -178,6 +247,8 @@
   const purchaseTicket = async () => {
     if (!phoneNumber) return;
 
+    capture("ticket_checkout_started", ticketProps(selectedTicket));
+
     try {
       let checkoutSession = await axios.post(
         "/api/createCheckoutSession",
@@ -193,8 +264,15 @@
           },
         }
       );
+      capture("ticket_checkout_redirected", ticketProps(selectedTicket));
       goto(checkoutSession.data.url);
-    } catch (error) {
+    } catch (error: any) {
+      // Previously this failure was silently swallowed (console.log only), so
+      // Stripe/session-creation errors were invisible in analytics.
+      capture("ticket_checkout_failed", {
+        ...ticketProps(selectedTicket),
+        error: error?.response?.data?.message || error?.message || String(error),
+      });
       console.log(error);
     }
   };
@@ -241,11 +319,21 @@
     return parseFloat(price).toFixed(2);
   }
 
+  let checkoutCanceledCaptured = false;
   $: if ($page.url.searchParams.get("status")) {
-    if ($page.url.searchParams.get("status") === "success") {
+    const status = $page.url.searchParams.get("status");
+    if (status === "success") {
       message = "Your ticket has been purchased successfully!";
-    } else if ($page.url.searchParams.get("status") === "canceled") {
+    } else if (status === "canceled") {
       message = "Your ticket purchase has been canceled.";
+      // Stripe redirects a canceled checkout back here with ?status=canceled;
+      // completion instead lands on /order/sucess (captured there).
+      if (!checkoutCanceledCaptured) {
+        checkoutCanceledCaptured = true;
+        capture("ticket_checkout_canceled", {
+          party_id: $page.params.id,
+        });
+      }
     }
   }
 
@@ -388,16 +476,13 @@
   >
     <div class="w-full md:w-[500px] bg-white rounded-md p-5">
       <IconX
-        on:click={() => {
-          phonenumberModal = false;
-          selectedTicket = null;
-        }}
+        on:click={() => closePhoneGate()}
         class="w-6 h-6 absolute top-2 right-2 text-white"
       />
       <div
         class="flex flex-col gap-2"
         use:clickOutside
-        on:click_outside={() => (phonenumberModal = false)}
+        on:click_outside={() => closePhoneGate()}
       >
         <div>
           <h1 class="text-2xl font-bold">Enter your phone number</h1>
@@ -547,10 +632,7 @@
                         </button>
                       {:else}
                         <button
-                          on:click={() => {
-                            selectedTicket = ticket;
-                            phonenumberModal = true;
-                          }}
+                          on:click={() => openPhoneGate(ticket)}
                           class="py-2 px-4 bg-mainRed hover:bg-red-400 text-white rounded-md"
                         >
                           Buy
@@ -619,10 +701,7 @@
                       </button>
                     {:else}
                       <button
-                        on:click={() => {
-                          selectedTicket = ticket;
-                          phonenumberModal = true;
-                        }}
+                        on:click={() => openPhoneGate(ticket)}
                         class="py-2 px-4 bg-mainRed hover:bg-red-400 text-white rounded-md"
                       >
                         Buy
